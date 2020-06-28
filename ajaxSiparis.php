@@ -22,13 +22,11 @@ $sepetkurcek->execute(array("pbid"=>$birid));
 $sckid=$sepetkurcek->fetch();
 $kid=$sckid["kurumsal_id"];
 
-
-
-//SİPARİŞ VER BASILDIKTAN SONRA MİNİMUM TUTAR KONTORLÜ İÇİN Bilgi 
-           $url1 = "https://api.omurserdar.com/api/kurumsal/index.php?id=$kid";
-           $json1 = file_get_contents($url1);
-           $jsonverilerim1 = json_decode($json1, true);   
-           $kurumsalminalim=$jsonverilerim1["kurumsalbilgileri"]["minAlimTutar"];
+//SİPARİŞ VER BASILDIKTAN SONRA MİNİMUM TUTAR KONTORLÜ İÇİN Bilgi
+$url1 = "https://api.omurserdar.com/api/kurumsal/index.php?id=$kid";
+$json1 = file_get_contents($url1);
+$jsonverilerim1 = json_decode($json1, true);
+$kurumsalminalim=$jsonverilerim1["kurumsalbilgileri"]["minAlimTutar"];
            
 //siparisDetay tablosuna çoklu ekleme yapılacak
 while($sepetcek=$sepetsor->fetch(PDO::FETCH_ASSOC)){
@@ -46,15 +44,13 @@ array_push($eklenceklerDizi,$eklencek);
     }
         /*
         $kiddizi=array();
-        foreach($_SESSION["sepet"] as $k=>$v){
+        foreach($_SESSION["sepet"] as $k=>$v)
             array_push($kiddizi,$v["k_id"]);
-        }
         */
         
 if($_POST["toplamtutar"]>=$kurumsalminalim){
     $db->beginTransaction();
-    
-    
+
     if(pdoMultiInsert('siparisDetay', $eklenceklerDizi, $db)){
         $durum="eklendi";
          //siparisDetay a her bir env eklendi
@@ -93,4 +89,3 @@ echo json_encode($dizim);
 else{
     exit;
 }
-//if($btn=="btnSiparisVer"){}

@@ -1,28 +1,25 @@
 <?php
 session_start();
 include "db.php";
-$btn=$_POST['secim'];
+$btn=strip_tags($_POST['secim']);
 
 if($_SESSION["kullanici_tip"]!="bireysel"){
-    echo "yasak";
+    echo "yetkiniz yok"; //yetki hata sayfasına yönlendirilebilir
     exit;
 }
 
 $birid=$_SESSION['kullanici_id'];
 
 if($btn=="btnsepetEkle"){ 
-      
-        //sepette giriş yapan kullanıcıya ait en az bir ürün varsa
-        if(isset($_POST["id"])&& !empty($_POST["id"])){
-            $id=$_POST["id"];   
-        }
-        else{
-            echo "envyok";
-            exit;
-        }
-        
-        
-        //sepetteki tüm k_id leri cek
+    //sepette giriş yapan kullanıcıya ait en az bir ürün varsa
+    if(isset($_POST["id"])&& !empty($_POST["id"])){
+        $id=strip_tags($_POST["id"]);
+    }
+    else{
+        echo "envyok";
+        exit;
+    }
+    //sepetteki tüm k_id leri cek
         $sepetsor=$db->prepare("select * from sepet where bireysel_id=:pbid");
         $sepetsor->execute(array('pbid'=>$birid));
         //envanter bilgilerini al
@@ -31,8 +28,7 @@ if($btn=="btnsepetEkle"){
         $jsonverilerim = json_decode($json, true);   
         $kume=$jsonverilerim["envanterBilgi"];
         //envanter bilgi al son
-        
-        
+
         if($sepetsor->rowCount()>0){
            $kiddizi=array(); //kullanıcının sepetindeki kurumsal_id ici
            while($sepetcek=$sepetsor->fetch(PDO::FETCH_ASSOC)){
@@ -59,7 +55,7 @@ if($btn=="btnsepetEkle"){
     	  elseif($envsayi==0&&in_array($kume["kurumsal_id"],$kiddizi)==true){ //aynı env yoksa dogrudan ekle
     	      $sepetenvekle=$db->prepare("INSERT INTO sepet set bireysel_id=:pbid,kurumsal_id=:pkid,envanter_id=:penvid");
               $sepetenvekle->execute(array('pbid'=>$birid,'pkid' => $kume["kurumsal_id"],"penvid" => $id));
-                if($sepetenvekle->rowCount()==1);
+                if($sepetenvekle->rowCount()==1)
                     echo "eklendi";
                  exit;
     	  }
@@ -82,8 +78,7 @@ if($btn=="btnsepetEkle"){
 elseif($btn=="btnSepetEnvKaldir"){
     $kaldircevap=array();
     $kaldirilacakEnvId=$_POST["envid"];
-    
-        
+
     $sepetsor=$db->prepare("select * from sepet where bireysel_id=:pbid");
     $sepetsor->execute(array('pbid'=>$birid));
     $sepetenvsayisi=$sepetsor->rowCount();
@@ -118,15 +113,6 @@ elseif($btn=="btnSepetEnvKaldir"){
 
 if(isset($_GET["secim"]) && $_GET["secim"]=="btnSepetim"){
     try{
-        
-	//$kullanicisor=$db->prepare("SELECT * FROM bireysel where email=:mail");
-	//$kullanicisor->execute(array('mail' => $_SESSION['kullanici_mail']));
-	
-// $kurumsalSor=$db->prepare("SELECT * FROM kurumsal where id=:id");
-// $kurumsalSor->execute(array('id' => $kume["id"]));
-// $cek=$kurumsalSor->fetch(PDO::FETCH_ASSOC);
-
-	 //$say=$kullanicisor->rowCount();
     if(isset($_SESSION["kullanici_tip"])&&$_SESSION["kullanici_tip"]=="bireysel"){
 	   $top=0;$k_min=0;
 	$sepetsor=$db->prepare("select * from sepet where bireysel_id=:pbid");
@@ -202,8 +188,7 @@ $dizim["minalim"]=$k_min;
 echo json_encode($dizim);
 	    }
       }
-      
-    
+
       catch (Exception $e){
 $dizim=array();
 $dizim["cevap"]=$e->getMessage();
