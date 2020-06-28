@@ -54,6 +54,7 @@ function SetHeader($kod){
     header("Content-Type: application/json; charset=utf-8;");
 }
 
+//session yoksa çık
 function sesYoksaCik($param,$deger){
     session_start();
     if(!isset($_SESSION[$param])||$_SESSION[$param]!=$deger||empty($_SESSION[$param])){

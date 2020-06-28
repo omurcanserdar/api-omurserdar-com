@@ -80,6 +80,10 @@
   </div>
 </div>
 <?php } ?>
+        <li class="nav-item">
+            <a class="nav-link" style="color:white" target="_blank" href="https://github.com/omurserdarr"><i class="fab fa-github"></i> omurserdarr</a>
+        </li>
+
 
 
     </ul>
