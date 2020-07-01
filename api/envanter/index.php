@@ -6,24 +6,9 @@ include "../../fonksiyonlar.php";
 //sesYoksaCik("kullanici_tip","kurumsal");
 //eger burada kalsaydı GET işlemini yapamazdım o yüzden örnek olarak delete requestinde kullandım
 
-
 $jsonArray = array(); 
 $jsonArray["hata"] = FALSE; 
 
-
- 
-function ara($arrays, $key, $search) {
-   $count = 0;
-   foreach($arrays as $object) {
-       if(is_object($object)) {
-          $object = get_object_vars($object);
-       }
-       if(array_key_exists($key, $object) && $object[$key] == $search) $count++;
-   }
-   return $count;
-}
- 
- 
 $httpKOD = 200; 
 $istekMOD = $_SERVER["REQUEST_METHOD"];
 //print_r(json_decode(file_get_contents("php://input"), true));
