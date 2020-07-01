@@ -32,10 +32,10 @@
     <script src="https://getbootstrap.com/docs/4.4/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" type="text/javascript"></script> <!-- fa js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script> <!-- confirm -->
-    <script type="text/javascript" src="/jsfonksiyonlar.js"></script> 
+    <script type="text/javascript" src="/js/jsfonksiyonlar.js"></script> 
    
-  <script type="text/javascript" src="/qr1.js"></script>
-  <script type="text/javascript" src="/qr2.js"></script>
+  <script type="text/javascript" src="/js/qr1.js"></script>
+  <script type="text/javascript" src="/js/qr2.js"></script>
     <!-- js fonksiyonlar -->
    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>  axios --> 
    
