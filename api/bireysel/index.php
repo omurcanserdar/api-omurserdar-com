@@ -12,7 +12,7 @@ if($istekMOD=="POST"){
    
     //kullanici adi veya email kayıtlarda varsa kullaniciVar mesajı dönsün ve işlem yapılsın
     $sorgu=$db->prepare("SELECT COUNT(id) as varmi FROM bireysel where email=:pmail or kullaniciadi=:pkul");
-    $sorgu->execute(array("pmail" => $_POST["email"],"pkul" => $_POST["kullaniciadi"]));
+    $sorgu->execute(array("pmail" => strip_tags($_POST["email"]),"pkul" => $_POST["kullaniciadi"]));
     $cek=$sorgu->fetch(PDO::FETCH_ASSOC);
     //kullanici db de yoksa
     if($cek["varmi"]==0){
