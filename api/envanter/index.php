@@ -16,9 +16,9 @@ $istekMOD = $_SERVER["REQUEST_METHOD"];
 
 if($istekMOD=="POST") {
  $envekle=$db->prepare("INSERT INTO envanter set kurumsal_id=:pkid,tabMenu_id=:ptid,ad=:pad,tanim=:ptanim,fiyat=:pfiyat");
- $envekle->execute(array('pkid' => $_POST["kid"],"ptid" => $_POST["tid"],
- "pad" => $_POST["ad"],"ptanim" => $_POST["tanim"],
- "pfiyat" => $_POST["fiyat"]));
+ $envekle->execute(array('pkid' => strip_tags($_POST["kid"]),"ptid" => strip_tags($_POST["tid"]),
+ "pad" => strip_tags($_POST["ad"]),"ptanim" => strip_tags($_POST["tanim"]),
+ "pfiyat" => strip_tags($_POST["fiyat"])));
  $envsay=$envekle->rowCount();
  //print_r($birekle->errorInfo());
 		 if($envsay==1){
@@ -39,7 +39,7 @@ else if($istekMOD=="PUT") {
     
     sesYoksaCik("kullanici_tip","kurumsal");
     
-     $gelenler=json_decode(file_get_contents("php://input"));
+     $gelenler=json_decode(strip_tags(file_get_contents("php://input")));
      if(isset($gelenler->id)&&!empty($gelenler->id)&&!isset($gelenler->topguncid)){
         if($db->query("select * from envanter where id='$gelenler->id'")->rowCount()==0){
              $httpKOD = 400;
@@ -72,7 +72,6 @@ else if($istekMOD=="PUT") {
         	}               
          *///son aynı envid sepette varsa
                      
-                     
                  $httpKOD = 200;
                  $jsonArray["mesaj"] = "güncellendi";
                  }
@@ -85,17 +84,15 @@ else if($istekMOD=="PUT") {
              }
  }
  else if(isset($gelenler->topguncid)&&!empty($gelenler->topguncid)&&!isset($gelenler->id)){
-     
-    
+	 
      if($gelenler->secim=="alinabiliryap")
         $neolacak=1;
         else
         $neolacak=0;
      
-     
      $db->beginTransaction();
     if (!is_array($gelenler->topguncid))
-        $gelenler->topguncid = array($gelenler->topguncid); // if it is just one id not in an array, put it in an array so the rest of the code work for all cases
+        $gelenler->topguncid = array($gelenler->topguncid);
    
    $envanterler=implode(',', $gelenler->topguncid);
    $guncsorgu=$db->prepare("UPDATE envanter SET alinabilirMi=$neolacak WHERE id IN ($envanterler)");
@@ -119,8 +116,8 @@ sesYoksaCik("kullanici_tip","kurumsal");
        // parse_str(file_get_contents("php://input"),$veriler);
        // $bid=$veriler["id"];
        
-    if(isset($_GET["id"]) && !empty(trim($_GET["id"])) &&!isset($_GET["silid"])){
-        $id=$_GET["id"];
+    if(isset(strip_tags($_GET["id"])) && !empty(trim(strip_tags($_GET["id"]))) &&!isset(strip_tags($_GET["silid"]))){
+        $id=strip_tags($_GET["id"]);
  $envVarMi = $db->query("select * from envanter where id=$id");
  if($envVarMi->rowCount()==1){
   $envsil = $db->query("delete from envanter where id=$id");
@@ -139,12 +136,12 @@ sesYoksaCik("kullanici_tip","kurumsal");
      $jsonArray["hataMesaj"] = "kayıt bulunamadı";
      }
  }
-elseif(!isset($_GET["id"])&&isset($_GET["silid"])&&!empty($_GET["silid"])){
+elseif(!isset(strip_tags($_GET["id"]))&&isset(strip_tags($_GET["silid"]))&&!empty(strip_tags($_GET["silid"]))){
 $db->beginTransaction();
-    if (!is_array($_GET["silid"]))
-        $_GET["silid"] = array($_GET["silid"]); // if it is just one id not in an array, put it in an array so the rest of the code work for all cases
+    if (!is_array(strip_tags($_GET["silid"])))
+        strip_tags($_GET["silid"]) = array(strip_tags($_GET["silid"])); // if it is just one id not in an array, put it in an array so the rest of the code work for all cases
    
-   $envanterler=implode(',', $_GET["silid"]);
+   $envanterler=implode(',', strip_tags($_GET["silid"]));
    $silsorgu=$db->prepare("DELETE FROM envanter WHERE id IN ($envanterler)");
    $sonuc=$silsorgu->execute();
    if($sonuc){
@@ -165,18 +162,18 @@ else{
  }
 }
 
-
 else if($istekMOD=="GET"){
     // parse_str(file_get_contents("php://input"),$veriler);
-       $eid=$_GET["id"];
-    if(isset($eid) && !empty(trim($eid))){
+       
+    if(isset(strip_tags($_GET["id"])) && !empty(trim(strip_tags($_GET["id"])))){
+	    $eid=strip_tags($_GET["id"]);
          $enVarMi = $db->query("select * from envanter where id='$eid'");
          if($enVarMi->rowCount()>0){
              $jsonArray["envanterBilgi"]=$enVarMi->fetch(PDO::FETCH_ASSOC);
              
            $tabid=$jsonArray["envanterBilgi"]["tabMenu_id"];
              
-           $url = "http://api.omurserdar.com/api/tabmenu/index.php?id=$tabid";
+           $url = "https://api.omurserdar.com/api/tabmenu/index.php?id=$tabid";
            $json = file_get_contents($url);
            $jsonverilerim = json_decode($json, true);   
            $menuAd=$jsonverilerim["tabMenuBilgi"]["ad"];
@@ -197,18 +194,8 @@ else if($istekMOD=="GET"){
  }
 }
 
-
-
-
-
 SetHeader($httpKOD);
 $jsonArray[$httpKOD] = HttpStatus($httpKOD);
 echo json_encode($jsonArray);
-
-
-
-
-
-
 
 ?>
