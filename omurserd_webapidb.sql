@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: localhost:3306
--- Üretim Zamanı: 25 Haz 2020, 14:43:16
+-- Üretim Zamanı: 10 Tem 2020, 14:07:01
 -- Sunucu sürümü: 10.3.23-MariaDB
 -- PHP Sürümü: 7.3.6
 
@@ -21,6 +21,26 @@ SET time_zone = "+00:00";
 --
 -- Veritabanı: `omurserd_webapidb`
 --
+CREATE DATABASE IF NOT EXISTS `omurserd_webapidb` DEFAULT CHARACTER SET utf8 COLLATE utf8_turkish_ci;
+USE `omurserd_webapidb`;
+
+DELIMITER $$
+--
+-- Yordamlar
+--
+DROP PROCEDURE IF EXISTS `sp_kurumsalTabMenuOrtMinMax`$$
+CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_kurumsalTabMenuOrtMinMax` (`k_id` INT)  BEGIN
+    SELECT tabMenu.ad,COUNT(envanter.id) as ENVANTERSAYISI, ROUND(AVG(fiyat),2) as ORTALAMAFIYAT,MIN(fiyat) AS ENDUSUKFIYAT, MAX(fiyat) as ENYUKSEKFIYAT 
+    FROM envanter,tabMenu,kurumsal
+    WHERE envanter.tabMenu_id=tabMenu.id
+    AND tabMenu.kurumsal_id=kurumsal.id
+    AND envanter.kurumsal_id=kurumsal.id
+    AND kurumsal.id=k_id
+    GROUP BY tabMenu.ad
+    ORDER BY ENVANTERSAYISI DESC;
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -28,10 +48,11 @@ SET time_zone = "+00:00";
 -- Tablo için tablo yapısı `bireysel`
 --
 
+DROP TABLE IF EXISTS `bireysel`;
 CREATE TABLE `bireysel` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `il_id` int(10) UNSIGNED NOT NULL,
-  `ilce_id` int(10) UNSIGNED NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
+  `il_id` tinyint(2) UNSIGNED NOT NULL,
+  `ilce_id` smallint(5) UNSIGNED NOT NULL,
   `ad` varchar(120) COLLATE utf8_turkish_ci NOT NULL,
   `soyad` varchar(120) COLLATE utf8_turkish_ci NOT NULL,
   `kullaniciadi` varchar(40) COLLATE utf8_turkish_ci DEFAULT NULL,
@@ -60,16 +81,15 @@ INSERT INTO `bireysel` (`id`, `il_id`, `ilce_id`, `ad`, `soyad`, `kullaniciadi`,
 -- Tablo için tablo yapısı `degerlendirme`
 --
 
+DROP TABLE IF EXISTS `degerlendirme`;
 CREATE TABLE `degerlendirme` (
   `id` int(11) NOT NULL,
-  `bireysel_id` int(11) NOT NULL,
-  `kurumsal_id` int(11) NOT NULL,
-  `siparisKod` int(11) NOT NULL,
-  `hiz` int(11) NOT NULL,
-  `lezzet` int(11) NOT NULL,
-  `servis` int(11) NOT NULL,
+  `siparisKod` varchar(14) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL,
+  `hiz` tinyint(2) UNSIGNED NOT NULL,
+  `lezzet` tinyint(2) UNSIGNED NOT NULL,
+  `servis` tinyint(2) UNSIGNED NOT NULL,
   `yorum` varchar(120) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -77,15 +97,16 @@ CREATE TABLE `degerlendirme` (
 -- Tablo için tablo yapısı `envanter`
 --
 
+DROP TABLE IF EXISTS `envanter`;
 CREATE TABLE `envanter` (
   `id` int(11) NOT NULL,
   `kurumsal_id` int(11) NOT NULL,
   `tabMenu_id` int(11) NOT NULL,
-  `ad` varchar(120) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL,
-  `tanim` varchar(150) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL,
+  `ad` varchar(120) COLLATE utf8_turkish_ci NOT NULL,
+  `tanim` varchar(150) COLLATE utf8_turkish_ci DEFAULT NULL,
   `fiyat` float NOT NULL,
   `alinabilirMi` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
 -- Tablo döküm verisi `envanter`
@@ -102,84 +123,84 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1559, 1, 1, 'Doyuran Et Menü', ' Pide Ekmek Arası Et Döner + Patates Kızartması + Kutu İçecek\r', 25, 1),
 (1560, 1, 1, 'Kaşarlı Et Dürüm Menü', ' Kaşarlı Et Döner Dürüm + Patates Kızartması + Kutu İçecek\r', 28, 1),
 (1561, 1, 2, 'Kahvaltı Tabağı', ' Beyaz peynir, burgu peynir, bal, tereyağı, zeytin, yumurta, kaşar peyniri, Koska Çikos, Karper peyniri, domates, salatalık, kayısı, patates kızartmas', 17.5, 1),
-(1562, 1, 2, 'Domatesli Kaşarlı Omlet', ' ', 14, 1),
-(1563, 1, 2, 'Sucuklu Yumurta', ' ', 15, 1),
-(1564, 1, 2, 'Menemen', ' ', 15, 1),
-(1565, 1, 2, 'Kavurmalı Kaşarlı Yumurta', '', 19, 1),
-(1566, 1, 2, 'Beyaz Peynirli Omlet', ' ', 13, 1),
-(1567, 1, 3, 'Tereyağlı Süzme Mercimek Çorbası', '', 8, 1),
-(1568, 1, 4, 'Beyaz Peynirli Tost', ' ', 8, 1),
-(1569, 1, 4, 'Kaşarlı Tost', '', 8, 1),
-(1570, 1, 4, 'Çift Kaşarlı Tost', '', 10, 1),
-(1571, 1, 4, 'Salamlı Tost', ' ', 8.5, 1),
-(1572, 1, 4, 'Sucuklu Tost', '', 11, 1),
-(1573, 1, 4, 'Salamlı Kaşarlı Tost', '', 10.5, 1),
-(1574, 1, 4, 'Sucuklu Kaşarlı Tost', '', 13, 1),
-(1575, 1, 4, 'Dilli Tost', '', 16, 1),
-(1576, 1, 4, 'Kavurmalı Tost', '', 15, 1),
-(1577, 1, 4, 'Dilli Kaşarlı Tost', '', 16, 1),
-(1578, 1, 4, 'Kavurmalı Kaşarlı Tost', ' Tanımlanmadı ', 17, 1),
-(1579, 1, 5, 'Ayvalık Ekmeğine Kaşarlı Tost', '', 12.1, 1),
-(1580, 1, 5, 'Ayvalık Tostu', ' Amerikan salatası, kaşar peyniri, sucuk, salam, sosis, domates, turşu\r', 16, 0),
-(1581, 1, 6, 'Yarım Ekmek Arası Beyaz Peynirli Tost', ' ', 11, 1),
-(1582, 1, 6, 'Yarım Ekmek Arası Kaşarlı Tost', ' ', 11, 1),
+(1562, 1, 2, 'Domatesli Kaşarlı Omlet', NULL, 14, 1),
+(1563, 1, 2, 'Sucuklu Yumurta', NULL, 15, 1),
+(1564, 1, 2, 'Menemen', NULL, 15, 1),
+(1565, 1, 2, 'Kavurmalı Kaşarlı Yumurta', NULL, 19, 1),
+(1566, 1, 2, 'Beyaz Peynirli Omlet', NULL, 13, 1),
+(1567, 1, 3, 'Tereyağlı Süzme Mercimek Çorbası', NULL, 8, 1),
+(1568, 1, 4, 'Beyaz Peynirli Tost', NULL, 8, 1),
+(1569, 1, 4, 'Kaşarlı Tost', NULL, 8, 1),
+(1570, 1, 4, 'Çift Kaşarlı Tost', NULL, 10, 1),
+(1571, 1, 4, 'Salamlı Tost', NULL, 8.5, 1),
+(1572, 1, 4, 'Sucuklu Tost', NULL, 11, 1),
+(1573, 1, 4, 'Salamlı Kaşarlı Tost', NULL, 10.5, 1),
+(1574, 1, 4, 'Sucuklu Kaşarlı Tost', NULL, 13, 1),
+(1575, 1, 4, 'Dilli Tost', NULL, 16, 1),
+(1576, 1, 4, 'Kavurmalı Tost', NULL, 15, 1),
+(1577, 1, 4, 'Dilli Kaşarlı Tost', NULL, 16, 1),
+(1578, 1, 4, 'Kavurmalı Kaşarlı Tost', NULL, 17, 1),
+(1579, 1, 5, 'Ayvalık Ekmeğine Kaşarlı Tost', NULL, 12.1, 1),
+(1580, 1, 5, 'Ayvalık Tostu', ' Amerikan salatası, kaşar peyniri, sucuk, salam, sosis, domates, turşu\r', 16, 1),
+(1581, 1, 6, 'Yarım Ekmek Arası Beyaz Peynirli Tost', NULL, 11, 1),
+(1582, 1, 6, 'Yarım Ekmek Arası Kaşarlı Tost', NULL, 11, 1),
 (1583, 1, 6, 'Yarım Ekmek Arası Karışık Tost', ' Sucuk, kaşar peyniri\r', 19, 1),
-(1584, 1, 7, '3/4 Ekmek Arası Et Döner (100 gr.)', ' Tanımlanmadı ', 27, 1),
+(1584, 1, 7, '3/4 Ekmek Arası Et Döner (100 gr.)', NULL, 27, 1),
 (1585, 1, 7, 'Tosto Et Döner (60 gr.)', ' Ayvalık ekmeğine et döner, kaşar peyniri, turşu, patates, domates', 15.1, 1),
-(1586, 1, 7, 'Bütün Ekmek Arası Et Döner (100 gr.)', ' ', 28, 1),
-(1587, 1, 7, 'Et Döner (100 gr.)', ' ', 27, 1),
-(1588, 1, 7, 'Et Döner (150 gr.)', ' ', 38, 1),
-(1589, 1, 7, 'Et Döner Dürüm (100 gr.)', ' Tanımlanmadı ', 26, 1),
-(1590, 1, 7, 'Et Döner Dürüm (60 gr.)', ' Tanımlanmadı ', 17, 1),
-(1591, 1, 7, 'İskender (Et Dönerden) (100 gr.)', ' Tanımlanmadı ', 33, 1),
-(1592, 1, 7, 'İskender (Et Dönerden) (150 gr.)', ' ', 43, 1),
-(1593, 1, 7, 'Kaşarlı Et Döner Dürüm (100 gr.)', ' Tanımlanmadı ', 29, 1),
-(1594, 1, 7, 'Kaşarlı Et Döner Dürüm (60 gr.)', ' ', 20, 1),
-(1595, 1, 7, 'Pide Arası Et Döner (100 gr.)', ' Tanımlanmadı ', 26, 1),
-(1596, 1, 7, 'Pide Arası Et Döner (60 gr.)', ' ', 17, 1),
-(1597, 1, 7, 'Pide Arası Kaşarlı Et Döner (60 gr.)', ' Tanımlanmadı ', 20, 1),
-(1598, 1, 7, 'Pilav Üstü Et Döner (100 gr.)', ' ', 30, 1),
-(1599, 1, 7, 'Pilav Üstü Et Döner (150 gr.)', ' ', 41, 1),
-(1600, 1, 7, 'Sandviç Ekmek Arası Et Döner (100 gr.)', ' ', 24.5, 1),
-(1601, 1, 7, 'Sandviç Ekmek Arası Et Döner (60 gr.)', ' ', 17, 1),
-(1602, 1, 7, 'Yarım Ekmek Arası Et Döner (100 gr.)', ' ', 26, 0),
-(1603, 1, 7, 'Yarım Ekmek Arası Et Döner (60 gr.)', ' Tanımlanmadı ', 17, 1),
-(1604, 1, 7, 'Yarım Ekmek Arası Kaşarlı Et Döner (60 gr.)', ' Tanımlanmadı ', 20, 1),
-(1605, 1, 8, '3/4 Ekmek Arası Tavuk Döner (100 gr.)', ' ', 17, 0),
+(1586, 1, 7, 'Bütün Ekmek Arası Et Döner (100 gr.)', NULL, 28, 1),
+(1587, 1, 7, 'Et Döner (100 gr.)', NULL, 27, 1),
+(1588, 1, 7, 'Et Döner (150 gr.)', NULL, 38, 1),
+(1589, 1, 7, 'Et Döner Dürüm (100 gr.)', NULL, 26, 1),
+(1590, 1, 7, 'Et Döner Dürüm (60 gr.)', NULL, 17, 1),
+(1591, 1, 7, 'İskender (Et Dönerden) (100 gr.)', NULL, 33, 1),
+(1592, 1, 7, 'İskender (Et Dönerden) (150 gr.)', NULL, 43, 1),
+(1593, 1, 7, 'Kaşarlı Et Döner Dürüm (100 gr.)', NULL, 29, 1),
+(1594, 1, 7, 'Kaşarlı Et Döner Dürüm (60 gr.)', NULL, 20, 1),
+(1595, 1, 7, 'Pide Arası Et Döner (100 gr.)', NULL, 26, 1),
+(1596, 1, 7, 'Pide Arası Et Döner (60 gr.)', NULL, 17, 1),
+(1597, 1, 7, 'Pide Arası Kaşarlı Et Döner (60 gr.)', NULL, 20, 1),
+(1598, 1, 7, 'Pilav Üstü Et Döner (100 gr.)', NULL, 30, 1),
+(1599, 1, 7, 'Pilav Üstü Et Döner (150 gr.)', NULL, 41, 1),
+(1600, 1, 7, 'Sandviç Ekmek Arası Et Döner (100 gr.)', NULL, 24.5, 1),
+(1601, 1, 7, 'Sandviç Ekmek Arası Et Döner (60 gr.)', NULL, 17, 1),
+(1602, 1, 7, 'Yarım Ekmek Arası Et Döner (100 gr.)', NULL, 26, 0),
+(1603, 1, 7, 'Yarım Ekmek Arası Et Döner (60 gr.)', NULL, 17, 1),
+(1604, 1, 7, 'Yarım Ekmek Arası Kaşarlı Et Döner (60 gr.)', NULL, 20, 1),
+(1605, 1, 8, '3/4 Ekmek Arası Tavuk Döner (100 gr.)', NULL, 17, 0),
 (1606, 1, 8, 'Tosto Tavuk Döner (60 gr.)', ' Ayvalık ekmeğine tavuk döner, kaşar peyniri, turşu, patates, domates', 14, 1),
-(1607, 1, 8, 'Bütün Ekmek Arası Tavuk Döner (100 gr.)', ' ', 17, 1),
-(1608, 1, 8, 'İskender (Tavuk Dönerden) (100 gr.)', ' Tanımlanmadı ', 21, 1),
-(1609, 1, 8, 'İskender (Tavuk Dönerden) (150 gr.)', ' Tanımlanmadı ', 25, 0),
-(1610, 1, 8, 'Kaşarlı Tavuk Döner Dürüm (100 gr.)', ' Tanımlanmadı ', 19, 1),
-(1611, 1, 8, 'Kaşarlı Tavuk Döner Dürüm (60 gr.)', ' ', 14, 1),
-(1612, 1, 8, 'Pide Arası Kaşarlı Tavuk Döner (60 gr.)', ' ', 14, 1),
-(1613, 1, 8, 'Pide Arası Tavuk Döner (100 gr.)', ' ', 16, 1),
-(1614, 1, 8, 'Pide Arası Tavuk Döner (60 gr.)', ' ', 10, 0),
-(1615, 1, 8, 'Pilav Üstü Tavuk Döner (100 gr.)', ' ', 20, 1),
-(1616, 1, 8, 'Pilav Üstü Tavuk Döner (150 gr.)', ' ', 26, 1),
-(1617, 1, 8, 'Sandviç Arası Tavuk Döner (100 gr.)', ' ', 15.5, 1),
-(1618, 1, 8, 'Sandviç Arası Tavuk Döner (60 gr.)', ' Tanımlanmadı ', 12.5, 1),
-(1619, 1, 8, 'Tavuk Döner (100 gr.)', ' ', 17, 1),
-(1620, 1, 8, 'Tavuk Döner (150 gr.)', ' ', 23, 0),
-(1621, 1, 8, 'Tavuk Döner Dürüm (100 gr.)', ' ', 16, 1),
-(1622, 1, 8, 'Tavuk Döner Dürüm (60 gr.)', ' ', 10, 0),
-(1623, 1, 8, 'Yarım Ekmek Arası Kaşarlı Tavuk Döner (60 gr.)', ' ', 14, 1),
-(1624, 1, 8, 'Yarım Ekmek Arası Tavuk Döner (100 gr.)', ' ', 16, 1),
-(1625, 1, 8, 'Yarım Ekmek Arası Tavuk Döner (50 gr.)', ' ', 10, 1),
-(1626, 1, 9, 'Hamburger', ' ', 7, 1),
+(1607, 1, 8, 'Bütün Ekmek Arası Tavuk Döner (100 gr.)', NULL, 17, 1),
+(1608, 1, 8, 'İskender (Tavuk Dönerden) (100 gr.)', NULL, 21, 1),
+(1609, 1, 8, 'İskender (Tavuk Dönerden) (150 gr.)', NULL, 25, 1),
+(1610, 1, 8, 'Kaşarlı Tavuk Döner Dürüm (100 gr.)', NULL, 19, 1),
+(1611, 1, 8, 'Kaşarlı Tavuk Döner Dürüm (60 gr.)', NULL, 14, 1),
+(1612, 1, 8, 'Pide Arası Kaşarlı Tavuk Döner (60 gr.)', NULL, 14, 1),
+(1613, 1, 8, 'Pide Arası Tavuk Döner (100 gr.)', NULL, 16, 1),
+(1614, 1, 8, 'Pide Arası Tavuk Döner (60 gr.)', NULL, 10, 0),
+(1615, 1, 8, 'Pilav Üstü Tavuk Döner (100 gr.)', NULL, 20, 1),
+(1616, 1, 8, 'Pilav Üstü Tavuk Döner (150 gr.)', NULL, 26, 1),
+(1617, 1, 8, 'Sandviç Arası Tavuk Döner (100 gr.)', NULL, 15.5, 1),
+(1618, 1, 8, 'Sandviç Arası Tavuk Döner (60 gr.)', NULL, 12.5, 1),
+(1619, 1, 8, 'Tavuk Döner (100 gr.)', NULL, 17, 1),
+(1620, 1, 8, 'Tavuk Döner (150 gr.)', NULL, 23, 0),
+(1621, 1, 8, 'Tavuk Döner Dürüm (100 gr.)', NULL, 16, 1),
+(1622, 1, 8, 'Tavuk Döner Dürüm (60 gr.)', NULL, 10, 0),
+(1623, 1, 8, 'Yarım Ekmek Arası Kaşarlı Tavuk Döner (60 gr.)', NULL, 14, 1),
+(1624, 1, 8, 'Yarım Ekmek Arası Tavuk Döner (100 gr.)', NULL, 16, 1),
+(1625, 1, 8, 'Yarım Ekmek Arası Tavuk Döner (50 gr.)', NULL, 10, 1),
+(1626, 1, 9, 'Hamburger', NULL, 7, 1),
 (1627, 1, 9, 'Büyük Burger', ' 120 gr. hamburger köftesi\r', 15, 1),
-(1628, 1, 9, 'Islak Hamburger', ' Tanımlanmadı ', 7, 1),
-(1629, 1, 9, 'Islak Cheeseburger', ' ', 9, 1),
-(1630, 1, 9, 'Cheeseburger', ' ', 9, 1),
-(1631, 1, 9, 'Luxburger', ' ', 10.5, 1),
-(1632, 1, 10, 'Amerikanlı Sandviç (Sıcak)', ' ', 8, 1),
-(1633, 1, 10, 'Dilli Amerikanlı Sandviç (Sıcak)', ' ', 17, 1),
-(1634, 1, 10, 'Dilli Füme Sandviç (Sıcak)', ' ', 15, 1),
-(1635, 1, 10, 'Goralı Sandviç (Sıcak)', ' ', 10, 1),
-(1636, 1, 10, 'Sosisli Sandviç (Sıcak)', ' Tanımlanmadı ', 9, 1),
+(1628, 1, 9, 'Islak Hamburger', NULL, 7, 1),
+(1629, 1, 9, 'Islak Cheeseburger', NULL, 9, 1),
+(1630, 1, 9, 'Cheeseburger', NULL, 9, 1),
+(1631, 1, 9, 'Luxburger', NULL, 10.5, 1),
+(1632, 1, 10, 'Amerikanlı Sandviç (Sıcak)', NULL, 8, 1),
+(1633, 1, 10, 'Dilli Amerikanlı Sandviç (Sıcak)', NULL, 17, 1),
+(1634, 1, 10, 'Dilli Füme Sandviç (Sıcak)', NULL, 15, 1),
+(1635, 1, 10, 'Goralı Sandviç (Sıcak)', NULL, 10, 1),
+(1636, 1, 10, 'Sosisli Sandviç (Sıcak)', NULL, 9, 1),
 (1637, 1, 11, 'Kaşarlı Patso', ' Sandviç ekmeğine patates kızartması, kaşar peyniri, turşu, ketçap, mayonez', 14, 1),
 (1638, 1, 11, 'Patso', ' Sandviç ekmeğine patates kızartması, turşu, ketçap, mayonez\r', 11, 0),
-(1639, 1, 11, 'Sosisli Kaşarlı Patso', ' ', 15, 1),
+(1639, 1, 11, 'Sosisli Kaşarlı Patso', NULL, 15, 1),
 (1640, 1, 11, 'Sosisli Patso', ' Sandviç ekmeğine patates kızartması, sosis, turşu, ketçap, mayonez\r', 14, 1),
 (1641, 1, 12, 'Soğuk Sandviç 4', ' Beyaz peynir, yeşillik, domates, salatalık\r', 10, 0),
 (1642, 1, 12, 'Soğuk Sandviç 5', ' Kaşar peyniri, yeşillik, domates, salatalık\r', 10, 1),
@@ -189,31 +210,31 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1646, 1, 12, 'Kendi Sandviçini Yap', ' Seçeceğiniz ekmek, seçeceğiniz malzemeler ile', 3, 1),
 (1647, 1, 13, 'Karışık Kumpir', ' Seçeceğiniz malzemeler ile\r', 23, 1),
 (1648, 1, 13, 'Sade Kumpir', ' Kaşar peyniri, tereyağı\r', 16, 0),
-(1649, 1, 14, 'Patates Kızartması', ' ', 11, 1),
-(1650, 1, 14, 'Ketçap', ' ', 0.5, 1),
-(1651, 1, 14, 'Mayonez', ' Tanımlanmadı ', 0.5, 1),
-(1652, 1, 15, 'Kazandibi', ' ', 9.5, 1),
-(1653, 1, 15, 'Supangle', ' ', 9.5, 1),
-(1654, 1, 15, 'Sütlaç', ' ', 9.5, 1),
-(1655, 1, 16, 'Coca-Cola (33 cl.)', ' ', 6, 1),
-(1656, 1, 16, 'Coca-Cola Light (33 cl.)', ' ', 6, 1),
-(1657, 1, 16, 'Coca-Cola Şekersiz (33 cl.)', ' ', 6, 1),
-(1658, 1, 16, 'Fanta (33 cl.)', ' ', 6, 1),
-(1659, 1, 16, 'Sprite (33 cl.)', ' ', 6, 1),
-(1660, 1, 16, 'Fuse Tea (33 cl.)', ' ', 6, 1),
-(1661, 1, 16, 'Cappy (33 cl.)', ' ', 6, 0),
-(1662, 1, 16, 'Ayran (30 cl.)', ' Tanımlanmadı ', 6, 1),
+(1649, 1, 14, 'Patates Kızartması', NULL, 11, 1),
+(1650, 1, 14, 'Ketçap', NULL, 0.5, 1),
+(1651, 1, 14, 'Mayonez', NULL, 0.5, 1),
+(1652, 1, 15, 'Kazandibi', NULL, 9.5, 1),
+(1653, 1, 15, 'Supangle', NULL, 9.5, 1),
+(1654, 1, 15, 'Sütlaç', NULL, 9.5, 1),
+(1655, 1, 16, 'Coca-Cola (33 cl.)', NULL, 6, 1),
+(1656, 1, 16, 'Coca-Cola Light (33 cl.)', NULL, 6, 1),
+(1657, 1, 16, 'Coca-Cola Şekersiz (33 cl.)', NULL, 6, 1),
+(1658, 1, 16, 'Fanta (33 cl.)', NULL, 6, 1),
+(1659, 1, 16, 'Sprite (33 cl.)', NULL, 6, 1),
+(1660, 1, 16, 'Fuse Tea (33 cl.)', NULL, 6, 1),
+(1661, 1, 16, 'Cappy (33 cl.)', NULL, 6, 0),
+(1662, 1, 16, 'Ayran (30 cl.)', NULL, 6, 1),
 (1663, 1, 16, 'Açık Ayran', ' (Bardak)', 6, 1),
-(1664, 1, 16, 'Meyveli Soda (20 cl.)', ' ', 4.5, 0),
-(1665, 1, 16, 'Soda (20 cl.)', ' Tanımlanmadı ', 3, 1),
-(1666, 1, 16, 'Su (20 cl.)', ' ', 2, 1),
-(1667, 1, 16, 'Coca-Cola (1 L.)', ' ', 9, 0),
-(1668, 1, 16, 'Coca-Cola Light (1 L.)', ' ', 9, 0),
-(1669, 1, 16, 'Coca-Cola Şekersiz (1 L.)', ' Tanımlanmadı ', 9, 1),
-(1670, 1, 16, 'Fanta (1 L.)', ' ', 9, 1),
-(1671, 1, 16, 'Su (1,5 L.)', ' ', 4, 1),
-(1672, 1, 16, 'Coca-Cola (2,5 L.)', ' ', 12, 1),
-(1673, 1, 16, 'Fanta (2,5 L.)', ' ', 12, 1),
+(1664, 1, 16, 'Meyveli Soda (20 cl.)', NULL, 4.5, 0),
+(1665, 1, 16, 'Soda (20 cl.)', NULL, 3, 1),
+(1666, 1, 16, 'Su (20 cl.)', NULL, 2, 1),
+(1667, 1, 16, 'Coca-Cola (1 L.)', NULL, 9, 0),
+(1668, 1, 16, 'Coca-Cola Light (1 L.)', NULL, 9, 0),
+(1669, 1, 16, 'Coca-Cola Şekersiz (1 L.)', NULL, 9, 1),
+(1670, 1, 16, 'Fanta (1 L.)', NULL, 9, 1),
+(1671, 1, 16, 'Su (1,5 L.)', NULL, 4, 1),
+(1672, 1, 16, 'Coca-Cola (2,5 L.)', NULL, 12, 1),
+(1673, 1, 16, 'Fanta (2,5 L.)', NULL, 12, 1),
 (1674, 1, 17, 'Ballı Muzlu Süt', ' (Bardak)\r', 11, 1),
 (1675, 1, 17, 'Elma Suyu', ' (Bardak)\r', 9, 0),
 (1676, 1, 17, 'Greyfurt Suyu', ' (Bardak)\r', 9, 1),
@@ -228,40 +249,40 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1688, 1, 17, 'Portakal Suyu', ' (Bardak)', 9, 1),
 (1689, 1, 17, 'Çikolatalı Atom Extra', ' (Bardak) Havuç, elma, portakal, muz, kivi, bal, çikolata\r', 12, 1),
 (1690, 1, 17, 'Kokteyl Atom', ' (Bardak) Havuç, elma, portakal, muz, kivi, bal\r', 12.5, 0),
-(1749, 2, 26, 'Fanta (33 cl.)', ' Tanımlanmadı ', 4, 1),
-(1750, 2, 26, 'Cappy (33 cl.)', ' ', 4, 1),
-(1734, 2, 22, 'Çiğ Köfte (300 gr.)', ' (3 Kişilik) yarım kilo göbek marul', 27, 1),
-(1735, 2, 22, 'Çiğ Köfte (600 gr.)', ' (3 Kişilik) 1/2 göbek marul, 1/2 limon, 6 adet lavaş, nar ekşisi, acı sos, roka, maydanoz ile', 25, 1),
-(1736, 2, 22, 'Çiğ Köfte (1 kg.)', ' (5 Kişilik) Tam göbek marul, tam limon, 10 adet lavaş, nar ekşisi, acı sos, roka, maydanoz ile', 40, 0),
-(1737, 2, 23, 'Amerikan Salatası (250 gr.)', ' ', 6, 1),
-(1738, 2, 23, 'Rus Salatası (250 gr.)', ' ', 6, 1),
-(1739, 2, 23, 'Acılı Ezme (250 gr.)', ' ', 6, 1),
-(1740, 2, 24, 'Fırın Sütlaç', ' ', 6, 1),
-(1741, 2, 24, 'Karamelli Trileçe', ' ', 7, 1),
-(1742, 2, 24, 'Kazandibi', ' ', 6, 1),
-(1743, 2, 24, 'Profiterol', ' ', 6, 1),
-(1744, 2, 25, 'Yeşillik Tabağı', ' ', 5, 1),
-(1745, 2, 25, 'Acı Sos', ' Tanımlanmadı ', 1, 1),
-(1746, 2, 25, 'Nar Ekşisi', ' Tanımlanmadı ', 1, 1),
-(1747, 2, 25, 'Lavaş (Adet)', ' Tanımlanmadı ', 0.5, 1),
-(1748, 2, 26, 'Coca-Cola (33 cl.)', ' ', 4, 0),
-(1733, 2, 22, 'Çiğ Köfte (200 gr.)', ' (1 Kişilik) 1/4 göbek marul, 1/4 limon, 2 adet lavaş, nar ekşisi, acı sos, roka, maydanoz ile', 10, 1),
-(1732, 2, 22, 'Duble Mega Çiğ Köfte Dürüm', ' 175 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi', 10, 1),
+(1728, 2, 22, 'Çiğ Köfte Dürüm Menü', 'çok acı bu çiğköfte', 22, 1),
 (1729, 2, 22, 'Çiğ Köfte Dürüm', ' 90 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi\r', 5.5, 1),
 (1730, 2, 22, 'Mega Çiğ Köfte Dürüm', ' 125 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi\r', 8.5, 1),
 (1731, 2, 22, 'Ultra Mega Çiğ Köfte Dürüm', ' 150 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi\r', 9, 1),
-(1728, 2, 22, 'Çiğ Köfte Dürüm Menü', 'çok acı bu çiğköfte', 22, 1),
-(1751, 2, 26, 'Şalgam Suyu (33 cl.)', ' ', 3, 1),
-(1752, 2, 26, 'Ayran (29 cl.)', ' ', 3, 1),
-(1753, 2, 26, 'Ayran (20 cl.)', ' ', 2, 1),
-(1754, 2, 26, 'Meyveli Soda (20 cl.)', ' ', 2, 1),
-(1755, 2, 26, 'Soda (20 cl.)', ' ', 1.5, 1),
-(1756, 2, 26, 'Su (50 cl.)', ' Tanımlanmadı ', 1.5, 1),
-(1757, 2, 26, 'Coca-Cola (1 L.)', ' ', 7, 1),
-(1758, 2, 26, 'Coca-Cola Light (1 L.)', ' ', 7, 1),
-(1759, 2, 26, 'Coca-Cola Şekersiz (1 L.)', ' Tanımlanmadı ', 7, 0),
-(1760, 2, 26, 'Fanta (1 L.)', ' ', 7, 1),
-(1761, 2, 26, 'Ayran (1 L.)', ' Tanımlanmadı ', 7, 1),
+(1732, 2, 22, 'Duble Mega Çiğ Köfte Dürüm', ' 175 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi', 10, 1),
+(1733, 2, 22, 'Çiğ Köfte (200 gr.)', ' (1 Kişilik) 1/4 göbek marul, 1/4 limon, 2 adet lavaş, nar ekşisi, acı sos, roka, maydanoz ile', 10, 1),
+(1734, 2, 22, 'Çiğ Köfte (300 gr.)', ' (3 Kişilik) yarım kilo göbek marul', 27, 1),
+(1735, 2, 22, 'Çiğ Köfte (600 gr.)', ' (3 Kişilik) 1/2 göbek marul, 1/2 limon, 6 adet lavaş, nar ekşisi, acı sos, roka, maydanoz ile', 25, 1),
+(1736, 2, 22, 'Çiğ Köfte (1 kg.)', ' (5 Kişilik) Tam göbek marul, tam limon, 10 adet lavaş, nar ekşisi, acı sos, roka, maydanoz ile', 40, 0),
+(1737, 2, 23, 'Amerikan Salatası (250 gr.)', NULL, 6, 1),
+(1738, 2, 23, 'Rus Salatası (250 gr.)', NULL, 6, 1),
+(1739, 2, 23, 'Acılı Ezme (250 gr.)', NULL, 6, 1),
+(1740, 2, 24, 'Fırın Sütlaç', NULL, 6, 1),
+(1741, 2, 24, 'Karamelli Trileçe', NULL, 7, 1),
+(1742, 2, 24, 'Kazandibi', NULL, 6, 1),
+(1743, 2, 24, 'Profiterol', NULL, 6, 1),
+(1744, 2, 25, 'Yeşillik Tabağı', NULL, 5, 1),
+(1745, 2, 25, 'Acı Sos', NULL, 1, 1),
+(1746, 2, 25, 'Nar Ekşisi', NULL, 1, 1),
+(1747, 2, 25, 'Lavaş (Adet)', NULL, 0.5, 1),
+(1748, 2, 26, 'Coca-Cola (33 cl.)', NULL, 4, 0),
+(1749, 2, 26, 'Fanta (33 cl.)', NULL, 4, 1),
+(1750, 2, 26, 'Cappy (33 cl.)', NULL, 4, 1),
+(1751, 2, 26, 'Şalgam Suyu (33 cl.)', NULL, 3, 1),
+(1752, 2, 26, 'Ayran (29 cl.)', NULL, 3, 1),
+(1753, 2, 26, 'Ayran (20 cl.)', NULL, 2, 1),
+(1754, 2, 26, 'Meyveli Soda (20 cl.)', NULL, 2, 1),
+(1755, 2, 26, 'Soda (20 cl.)', NULL, 1.5, 1),
+(1756, 2, 26, 'Su (50 cl.)', NULL, 1.5, 1),
+(1757, 2, 26, 'Coca-Cola (1 L.)', NULL, 7, 1),
+(1758, 2, 26, 'Coca-Cola Light (1 L.)', NULL, 7, 1),
+(1759, 2, 26, 'Coca-Cola Şekersiz (1 L.)', NULL, 7, 0),
+(1760, 2, 26, 'Fanta (1 L.)', NULL, 7, 1),
+(1761, 2, 26, 'Ayran (1 L.)', NULL, 7, 1),
 (1763, 3, 29, 'Karışık Tost', ' Kaşar peyniri, sucuk\r', 8, 1),
 (1764, 3, 30, 'Tavuk Kanat', ' Közlenmiş domates, közlenmiş biber, sumaklı soğan, bulgur pilavı veya pirinç pilavı\r', 17, 1),
 (1765, 3, 30, 'Tavuk Kelebek', ' Közlenmiş domates, közlenmiş biber, sumaklı soğan, bulgur pilavı veya pirinç pilavı\r', 17, 1),
@@ -269,72 +290,72 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1767, 3, 30, 'Karışık Izgara', ' Izgara köfte, kasap sucuk, kemiksiz tavuk incik. Közlenmiş domates, közlenmiş biber, sumaklı soğan, bulgur pilavı veya pirinç pilavı\r', 20, 0),
 (1768, 3, 31, 'Ekmek Arası Köfte', ' Domates, marul, soğan\r', 17, 0),
 (1769, 3, 31, 'Ekmek Arası Sucuk', ' Domates, marul, soğan\r', 17, 1),
-(1770, 3, 32, 'Mantı (200 gr.)', ' ', 18, 0),
-(1771, 3, 33, 'Yedigün (33 cl.)', ' ', 5, 0),
-(1772, 3, 33, 'Coca-Cola (1 L.)', ' ', 7, 1),
-(1773, 3, 33, 'Sprite (33 cl.)', ' ', 5, 1),
-(1774, 3, 33, 'Sprite (1 L.)', ' ', 7, 1),
-(1775, 3, 33, 'Şalgam Suyu (30 cl.)', ' ', 4, 1),
-(1776, 3, 33, 'Fruko (1 L.)', ' ', 7, 0),
-(1777, 3, 33, 'Şalgam Suyu (33 cl.)', ' ', 4, 1),
-(1778, 3, 33, 'Meyveli Soda (20 cl.)', ' ', 3, 1),
-(1779, 3, 33, 'Fuse Tea (33 cl.)', ' ', 5, 1),
-(1780, 3, 33, 'Coca-Cola Şekersiz (33 cl.)', ' ', 5, 0),
-(1781, 3, 33, 'Fanta (33 cl.)', ' ', 5, 0),
-(1782, 3, 33, 'Coca-Cola (33 cl.)', ' ', 5, 1),
-(1783, 3, 33, 'Pepsi (1 L.)', ' ', 7, 0),
-(1784, 3, 33, 'Pepsi Max (1 L.)', ' ', 7, 1),
-(1785, 3, 33, 'Su (50 cl.)', ' ', 2, 1),
-(1786, 3, 33, '7UP (1 L.)', ' ', 7, 1),
-(1787, 3, 33, 'Pepsi (33 cl.)', ' ', 5, 0),
-(1788, 3, 33, 'Soda (20 cl.)', ' ', 2, 1),
-(1789, 3, 33, 'Fruko (33 cl.)', ' ', 5, 1),
-(1790, 3, 33, 'Tropicana (33 cl.)', ' ', 5, 0),
-(1791, 3, 33, 'Coca-Cola Light (1 L.)', ' ', 7, 1),
-(1792, 3, 33, 'Coca-Cola Light (33 cl.)', ' ', 5, 1),
-(1793, 3, 33, 'Yedigün (1 L.)', ' ', 7, 1),
-(1794, 3, 33, 'Cappy (33 cl.)', ' ', 5, 0),
-(1795, 3, 33, 'Tamek (33 cl.)', ' ', 5, 1),
-(1796, 3, 33, 'Coca-Cola Şekersiz (1 L.)', ' ', 7, 1),
-(1797, 3, 33, 'Pepsi Max (33 cl.)', ' ', 5, 1),
-(1798, 3, 33, '7UP (33 cl.)', ' ', 5, 0),
-(1799, 3, 33, 'Pepsi Light (33 cl.)', ' ', 5, 0),
-(1800, 3, 33, 'Pepsi Light (1 L.)', ' ', 7, 1),
-(1801, 3, 33, 'Ayran (20 cl.)', ' ', 2, 1),
-(1802, 3, 33, 'Fanta (1 L.)', ' ', 7, 1),
-(1803, 3, 33, 'Ayran (30 cl.)', ' ', 4, 0),
-(1804, 3, 34, 'Poşet', ' ', 0.25, 0),
+(1770, 3, 32, 'Mantı (200 gr.)', NULL, 18, 0),
+(1771, 3, 33, 'Yedigün (33 cl.)', NULL, 5, 0),
+(1772, 3, 33, 'Coca-Cola (1 L.)', NULL, 7, 1),
+(1773, 3, 33, 'Sprite (33 cl.)', NULL, 5, 1),
+(1774, 3, 33, 'Sprite (1 L.)', NULL, 7, 1),
+(1775, 3, 33, 'Şalgam Suyu (30 cl.)', NULL, 4, 1),
+(1776, 3, 33, 'Fruko (1 L.)', NULL, 7, 0),
+(1777, 3, 33, 'Şalgam Suyu (33 cl.)', NULL, 4, 1),
+(1778, 3, 33, 'Meyveli Soda (20 cl.)', NULL, 3, 1),
+(1779, 3, 33, 'Fuse Tea (33 cl.)', NULL, 5, 1),
+(1780, 3, 33, 'Coca-Cola Şekersiz (33 cl.)', NULL, 5, 0),
+(1781, 3, 33, 'Fanta (33 cl.)', NULL, 5, 0),
+(1782, 3, 33, 'Coca-Cola (33 cl.)', NULL, 5, 1),
+(1783, 3, 33, 'Pepsi (1 L.)', NULL, 7, 0),
+(1784, 3, 33, 'Pepsi Max (1 L.)', NULL, 7, 1),
+(1785, 3, 33, 'Su (50 cl.)', NULL, 2, 1),
+(1786, 3, 33, '7UP (1 L.)', NULL, 7, 1),
+(1787, 3, 33, 'Pepsi (33 cl.)', NULL, 5, 0),
+(1788, 3, 33, 'Soda (20 cl.)', NULL, 2, 1),
+(1789, 3, 33, 'Fruko (33 cl.)', NULL, 5, 1),
+(1790, 3, 33, 'Tropicana (33 cl.)', NULL, 5, 0),
+(1791, 3, 33, 'Coca-Cola Light (1 L.)', NULL, 7, 1),
+(1792, 3, 33, 'Coca-Cola Light (33 cl.)', NULL, 5, 1),
+(1793, 3, 33, 'Yedigün (1 L.)', NULL, 7, 1),
+(1794, 3, 33, 'Cappy (33 cl.)', NULL, 5, 0),
+(1795, 3, 33, 'Tamek (33 cl.)', NULL, 5, 1),
+(1796, 3, 33, 'Coca-Cola Şekersiz (1 L.)', NULL, 7, 1),
+(1797, 3, 33, 'Pepsi Max (33 cl.)', NULL, 5, 1),
+(1798, 3, 33, '7UP (33 cl.)', NULL, 5, 0),
+(1799, 3, 33, 'Pepsi Light (33 cl.)', NULL, 5, 0),
+(1800, 3, 33, 'Pepsi Light (1 L.)', NULL, 7, 1),
+(1801, 3, 33, 'Ayran (20 cl.)', NULL, 2, 1),
+(1802, 3, 33, 'Fanta (1 L.)', NULL, 7, 1),
+(1803, 3, 33, 'Ayran (30 cl.)', NULL, 4, 0),
+(1804, 3, 34, 'Poşet', NULL, 0.25, 0),
 (1805, 4, 35, 'Ekmek Arası Tavuk Döner Menü', ' Ekmek Arası Tavuk Döner (100 gr. tavuk döner) + Patates Kızartması + Ayran (30 cl.)\r', 15, 1),
-(1806, 4, 36, 'Ezogelin Çorbası', ' ', 6, 0),
+(1806, 4, 36, 'Ezogelin Çorbası', NULL, 6, 0),
 (1807, 4, 37, 'Tavuk Döner', ' Domates, marul, turşu, patates kızartması ile\r', 9, 0),
 (1808, 4, 37, 'Pilav & Tavuk Döner', ' 100 gr. pilav üstü tavuk döner, patates kızartması, domates, marul, turşu, ketçap, mayonez\r', 16, 1),
-(1809, 4, 37, 'Pilav Üstü Tavuk Döner', ' ', 16, 0),
+(1809, 4, 37, 'Pilav Üstü Tavuk Döner', NULL, 16, 0),
 (1810, 4, 37, 'Tophane Ekmeğine Tavuk Döner', ' Domates, göbek marul, turşu, patates kızartması\r', 11, 1),
 (1811, 4, 37, 'Ekmek Arası Tavuk Döner', ' Domates, göbek marul, turşu, patates kızartması\r', 11, 1),
 (1812, 4, 37, 'Kaşarlı Tavuk Döner Dürüm', ' Domates, göbek marul, turşu, patates kızartması\r', 11, 1),
 (1813, 4, 38, 'Yarım Ekmek Arası Izgara Köfte', ' Soğan, domates, göbek marul, patates kızartması\r', 15, 0),
-(1814, 4, 39, 'Kuru Fasulye', ' ', 12, 1),
-(1815, 4, 39, 'Pirinç Pilavı', ' ', 7, 1),
-(1816, 4, 39, 'Pilav Üstü Kuru Fasulye', ' ', 9, 0),
-(1817, 4, 40, 'Patates Kızartması', ' ', 5, 1),
-(1818, 4, 41, 'Sütlaç', ' ', 6, 0),
-(1819, 4, 42, 'Coca-Cola (33 cl.)', ' ', 4, 0),
-(1820, 4, 42, 'Coca-Cola Light (33 cl.)', ' ', 4, 0),
-(1821, 4, 42, 'Coca-Cola Şekersiz (33 cl.)', ' ', 4, 1),
-(1822, 4, 42, 'Fanta (33 cl.)', ' ', 4, 0),
-(1823, 4, 42, 'Sprite (33 cl.)', ' ', 4, 0),
-(1824, 4, 42, 'Cappy (33 cl.)', ' ', 4, 0),
-(1825, 4, 42, 'Fuse Tea (33 cl.)', ' ', 4, 0),
-(1826, 4, 42, 'Ayran (30 cl.)', ' ', 2.5, 0),
-(1827, 4, 42, 'Meyveli Soda (20 cl.)', ' ', 2.5, 0),
-(1828, 4, 42, 'Soda (20 cl.)', ' ', 2.5, 1),
-(1829, 4, 42, 'Su (50 cl.)', ' ', 1.5, 0),
-(1830, 4, 42, 'Coca-Cola (1 L.)', ' ', 7, 1),
-(1831, 4, 42, 'Coca-Cola Light (1 L.)', ' ', 7, 1),
-(1832, 4, 42, 'Coca-Cola Şekersiz (1 L.)', ' ', 7, 0),
-(1833, 4, 42, 'Fanta (1 L.)', ' ', 7, 0),
-(1834, 4, 42, 'Sprite (1 L.)', ' ', 7, 1),
-(1835, 4, 43, 'Poşet', ' ', 0.25, 1),
+(1814, 4, 39, 'Kuru Fasulye', NULL, 12, 1),
+(1815, 4, 39, 'Pirinç Pilavı', NULL, 7, 1),
+(1816, 4, 39, 'Pilav Üstü Kuru Fasulye', NULL, 9, 0),
+(1817, 4, 40, 'Patates Kızartması', NULL, 5, 1),
+(1818, 4, 41, 'Sütlaç', NULL, 6, 0),
+(1819, 4, 42, 'Coca-Cola (33 cl.)', NULL, 4, 0),
+(1820, 4, 42, 'Coca-Cola Light (33 cl.)', NULL, 4, 0),
+(1821, 4, 42, 'Coca-Cola Şekersiz (33 cl.)', NULL, 4, 1),
+(1822, 4, 42, 'Fanta (33 cl.)', NULL, 4, 0),
+(1823, 4, 42, 'Sprite (33 cl.)', NULL, 4, 0),
+(1824, 4, 42, 'Cappy (33 cl.)', NULL, 4, 0),
+(1825, 4, 42, 'Fuse Tea (33 cl.)', NULL, 4, 0),
+(1826, 4, 42, 'Ayran (30 cl.)', NULL, 2.5, 0),
+(1827, 4, 42, 'Meyveli Soda (20 cl.)', NULL, 2.5, 0),
+(1828, 4, 42, 'Soda (20 cl.)', NULL, 2.5, 1),
+(1829, 4, 42, 'Su (50 cl.)', NULL, 1.5, 0),
+(1830, 4, 42, 'Coca-Cola (1 L.)', NULL, 7, 1),
+(1831, 4, 42, 'Coca-Cola Light (1 L.)', NULL, 7, 1),
+(1832, 4, 42, 'Coca-Cola Şekersiz (1 L.)', NULL, 7, 0),
+(1833, 4, 42, 'Fanta (1 L.)', NULL, 7, 0),
+(1834, 4, 42, 'Sprite (1 L.)', NULL, 7, 1),
+(1835, 4, 43, 'Poşet', NULL, 0.25, 1),
 (1836, 5, 44, 'Menü 1', ' Kıymalı Pide + İçecek (1 L.)\r', 20, 1),
 (1837, 5, 44, 'Menü 2', ' 10 Adet Lahmacun + Coca-Cola (2,5 L.) (Lahmacunların acı seçimini sipariş notunda belirtiniz.)\r', 70, 1),
 (1838, 5, 44, 'Menü 3', ' Kavurmalı Pide + İçecek (1 L.)\r', 22, 1),
@@ -353,23 +374,23 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1851, 5, 46, 'Kavurmalı Pide', ' Limon, maydanoz ile\r', 20, 1),
 (1852, 5, 47, 'Ekmek Arası Et Sac Kavurma', ' İsteğe göre soğan\r', 15, 1),
 (1853, 5, 47, 'Ekmek Arası Tavuk Sac Kavurma', ' İsteğe göre soğan\r', 10, 0),
-(1854, 5, 48, 'Coca-Cola (33 cl.)', ' ', 4, 0),
-(1855, 5, 48, 'Coca-Cola Light (33 cl.)', ' ', 4, 0),
-(1856, 5, 48, 'Coca-Cola Şekersiz (33 cl.)', ' ', 4, 0),
-(1857, 5, 48, 'Fanta (33 cl.)', ' ', 4, 0),
-(1858, 5, 48, 'Sprite (33 cl.)', ' ', 3, 1),
-(1859, 5, 48, 'Cappy (33 cl.)', ' ', 4, 1),
-(1860, 5, 48, 'Fuse Tea (33 cl.)', ' ', 4, 1),
-(1861, 5, 48, 'Ayran (30 cl.)', ' ', 2.5, 0),
-(1862, 5, 48, 'Ayran (20 cl.)', ' ', 1.5, 1),
-(1863, 5, 48, 'Meyveli Soda (20 cl.)', ' ', 2.5, 0),
-(1864, 5, 48, 'Soda (20 cl.)', ' ', 2, 0),
-(1865, 5, 48, 'Su (50 cl.)', ' ', 1, 0),
-(1866, 5, 48, 'Coca-Cola (1 L.)', ' ', 5, 0),
-(1867, 5, 48, 'Coca-Cola Light (1 L.)', ' ', 5, 0),
-(1868, 5, 48, 'Coca-Cola Şekersiz (1 L.)', ' ', 5, 1),
-(1869, 5, 48, 'Fanta (1 L.)', ' ', 5, 1),
-(1870, 5, 49, 'Poşet', ' ', 0.25, 0),
+(1854, 5, 48, 'Coca-Cola (33 cl.)', NULL, 4, 0),
+(1855, 5, 48, 'Coca-Cola Light (33 cl.)', NULL, 4, 0),
+(1856, 5, 48, 'Coca-Cola Şekersiz (33 cl.)', NULL, 4, 0),
+(1857, 5, 48, 'Fanta (33 cl.)', NULL, 4, 0),
+(1858, 5, 48, 'Sprite (33 cl.)', NULL, 3, 1),
+(1859, 5, 48, 'Cappy (33 cl.)', NULL, 4, 1),
+(1860, 5, 48, 'Fuse Tea (33 cl.)', NULL, 4, 1),
+(1861, 5, 48, 'Ayran (30 cl.)', NULL, 2.5, 0),
+(1862, 5, 48, 'Ayran (20 cl.)', NULL, 1.5, 1),
+(1863, 5, 48, 'Meyveli Soda (20 cl.)', NULL, 2.5, 0),
+(1864, 5, 48, 'Soda (20 cl.)', NULL, 2, 0),
+(1865, 5, 48, 'Su (50 cl.)', NULL, 1, 0),
+(1866, 5, 48, 'Coca-Cola (1 L.)', NULL, 5, 0),
+(1867, 5, 48, 'Coca-Cola Light (1 L.)', NULL, 5, 0),
+(1868, 5, 48, 'Coca-Cola Şekersiz (1 L.)', NULL, 5, 1),
+(1869, 5, 48, 'Fanta (1 L.)', NULL, 5, 1),
+(1870, 5, 49, 'Poşet', NULL, 0.25, 0),
 (1871, 6, 50, 'Adana Kebap (1 Şiş)', ' Közlenmiş biber, soğan, limon, nane, maydanoz, soğan salatası, domates ile\r', 19, 0),
 (1872, 6, 50, 'Adana Kebap (2 Şiş)', ' Közlenmiş biber, soğan, limon, nane, maydanoz, soğan salatası, domates ile\r', 30, 0),
 (1873, 6, 50, 'Urfa Kebap (1 Şiş)', ' Közlenmiş biber, soğan, limon, nane, maydanoz, soğan salatası, domates ile\r', 19, 1),
@@ -388,45 +409,45 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1886, 6, 51, 'Tam Ekmek Arası Terbiyesiz Kuşbaşı', ' Közlenmiş biber, soğan, limon, nane, maydanoz, soğan salatası, domates ile\r', 30, 1),
 (1887, 6, 51, 'Tam Ekmek Arası Terbiyesiz Tavuk', ' Közlenmiş biber, soğan, limon, nane, maydanoz, soğan salatası, domates ile\r', 19, 0),
 (1888, 6, 51, 'Tam Ekmek Arası Yürek', ' Közlenmiş biber, soğan, limon, nane, maydanoz, soğan salatası, domates ile\r', 20, 1),
-(1889, 6, 52, 'Kızartma İçli Köfte (Adet)', ' ', 6, 0),
-(1890, 6, 53, 'Fıstıklı Kaymaklı Katmer', ' ', 16, 0),
-(1891, 6, 54, 'Coca-Cola (33 cl.)', ' ', 4, 1),
-(1892, 6, 54, 'Fanta (33 cl.)', ' ', 4, 1),
-(1893, 6, 54, 'Cappy (33 cl.)', ' ', 4, 0),
-(1894, 6, 54, 'Pepsi (33 cl.)', ' ', 4, 0),
-(1895, 6, 54, 'Pepsi Max (33 cl.)', ' ', 4, 0),
-(1896, 6, 54, 'Yedigün (33 cl.)', ' ', 4, 1),
-(1897, 6, 54, 'Fruko (33 cl.)', ' ', 4, 1),
-(1898, 6, 54, 'Tropicana (33 cl.)', ' ', 4, 1),
-(1899, 6, 54, 'Lipton Ice Tea (33 cl.)', ' ', 4, 1),
+(1889, 6, 52, 'Kızartma İçli Köfte (Adet)', NULL, 6, 0),
+(1890, 6, 53, 'Fıstıklı Kaymaklı Katmer', NULL, 16, 0),
+(1891, 6, 54, 'Coca-Cola (33 cl.)', NULL, 4, 1),
+(1892, 6, 54, 'Fanta (33 cl.)', NULL, 4, 1),
+(1893, 6, 54, 'Cappy (33 cl.)', NULL, 4, 0),
+(1894, 6, 54, 'Pepsi (33 cl.)', NULL, 4, 0),
+(1895, 6, 54, 'Pepsi Max (33 cl.)', NULL, 4, 0),
+(1896, 6, 54, 'Yedigün (33 cl.)', NULL, 4, 1),
+(1897, 6, 54, 'Fruko (33 cl.)', NULL, 4, 1),
+(1898, 6, 54, 'Tropicana (33 cl.)', NULL, 4, 1),
+(1899, 6, 54, 'Lipton Ice Tea (33 cl.)', NULL, 4, 1),
 (1900, 6, 54, 'Şalgam Suyu (33 cl.)', ' Acılı\r', 4, 0),
-(1901, 6, 54, 'Ayran (30 cl.)', ' ', 3, 0),
-(1902, 6, 54, 'Açık Ayran (20 cl.)', ' ', 2.5, 1),
-(1903, 6, 54, 'Meyveli Soda (20 cl.)', ' ', 4, 0),
-(1904, 6, 54, 'Su (50 cl.)', ' ', 1.5, 0),
-(1905, 7, 55, 'Lahmacun', ' ', 7.5, 0),
-(1906, 7, 55, 'Cevizli Lahmacun', ' ', 9, 0),
-(1907, 7, 55, 'Yumurtalı Lahmacun', ' ', 9, 0),
+(1901, 6, 54, 'Ayran (30 cl.)', NULL, 3, 0),
+(1902, 6, 54, 'Açık Ayran (20 cl.)', NULL, 2.5, 1),
+(1903, 6, 54, 'Meyveli Soda (20 cl.)', NULL, 4, 0),
+(1904, 6, 54, 'Su (50 cl.)', NULL, 1.5, 0),
+(1905, 7, 55, 'Lahmacun', NULL, 7.5, 0),
+(1906, 7, 55, 'Cevizli Lahmacun', NULL, 9, 0),
+(1907, 7, 55, 'Yumurtalı Lahmacun', NULL, 9, 0),
 (1908, 7, 56, 'Kıymalı Karadeniz Pidesi', ' Nane, maydanoz, soğan salatası, karalahana, limon ile\r', 18, 0),
 (1909, 7, 56, 'Kaşarlı Pide', ' Nane, maydanoz, soğan salatası, karalahana, limon ile\r', 17, 0),
 (1910, 7, 56, 'Kıymalı Pide', ' Nane, maydanoz, soğan salatası, karalahana, limon ile\r', 20, 1),
 (1911, 7, 56, 'Karışık Pide', ' Kıyma, kaşar peyniri, kuşbaşı. Nane, maydanoz, soğan salatası, karalahana, limon ile\r', 20, 1),
 (1912, 7, 56, 'Sucuklu Kaşarlı Pide', ' Nane, maydanoz, soğan salatası, karalahana, limon ile\r', 18, 0),
 (1913, 7, 56, 'Kuşbaşılı Pide', ' Nane, maydanoz, soğan salatası, karalahana, limon ile\r', 20, 0),
-(1914, 7, 57, 'Pepsi (33 cl.)', ' ', 4, 1),
-(1915, 7, 57, 'Yedigün (33 cl.)', ' ', 4, 1),
-(1916, 7, 57, 'Yedigün Portakal (33 cl.)', ' ', 4, 1),
-(1917, 7, 57, 'Tropicana (33 cl.)', ' ', 4, 1),
-(1918, 7, 57, 'Ayran (20 cl.)', ' ', 1.5, 1),
-(1919, 7, 57, 'Su (50 cl.)', ' ', 1.5, 0),
-(1920, 7, 58, 'Poşet', ' ', 0.25, 0),
+(1914, 7, 57, 'Pepsi (33 cl.)', NULL, 4, 1),
+(1915, 7, 57, 'Yedigün (33 cl.)', NULL, 4, 1),
+(1916, 7, 57, 'Yedigün Portakal (33 cl.)', NULL, 4, 1),
+(1917, 7, 57, 'Tropicana (33 cl.)', NULL, 4, 1),
+(1918, 7, 57, 'Ayran (20 cl.)', NULL, 1.5, 1),
+(1919, 7, 57, 'Su (50 cl.)', NULL, 1.5, 0),
+(1920, 7, 58, 'Poşet', NULL, 0.25, 0),
 (1921, 8, 59, 'Standart Lahmacun', ' Dana kıyma, soğan, domates, biber, maydanoz. Salata ile\r', 7, 1),
 (1922, 8, 59, 'Acılı Lahmacun', ' Dana kıyma, soğan, domates, biber, maydanoz, özel acı sos. Salata ile\r', 7, 1),
 (1923, 8, 59, 'My Lahmacun', ' Dana kıyma, soğan, domates, biber, maydanoz, kaşar peyniri. Salata ile\r', 9.5, 1),
 (1924, 8, 60, 'Kıymalı Pide', ' Dana kıyma, soğan, domates, biber. Salata ile\r', 13, 0),
 (1925, 8, 60, 'My Pidem Special Pide', ' Kıyma, kuşbaşı, kaşar peyniri, kavurma, sucuk\r', 26, 1),
 (1926, 8, 60, 'Bohça Special Pide', ' Kavrulmuş kıyma, kavurma, sucuk, pastırma, kaşar peyniri\r', 43, 1),
-(1927, 8, 60, 'Kavurmalı Pastırmalı Kaşarlı Pide', ' ', 39, 0),
+(1927, 8, 60, 'Kavurmalı Pastırmalı Kaşarlı Pide', NULL, 39, 0),
 (1928, 8, 60, 'Toblerone Pide', ' Toblerone çikolata, muz, fındık, pudra şekeri\r', 25, 1),
 (1929, 8, 60, 'Kuşbaşılı Pide', ' Dana kuşbaşı, domates, biber. Salata ile\r', 16, 0),
 (1930, 8, 60, 'Kaşarlı Pide', ' Kaşar peyniri. Salata ile\r', 16, 0),
@@ -435,31 +456,31 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1933, 8, 60, 'Trabzon Yağlısı', ' Kaşar peyniri, köy yumurtası, tereyağı. Salata ile\r', 22, 0),
 (1934, 8, 60, 'Kapalı Kavurmalı Pide', ' Dana kavurma. Salata ile\r', 20, 1),
 (1935, 8, 60, 'Kavurmalı Kaşarlı Pide', ' Dana kavurma, kaşar peyniri. Salata ile\r', 23, 1),
-(1936, 8, 61, 'Coca-Cola (33 cl.)', ' ', 4, 1),
-(1937, 8, 61, 'Coca-Cola Şekersiz (33 cl.)', ' ', 4, 0),
-(1938, 8, 61, 'Fanta (33 cl.)', ' ', 4, 1),
-(1939, 8, 61, 'Sprite (33 cl.)', ' ', 4, 0),
-(1940, 8, 61, 'Cappy (33 cl.)', ' ', 4, 0),
-(1941, 8, 61, 'Fuse Tea (33 cl.)', ' ', 4, 0),
-(1942, 8, 61, 'Şalgam Suyu (30 cl.)', ' ', 4, 0),
-(1943, 8, 61, 'Ayran (20 cl.)', ' ', 2, 1),
-(1944, 8, 61, 'Ayran (30 cl.)', ' ', 3, 1),
-(1945, 8, 61, 'Meyveli Soda (20 cl.)', ' ', 2, 1),
-(1946, 8, 61, 'Soda (20 cl.)', ' ', 1.5, 0),
-(1947, 8, 61, 'Su (50 cl.)', ' ', 1.5, 0),
-(1948, 8, 61, 'Coca-Cola (1 L.)', ' ', 6, 1),
-(1949, 8, 61, 'Coca-Cola Şekersiz (1 L.)', ' ', 6, 0),
-(1950, 8, 61, 'Fanta (1 L.)', ' ', 6, 0),
-(1951, 8, 61, 'Sprite (1 L.)', ' ', 6, 0),
-(1952, 8, 61, 'Ayran (1 L.)', ' ', 6.5, 0),
-(1953, 8, 62, 'Poşet', ' ', 0.25, 1),
+(1936, 8, 61, 'Coca-Cola (33 cl.)', NULL, 4, 1),
+(1937, 8, 61, 'Coca-Cola Şekersiz (33 cl.)', NULL, 4, 0),
+(1938, 8, 61, 'Fanta (33 cl.)', NULL, 4, 1),
+(1939, 8, 61, 'Sprite (33 cl.)', NULL, 4, 0),
+(1940, 8, 61, 'Cappy (33 cl.)', NULL, 4, 0),
+(1941, 8, 61, 'Fuse Tea (33 cl.)', NULL, 4, 0),
+(1942, 8, 61, 'Şalgam Suyu (30 cl.)', NULL, 4, 0),
+(1943, 8, 61, 'Ayran (20 cl.)', NULL, 2, 1),
+(1944, 8, 61, 'Ayran (30 cl.)', NULL, 3, 1),
+(1945, 8, 61, 'Meyveli Soda (20 cl.)', NULL, 2, 1),
+(1946, 8, 61, 'Soda (20 cl.)', NULL, 1.5, 0),
+(1947, 8, 61, 'Su (50 cl.)', NULL, 1.5, 0),
+(1948, 8, 61, 'Coca-Cola (1 L.)', NULL, 6, 1),
+(1949, 8, 61, 'Coca-Cola Şekersiz (1 L.)', NULL, 6, 0),
+(1950, 8, 61, 'Fanta (1 L.)', NULL, 6, 0),
+(1951, 8, 61, 'Sprite (1 L.)', NULL, 6, 0),
+(1952, 8, 61, 'Ayran (1 L.)', NULL, 6.5, 0),
+(1953, 8, 62, 'Poşet', NULL, 0.25, 1),
 (1954, 9, 63, 'Sporcu Çocuk Menüsü 1', ' Izgara Köfte (120 gr.) + Eğlenceli Makarnalar + Yoğurt + Muz\r', 26, 1),
 (1955, 9, 63, 'Sporcu Çocuk Menüsü 2', ' Tavuk (120 gr.) + Eğlenceli Makarnalar + Yoğurt + Muz\r', 22, 0),
 (1956, 9, 63, 'Günlük Menü 1', ' Günün Çorbası + Tavuk + Kepekli Bulgur Pilavı + Salata + Yoğurt + Meyve\r', 25, 1),
 (1957, 9, 63, 'Günlük Menü 2', ' Günün Çorbası + Köfte + Kepekli Bulgur Pilavı + Salata + Yoğurt + Meyve\r', 29, 1),
-(1958, 9, 64, 'Mevsim Sebzeleri Çorbası', ' ', 5, 1),
+(1958, 9, 64, 'Mevsim Sebzeleri Çorbası', NULL, 5, 1),
 (1959, 9, 65, 'Mücver', ' Seçeceğiniz 2 adet yan ürün ile\r', 25, 1),
-(1960, 9, 65, 'Levrek', ' ', 28, 0),
+(1960, 9, 65, 'Levrek', NULL, 28, 0),
 (1961, 9, 65, 'Izgara Biftek', ' 150 gr. biftek, 150 - 200 gr. karbonhidrat ve mineral (Seçeceğiniz 2 adet yan ürün ile)\r', 35, 0),
 (1962, 9, 65, 'Izgara Antrikot', ' 150 gr. antrikot, 150 - 200 gr. karbonhidrat ve mineral (Seçeceğiniz 2 adet yan ürün ile)\r', 35, 1),
 (1963, 9, 65, 'Haşlanmış Tavuk', ' 150 gr. tavuk, 150 - 200 gr. karbonhidrat ve mineral (Seçeceğiniz 2 adet yan ürün ile)\r', 22, 1),
@@ -487,22 +508,22 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 (1985, 9, 67, 'Ton Balıklı Salata', ' 100 gr. ton balığı, roka, dereotu, Akdeniz yeşillikleri, kıvırcık marul, göbek marul, galeta, zeytinyağı, caju\r', 19, 0),
 (1986, 9, 67, 'Maş Fasülyesi Salatası', ' 100 gr. tavuk, maydanoz, maş fasulyesi, roka, dereotu, Akdeniz marul, göbek marul, tere, limon, zeytinyağı\r', 19, 0),
 (1987, 9, 67, 'Chia Salatası', ' 100 gr. tavuk, chia, maydanoz, roka, tere, dereotu, Akdeniz marul, göbek marul, limon, zeytinyağı\r', 19, 1),
-(1988, 9, 67, 'Mevsim Meyveleri Salatası', ' ', 18, 0),
+(1988, 9, 67, 'Mevsim Meyveleri Salatası', NULL, 18, 0),
 (1989, 9, 67, 'Börülceli Ton Balığı Salatası', ' 100 gr. ton balığı, haşlanmış börülce, roka, tere, maydanoz, dereotu, Akdeniz yeşilliği, göbek marul\r', 19, 1),
 (1990, 9, 67, 'Börülceli Tavuk Salatası', ' 100 gr. tavuk, haşlanmış börülce, roka, tere, dereotu, maydanoz, Akdeniz yeşilliği, göbek marul\r', 19, 1),
-(1991, 9, 68, 'Ayran (20 cl.)', ' ', 3, 1),
-(1992, 9, 68, 'Kinoalı Ayran', ' ', 3.5, 0),
-(1993, 9, 68, 'Chialı Ayran', ' ', 3, 0),
-(1994, 9, 68, 'Keten Tohumlu Ayran', ' ', 3.5, 1),
-(1995, 9, 68, 'Frenk Maydonozlu Ayran', ' ', 3.5, 1),
-(1996, 9, 68, 'Soda', ' ', 4, 1),
-(1997, 9, 68, 'Su', ' ', 2, 0),
-(1998, 9, 68, 'Zencefil Ayran', ' ', 3.5, 0),
-(1999, 9, 68, 'Zerdeçallı Ayran', ' ', 3.5, 1),
-(2000, 9, 68, 'Naneli Ayran', ' ', 3.5, 1),
+(1991, 9, 68, 'Ayran (20 cl.)', NULL, 3, 1),
+(1992, 9, 68, 'Kinoalı Ayran', NULL, 3.5, 0),
+(1993, 9, 68, 'Chialı Ayran', NULL, 3, 0),
+(1994, 9, 68, 'Keten Tohumlu Ayran', NULL, 3.5, 1),
+(1995, 9, 68, 'Frenk Maydonozlu Ayran', NULL, 3.5, 1),
+(1996, 9, 68, 'Soda', NULL, 4, 1),
+(1997, 9, 68, 'Su', NULL, 2, 0),
+(1998, 9, 68, 'Zencefil Ayran', NULL, 3.5, 0),
+(1999, 9, 68, 'Zerdeçallı Ayran', NULL, 3.5, 1),
+(2000, 9, 68, 'Naneli Ayran', NULL, 3.5, 1),
 (2001, 9, 69, 'Yeşil Detoks (40 cl.)', ' Ispanak, yeşil elma, salatalık, limon, kereviz sapı\r', 10, 1),
 (2002, 9, 69, 'Gaji Detoks (40 cl.)', ' Portakal suyu, goji üzümü, muz\r', 12, 1),
-(2235, 53, 144, 'hmmm çift kaşarlı', ' Tanımlanmadı ', 15, 1);
+(2235, 53, 144, 'hmmm çift kaşarlı', NULL, 15, 1);
 
 -- --------------------------------------------------------
 
@@ -510,11 +531,12 @@ INSERT INTO `envanter` (`id`, `kurumsal_id`, `tabMenu_id`, `ad`, `tanim`, `fiyat
 -- Tablo için tablo yapısı `il`
 --
 
+DROP TABLE IF EXISTS `il`;
 CREATE TABLE `il` (
-  `id` bigint(20) NOT NULL,
+  `id` tinyint(2) UNSIGNED NOT NULL,
   `il_adi` varchar(50) CHARACTER SET utf8 COLLATE utf8_turkish_ci DEFAULT NULL,
   `slug` varchar(50) CHARACTER SET utf8 COLLATE utf8_turkish_ci DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Tablo döküm verisi `il`
@@ -609,12 +631,13 @@ INSERT INTO `il` (`id`, `il_adi`, `slug`) VALUES
 -- Tablo için tablo yapısı `ilce`
 --
 
+DROP TABLE IF EXISTS `ilce`;
 CREATE TABLE `ilce` (
-  `id` bigint(20) NOT NULL,
-  `il_id` bigint(20) DEFAULT NULL,
+  `id` smallint(5) UNSIGNED NOT NULL,
+  `il_id` tinyint(2) UNSIGNED NOT NULL,
   `ilce_adi` varchar(50) CHARACTER SET utf8 COLLATE utf8_turkish_ci DEFAULT NULL,
   `slug` varchar(50) CHARACTER SET utf8 COLLATE utf8_turkish_ci DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Tablo döküm verisi `ilce`
@@ -1592,10 +1615,11 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 -- Tablo için tablo yapısı `kurumsal`
 --
 
+DROP TABLE IF EXISTS `kurumsal`;
 CREATE TABLE `kurumsal` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `il_id` int(10) UNSIGNED NOT NULL,
-  `ilce_id` int(10) UNSIGNED NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
+  `il_id` tinyint(2) UNSIGNED NOT NULL,
+  `ilce_id` smallint(5) UNSIGNED NOT NULL,
   `ad` varchar(120) COLLATE utf8_turkish_ci NOT NULL,
   `kullaniciadi` varchar(40) COLLATE utf8_turkish_ci NOT NULL,
   `email` varchar(254) COLLATE utf8_turkish_ci NOT NULL,
@@ -1605,7 +1629,7 @@ CREATE TABLE `kurumsal` (
   `minAlimTutar` tinyint(4) UNSIGNED DEFAULT 1,
   `acikMi` tinyint(1) DEFAULT 0,
   `kayit_tarihi` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
 -- Tablo döküm verisi `kurumsal`
@@ -1620,7 +1644,7 @@ INSERT INTO `kurumsal` (`id`, `il_id`, `ilce_id`, `ad`, `kullaniciadi`, `email`,
 (6, 63, 835, 'Siverek Cafe', 'cafesiverek', 'cafesiv@siverek.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474143', 'Mumışığı Sk No:1', 27, 0, '2020-03-10 22:20:42'),
 (7, 63, 835, 'Dikkat Launch', 'dikkatlaunch', 'dikkat@dikkat.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474145', 'Hamamçimeni İş Merkezi No:23', 38, 0, '2020-03-10 22:20:42'),
 (8, 81, 951, 'umutlu Tantuni', 'tantuniumutlu', 'umutlu@tantuni.com', 'aa1c8371ebd158fb3966a146e5f9ed45', NULL, 'orhangazi mah', 5, 0, '2020-03-11 19:50:25'),
-(9, 81, 951, 'Beçi Lokanta', 'becilokanta', 'hesap@kurumsal.com', '8a5da52ed126447d359e70c05721a8aa', '5413474142', 'Soğuk Sk No:202/A', 7, 1, '2020-03-11 19:50:25'),
+(9, 81, 951, 'Beçi Lokanta', 'becilokanta', 'hesap@kurumsal.com', '8a5da52ed126447d359e70c05721a8aa', '5413474142', 'Soğuk Sk No:202/A', 5, 1, '2020-03-11 19:50:25'),
 (53, 61, 802, 'Cafe de Albert', 'omurserdarr', 'omurserdarr@gmail.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '(541) 347 - 4150', '', 1, 1, '2020-05-22 23:36:17');
 
 -- --------------------------------------------------------
@@ -1629,12 +1653,13 @@ INSERT INTO `kurumsal` (`id`, `il_id`, `ilce_id`, `ad`, `kullaniciadi`, `email`,
 -- Tablo için tablo yapısı `sepet`
 --
 
+DROP TABLE IF EXISTS `sepet`;
 CREATE TABLE `sepet` (
   `id` int(11) NOT NULL,
-  `bireysel_id` int(11) NOT NULL,
+  `bireysel_id` int(11) UNSIGNED NOT NULL,
   `kurumsal_id` int(11) NOT NULL,
   `envanter_id` int(11) NOT NULL,
-  `adet` int(11) DEFAULT 1
+  `adet` tinyint(2) UNSIGNED DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
@@ -1644,7 +1669,9 @@ CREATE TABLE `sepet` (
 INSERT INTO `sepet` (`id`, `bireysel_id`, `kurumsal_id`, `envanter_id`, `adet`) VALUES
 (117, 2, 1, 1567, 1),
 (118, 2, 1, 1581, 1),
-(119, 2, 1, 1683, 1);
+(124, 1, 1, 1636, 4),
+(125, 1, 1, 1637, 1),
+(126, 1, 1, 1584, 1);
 
 -- --------------------------------------------------------
 
@@ -1652,32 +1679,15 @@ INSERT INTO `sepet` (`id`, `bireysel_id`, `kurumsal_id`, `envanter_id`, `adet`) 
 -- Tablo için tablo yapısı `siparis`
 --
 
+DROP TABLE IF EXISTS `siparis`;
 CREATE TABLE `siparis` (
   `siparisKod` varchar(14) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL,
-  `bireysel_id` int(11) NOT NULL,
-  `kurumsal_id` int(11) NOT NULL,
-  `durum_id` int(11) NOT NULL,
+  `bireysel_id` int(11) UNSIGNED NOT NULL,
+  `kurumsal_id` int(11) UNSIGNED NOT NULL,
+  `durum_id` tinyint(1) UNSIGNED NOT NULL,
   `siparisTarih` datetime DEFAULT current_timestamp(),
   `toplamTutar` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf16 COLLATE=utf16_turkish_ci;
-
---
--- Tablo döküm verisi `siparis`
---
-
-INSERT INTO `siparis` (`siparisKod`, `bireysel_id`, `kurumsal_id`, `durum_id`, `siparisTarih`, `toplamTutar`) VALUES
-('S-130877569753', 1, 1, 4, '2020-05-26 18:07:32', 78),
-('S-143541269750', 1, 2, 1, '2020-05-29 23:11:37', 25),
-('S-165290926538', 2, 2, 1, '2020-06-18 23:32:54', 25),
-('S-362473821848', 1, 2, 4, '2020-05-26 13:16:09', 30),
-('S-449286599149', 2, 1, 4, '2020-06-18 23:34:02', 25),
-('S-450390104665', 1, 2, 1, '2020-05-28 18:38:03', 28),
-('S-525600829748', 1, 2, 3, '2020-05-26 13:06:57', 30),
-('S-587905460128', 2, 1, 2, '2020-06-18 15:26:17', 24),
-('S-594617558154', 2, 1, 3, '2020-06-18 23:33:17', 39),
-('S-646417758466', 2, 2, 1, '2020-06-18 23:34:29', 27),
-('S-928826553544', 6, 9, 1, '2020-06-09 12:20:02', 76.5),
-('S-999371412675', 2, 1, 1, '2020-05-31 12:36:54', 20.1);
 
 -- --------------------------------------------------------
 
@@ -1685,47 +1695,14 @@ INSERT INTO `siparis` (`siparisKod`, `bireysel_id`, `kurumsal_id`, `durum_id`, `
 -- Tablo için tablo yapısı `siparisDetay`
 --
 
+DROP TABLE IF EXISTS `siparisDetay`;
 CREATE TABLE `siparisDetay` (
   `siparisDetayId` int(11) NOT NULL,
-  `siparisKod` varchar(32) COLLATE utf8_turkish_ci NOT NULL,
+  `siparisKod` varchar(14) COLLATE utf8_turkish_ci NOT NULL,
   `envanter_id` int(11) NOT NULL,
   `adet` int(11) NOT NULL,
   `tutar` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci ROW_FORMAT=COMPACT;
-
---
--- Tablo döküm verisi `siparisDetay`
---
-
-INSERT INTO `siparisDetay` (`siparisDetayId`, `siparisKod`, `envanter_id`, `adet`, `tutar`) VALUES
-(1, 'S-525600829748', 1742, 1, 6),
-(2, 'S-525600829748', 1745, 2, 2),
-(3, 'S-525600829748', 1744, 2, 10),
-(4, 'S-525600829748', 1743, 2, 12),
-(5, 'S-362473821848', 1742, 5, 30),
-(6, 'S-130877569753', 1552, 1, 28),
-(7, 'S-130877569753', 1553, 2, 50),
-(8, 'S-450390104665', 1749, 1, 4),
-(9, 'S-450390104665', 1742, 4, 24),
-(10, 'S-143541269750', 1735, 1, 25),
-(11, 'S-999371412675', 1579, 1, 12.1),
-(12, 'S-999371412675', 1567, 1, 8),
-(13, 'S-928826553544', 1954, 2, 52),
-(14, 'S-928826553544', 1981, 1, 21),
-(15, 'S-928826553544', 2000, 1, 3.5),
-(16, 'S-587905460128', 1567, 3, 24),
-(17, 'S-165290926538', 1743, 1, 6),
-(18, 'S-165290926538', 1750, 1, 4),
-(19, 'S-165290926538', 1755, 1, 1.5),
-(20, 'S-165290926538', 1761, 1, 7),
-(21, 'S-165290926538', 1745, 1, 1),
-(22, 'S-165290926538', 1747, 1, 0.5),
-(23, 'S-165290926538', 1744, 1, 5),
-(24, 'S-594617558154', 1553, 1, 25),
-(25, 'S-594617558154', 1562, 1, 14),
-(26, 'S-449286599149', 1583, 1, 19),
-(27, 'S-449286599149', 1655, 1, 6),
-(28, 'S-646417758466', 1734, 1, 27);
 
 -- --------------------------------------------------------
 
@@ -1733,10 +1710,11 @@ INSERT INTO `siparisDetay` (`siparisDetayId`, `siparisKod`, `envanter_id`, `adet
 -- Tablo için tablo yapısı `siparisDurum`
 --
 
+DROP TABLE IF EXISTS `siparisDurum`;
 CREATE TABLE `siparisDurum` (
-  `id` int(11) NOT NULL,
+  `id` tinyint(1) UNSIGNED NOT NULL,
   `tanim` tinytext COLLATE utf8_turkish_ci NOT NULL DEFAULT 'Yeni Sipariş'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
 -- Tablo döküm verisi `siparisDurum`
@@ -1754,11 +1732,12 @@ INSERT INTO `siparisDurum` (`id`, `tanim`) VALUES
 -- Tablo için tablo yapısı `tabMenu`
 --
 
+DROP TABLE IF EXISTS `tabMenu`;
 CREATE TABLE `tabMenu` (
   `id` int(11) NOT NULL,
-  `kurumsal_id` int(11) NOT NULL,
-  `ad` varchar(50) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `kurumsal_id` int(11) UNSIGNED NOT NULL,
+  `ad` varchar(50) COLLATE utf8_turkish_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
 -- Tablo döküm verisi `tabMenu`
@@ -1782,18 +1761,18 @@ INSERT INTO `tabMenu` (`id`, `kurumsal_id`, `ad`) VALUES
 (15, 1, 'Tatlılar'),
 (16, 1, 'İçecekler'),
 (17, 1, 'Vitamin Bar'),
-(29, 3, 'Tostlar'),
-(35, 4, 'Menüler'),
 (22, 2, 'Çiğ Köfteler'),
 (23, 2, 'Mezeler'),
 (24, 2, 'Tatlılar'),
 (25, 2, 'Yan Ürünler'),
 (26, 2, 'İçecekler'),
+(29, 3, 'Tostlar'),
 (30, 3, 'Izgaralar'),
 (31, 3, 'Ekmek Arası Ürünler'),
 (32, 3, 'Diğer Lezzetler'),
 (33, 3, 'İçecekler'),
 (34, 3, 'Poşet'),
+(35, 4, 'Menüler'),
 (36, 4, 'Çorbalar'),
 (37, 4, 'Tavuk Dönerler'),
 (38, 4, 'Ekmek Arası Ürünler'),
@@ -1829,8 +1808,8 @@ INSERT INTO `tabMenu` (`id`, `kurumsal_id`, `ad`) VALUES
 (68, 9, 'İçecekler'),
 (69, 9, 'Detoks İçecekler (40 cl.)'),
 (117, 3, 'Abdurrezzak'),
-(146, 9, 'Örnek Boş Menü'),
-(144, 53, 'Poşetler');
+(144, 53, 'Poşetler'),
+(146, 9, 'Örnek Boş Menü');
 
 --
 -- Dökümü yapılmış tablolar için indeksler
@@ -1842,19 +1821,36 @@ INSERT INTO `tabMenu` (`id`, `kurumsal_id`, `ad`) VALUES
 ALTER TABLE `bireysel`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `kullaniciadi` (`kullaniciadi`);
+  ADD UNIQUE KEY `kullaniciadi` (`kullaniciadi`),
+  ADD KEY `il_id` (`il_id`),
+  ADD KEY `ilce_id` (`ilce_id`);
 
 --
 -- Tablo için indeksler `degerlendirme`
 --
 ALTER TABLE `degerlendirme`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `siparisKod` (`siparisKod`);
 
 --
 -- Tablo için indeksler `envanter`
 --
 ALTER TABLE `envanter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `tabMenu_id` (`tabMenu_id`);
+
+--
+-- Tablo için indeksler `il`
+--
+ALTER TABLE `il`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Tablo için indeksler `ilce`
+--
+ALTER TABLE `ilce`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `il_id` (`il_id`);
 
 --
 -- Tablo için indeksler `kurumsal`
@@ -1862,25 +1858,33 @@ ALTER TABLE `envanter`
 ALTER TABLE `kurumsal`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `kullaniciadi` (`kullaniciadi`);
+  ADD UNIQUE KEY `kullaniciadi` (`kullaniciadi`),
+  ADD KEY `il_id` (`il_id`),
+  ADD KEY `ilce_id` (`ilce_id`);
 
 --
 -- Tablo için indeksler `sepet`
 --
 ALTER TABLE `sepet`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `envanter_id` (`envanter_id`),
+  ADD KEY `bireysel_id` (`bireysel_id`);
 
 --
 -- Tablo için indeksler `siparis`
 --
 ALTER TABLE `siparis`
-  ADD PRIMARY KEY (`siparisKod`);
+  ADD PRIMARY KEY (`siparisKod`),
+  ADD KEY `bireysel_id` (`bireysel_id`),
+  ADD KEY `kurumsal_id` (`kurumsal_id`),
+  ADD KEY `durum_id` (`durum_id`);
 
 --
 -- Tablo için indeksler `siparisDetay`
 --
 ALTER TABLE `siparisDetay`
-  ADD PRIMARY KEY (`siparisDetayId`);
+  ADD PRIMARY KEY (`siparisDetayId`),
+  ADD KEY `siparisKod` (`siparisKod`);
 
 --
 -- Tablo için indeksler `siparisDurum`
@@ -1892,7 +1896,8 @@ ALTER TABLE `siparisDurum`
 -- Tablo için indeksler `tabMenu`
 --
 ALTER TABLE `tabMenu`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `kurumsal_id` (`kurumsal_id`);
 
 --
 -- Dökümü yapılmış tablolar için AUTO_INCREMENT değeri
@@ -1902,7 +1907,7 @@ ALTER TABLE `tabMenu`
 -- Tablo için AUTO_INCREMENT değeri `bireysel`
 --
 ALTER TABLE `bireysel`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Tablo için AUTO_INCREMENT değeri `degerlendirme`
@@ -1920,13 +1925,13 @@ ALTER TABLE `envanter`
 -- Tablo için AUTO_INCREMENT değeri `kurumsal`
 --
 ALTER TABLE `kurumsal`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- Tablo için AUTO_INCREMENT değeri `sepet`
 --
 ALTER TABLE `sepet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
 
 --
 -- Tablo için AUTO_INCREMENT değeri `siparisDetay`
@@ -1938,13 +1943,76 @@ ALTER TABLE `siparisDetay`
 -- Tablo için AUTO_INCREMENT değeri `siparisDurum`
 --
 ALTER TABLE `siparisDurum`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` tinyint(1) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Tablo için AUTO_INCREMENT değeri `tabMenu`
 --
 ALTER TABLE `tabMenu`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=147;
+
+--
+-- Dökümü yapılmış tablolar için kısıtlamalar
+--
+
+--
+-- Tablo kısıtlamaları `bireysel`
+--
+ALTER TABLE `bireysel`
+  ADD CONSTRAINT `bireysel_ibfk_1` FOREIGN KEY (`il_id`) REFERENCES `il` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `bireysel_ibfk_2` FOREIGN KEY (`ilce_id`) REFERENCES `ilce` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `degerlendirme`
+--
+ALTER TABLE `degerlendirme`
+  ADD CONSTRAINT `degerlendirme_ibfk_1` FOREIGN KEY (`siparisKod`) REFERENCES `siparis` (`siparisKod`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `envanter`
+--
+ALTER TABLE `envanter`
+  ADD CONSTRAINT `envanter_ibfk_1` FOREIGN KEY (`tabMenu_id`) REFERENCES `tabMenu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `ilce`
+--
+ALTER TABLE `ilce`
+  ADD CONSTRAINT `ilce_ibfk_1` FOREIGN KEY (`il_id`) REFERENCES `il` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `kurumsal`
+--
+ALTER TABLE `kurumsal`
+  ADD CONSTRAINT `kurumsal_ibfk_1` FOREIGN KEY (`il_id`) REFERENCES `il` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `kurumsal_ibfk_2` FOREIGN KEY (`ilce_id`) REFERENCES `ilce` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `sepet`
+--
+ALTER TABLE `sepet`
+  ADD CONSTRAINT `sepet_ibfk_1` FOREIGN KEY (`envanter_id`) REFERENCES `envanter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `sepet_ibfk_2` FOREIGN KEY (`bireysel_id`) REFERENCES `bireysel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `siparis`
+--
+ALTER TABLE `siparis`
+  ADD CONSTRAINT `siparis_ibfk_1` FOREIGN KEY (`bireysel_id`) REFERENCES `bireysel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `siparis_ibfk_2` FOREIGN KEY (`kurumsal_id`) REFERENCES `kurumsal` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `siparis_ibfk_3` FOREIGN KEY (`durum_id`) REFERENCES `siparisDurum` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `siparisDetay`
+--
+ALTER TABLE `siparisDetay`
+  ADD CONSTRAINT `siparisDetay_ibfk_1` FOREIGN KEY (`siparisKod`) REFERENCES `siparis` (`siparisKod`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `tabMenu`
+--
+ALTER TABLE `tabMenu`
+  ADD CONSTRAINT `tabMenu_ibfk_1` FOREIGN KEY (`kurumsal_id`) REFERENCES `kurumsal` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
