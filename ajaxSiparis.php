@@ -31,60 +31,60 @@ $kurumsalminalim=$jsonverilerim1["kurumsalbilgileri"]["minAlimTutar"];
 //siparisDetay tablosuna çoklu ekleme yapılacak
 while($sepetcek=$sepetsor->fetch(PDO::FETCH_ASSOC)){
 $envid=$sepetcek['envanter_id'];
+
 $url = "https://api.omurserdar.com/api/envanter/index.php?id=$envid";
 $json = file_get_contents($url);
 $jsonverilerim = json_decode($json, true);   
+
 $envBirimFiyat=$jsonverilerim["envanterBilgi"]["fiyat"];
 $adet=$sepetcek["adet"];
+
 $eklencek=array("siparisKod"=>$sipKod,
                 "envanter_id"=>$envid,
                 "adet"=>$adet,
                 "tutar"=>$adet*$envBirimFiyat);
+                
 array_push($eklenceklerDizi,$eklencek);
-    }
-        /*
-        $kiddizi=array();
-        foreach($_SESSION["sepet"] as $k=>$v)
-            array_push($kiddizi,$v["k_id"]);
-        */
-        
+}
+    
 if($_POST["toplamtutar"]>=$kurumsalminalim){
+    
+    //ilişkilendirmelerden sonra $pdoStatement->errorInfo(); ile sipariş tablosuna kayıt oluşturmadan sipariş detay tablosuna kayıt oluşturamam (Cannot add or update a child row: a foreign key constraint fails) 
+    //$cokluekleexecSorgu=pdoMultiInsert('siparisDetay', $eklenceklerDizi, $db);
+    
     $db->beginTransaction();
-
-    if(pdoMultiInsert('siparisDetay', $eklenceklerDizi, $db)){
-        $durum="eklendi";
-         //siparisDetay a her bir env eklendi
-         
-         //simdi siparis tablosuna tek kayıt(sonuc) eklenecek
-        $query = $db->prepare("INSERT INTO siparis SET siparisKod = ?,bireysel_id = ?,
+    
+    $sipeklesorgu = $db->prepare("INSERT INTO siparis SET siparisKod = ?,bireysel_id = ?,
         kurumsal_id = ?,durum_id = ?,toplamTutar=?");
-        $insert = $query->execute(array($sipKod,$birid,$kid,1,$_POST["toplamtutar"]));
-        //eklendi
-            /*
-            if ($insert){
-                //$last_id = $db->lastInsertId();
-                $query = $db->prepare("INSERT INTO siparisDetay SET
-            }
-            */
+        $sipekleexec = $sipeklesorgu->execute(array($sipKod,$birid,$kid,1,$_POST["toplamtutar"]));
+    
+    if($sipekleexec){
+        if(pdoMultiInsert('siparisDetay', $eklenceklerDizi, $db)){
+        $durum="eklendi";
+
         //simdi sepet tablosundaki siparis verilen ürünler silinecek
         $silsorgu=$db->prepare("DELETE FROM sepet WHERE bireysel_id=:pbid");
         $silsorgu->execute(array("pbid"=>$birid));
+        }//coklu ekleme
         $db->commit();
     }
     else{
         $durum="hata";
         $db->rollBack();
     }
-  }
-  else
+}//min hata
+else
     $durum="minhata";
+  
     
 $dizim=array();
 $dizim["eklencekler"]=$eklenceklerDizi;
 $dizim["cevap"]=$durum;
+
 if($durum!="minhata"&&$durum!="hata")
     $dizim["sipKod"]=$sipKod;
 echo json_encode($dizim);
+
 }
 else{
     exit;

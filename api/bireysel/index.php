@@ -12,14 +12,14 @@ if($istekMOD=="POST"){
    
     //kullanici adi veya email kayıtlarda varsa kullaniciVar mesajı dönsün ve işlem yapılsın
     $sorgu=$db->prepare("SELECT COUNT(id) as varmi FROM bireysel where email=:pmail or kullaniciadi=:pkul");
-    $sorgu->execute(array("pmail" => strip_tags($_POST["email"]),"pkul" => strip_tags($_POST["kullaniciadi"])));
+    $sorgu->execute(array("pmail" => $_POST["email"],"pkul" => $_POST["kullaniciadi"]));
     $cek=$sorgu->fetch(PDO::FETCH_ASSOC);
     //kullanici db de yoksa
     if($cek["varmi"]==0){
          $birekle=$db->prepare("INSERT INTO bireysel set il_id=:pil,ilce_id=:pilce,ad=:pad,soyad=:psoyad,kullaniciadi=:pkulad,email=:pmail,sifre=:psif");
- $birekle->execute(array('pil' => strip_tags($_POST["il"]),"pilce" => strip_tags($_POST["ilce"]),
- "pad" => $_POST["ad"],"psoyad" => strip_tags($_POST["soyad"]),"pkulad" => strip_tags($_POST["kullaniciadi"]),
- "pmail" => $_POST["email"],"psif" => md5(strip_tags($_POST["sifre"]))));
+ $birekle->execute(array('pil' => $_POST["il"],"pilce" => $_POST["ilce"],
+ "pad" => $_POST["ad"],"psoyad" => $_POST["soyad"],"pkulad" => $_POST["kullaniciadi"],
+ "pmail" => $_POST["email"],"psif" => md5($_POST["sifre"])));
 
  $birsay=$birekle->rowCount();
  //echo $birsay;
@@ -42,8 +42,7 @@ if($istekMOD=="POST"){
     
 }
 else if($istekMOD=="PUT") {
-     $gelenler=json_decode(strip_tags(file_get_contents("php://input")));
-
+     $gelenler=json_decode(file_get_contents("php://input"));
         if($db->query("select * from bireysel where id='$gelenler->id'")->rowCount()==0){
              $httpKOD = 400;
              $jsonArray["hata"] = TRUE;
@@ -73,7 +72,7 @@ else if($istekMOD=="PUT") {
 }
 
 else if($istekMOD=="DELETE") {
-        parse_str(strip_tags(file_get_contents("php://input")),$veriler);
+        parse_str(file_get_contents("php://input"),$veriler);
     if(isset($veriler["id"]) && !empty(trim($veriler["id"]))) {
         $bid=$veriler["id"];
  $birVarMi = $db->query("select * from bireysel where id='$bid'");
@@ -105,8 +104,8 @@ else if($istekMOD=="DELETE") {
 else if($istekMOD=="GET"){
       // parse_str(file_get_contents("php://input"),$veriler);
      //  $kullad=$veriler["kullaniciadi"];
-    if(isset(strip_tags($_GET["id"])) && !empty(trim(strip_tags($_GET["id"])))){
-         $bid=strip_tags($_GET["id"]);
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
+         $bid=$_GET["id"];
          $birVarMi = $db->query("select * from bireysel where id='$bid'");
          //$birVarMi->debugDumpParams();
          if($birVarMi->rowCount()>0){

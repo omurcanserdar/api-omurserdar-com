@@ -5,8 +5,11 @@
     <p class="float-right">
       <a class="top btn btn-outline-info btn-sm" href="javascript:void(0)"><i class="fa fa-arrow-circle-up" aria-hidden="true"></i> yukarı çık</a>
     </p>
+    
+  <!--  <p> ömürcan serdar </p> -->
   </div>
 </footer>
+
       <!-- YUKARI ÇIK BUTON -->
 <script>
 $(document).ready(function() {
@@ -24,6 +27,7 @@ $(document).ready(function() {
   });
 });
 </script>
+
 
 <!-- YUKARI ÇIK BUTON BİTİŞ--> 
 

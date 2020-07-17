@@ -89,7 +89,6 @@ else if($istekMOD=="GET"){
             
             $tabAdveSayi=$db->prepare("select tabMenu.id,tabMenu.ad,COUNT(tabMenu.id) as envsayi FROM envanter,tabMenu,kurumsal
              WHERE envanter.tabMenu_id=tabMenu.id AND 
-             kurumsal.id=envanter.kurumsal_id AND 
              tabMenu.kurumsal_id=kurumsal.id AND 
              kurumsal.id=?
              GROUP BY tabMenu.ad
@@ -126,7 +125,6 @@ else if($istekMOD=="GET"){
         
         $tabenv=$db->prepare("select envanter.ad,envanter.tanim,fiyat,alinabilirMi,envanter.id FROM envanter,tabMenu,kurumsal
         WHERE envanter.tabMenu_id=tabMenu.id AND
-        kurumsal.id=envanter.kurumsal_id AND
         tabMenu.kurumsal_id=kurumsal.id AND
         kurumsal.id=?
         and tabMenu.id=?");

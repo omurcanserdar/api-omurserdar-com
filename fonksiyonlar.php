@@ -54,7 +54,6 @@ function SetHeader($kod){
     header("Content-Type: application/json; charset=utf-8;");
 }
 
-//session yoksa çık
 function sesYoksaCik($param,$deger){
     session_start();
     if(!isset($_SESSION[$param])||$_SESSION[$param]!=$deger||empty($_SESSION[$param])){
@@ -68,6 +67,7 @@ function sesYoksaCik($param,$deger){
         exit;
     }
 }
+
 
 function pdoMultiInsert($tableName, $data, $pdoObject){
     //Will contain SQL snippets.
@@ -102,6 +102,8 @@ function pdoMultiInsert($tableName, $data, $pdoObject){
     }
     
     //Execute our statement (i.e. insert the data).
+    //$pdoStatement->errorInfo();
+    
     return $pdoStatement->execute();
 }
 
@@ -110,7 +112,7 @@ $len = 4;   // total number of numbers
 $min = 100;  // minimum
 $max = 999;  // maximum
 $range = []; // initialize array
-$kod="S-";
+$kod="";
 foreach(range(0, $len - 1) as $i) {
     while(in_array($num = mt_rand($min, $max), $range));
     $range[] = $num;
@@ -118,6 +120,22 @@ foreach(range(0, $len - 1) as $i) {
 }
 return $kod;
 }
+
+//Genrate Random Key
+
+function generateRandomKey(){
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < 32; $i++)
+    {
+      $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
+//Genrate Random Key
+
 
 /*
 function ara($arrays, $key, $search) {

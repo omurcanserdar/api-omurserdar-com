@@ -29,7 +29,6 @@ FROM siparis,siparisDetay,bireysel,kurumsal,envanter WHERE
 siparis.siparisKod=siparisDetay.siparisKod AND
 bireysel.id=siparis.bireysel_id AND
 kurumsal.id=siparis.kurumsal_id AND
-kurumsal.id=envanter.kurumsal_id AND
 siparisDetay.envanter_id=envanter.id AND
 siparis.siparisKod='$sipKod'");
          if($sipVarMi->rowCount()>0){

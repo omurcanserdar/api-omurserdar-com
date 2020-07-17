@@ -15,19 +15,19 @@ $istekMOD = $_SERVER["REQUEST_METHOD"];
 
 
 if($istekMOD=="POST") {
- $envekle=$db->prepare("INSERT INTO envanter set kurumsal_id=:pkid,tabMenu_id=:ptid,ad=:pad,tanim=:ptanim,fiyat=:pfiyat");
- $envekle->execute(array('pkid' => strip_tags($_POST["kid"]),"ptid" => strip_tags($_POST["tid"]),
- "pad" => strip_tags($_POST["ad"]),"ptanim" => strip_tags($_POST["tanim"]),
- "pfiyat" => strip_tags($_POST["fiyat"])));
+ $envekle=$db->prepare("INSERT INTO envanter set tabMenu_id=:ptid,ad=:pad,tanim=:ptanim,fiyat=:pfiyat");
+ $envekle->execute(array("ptid" => strip_tags($_POST["tid"]),"pad" => strip_tags($_POST["ad"]),
+ "ptanim" => strip_tags($_POST["tanim"]),"pfiyat" => strip_tags($_POST["fiyat"])));
  $envsay=$envekle->rowCount();
  //print_r($birekle->errorInfo());
+ 
 		 if($envsay==1){
 		     $jsonArray["eklenen_env_id"]=$db->lastInsertId();
 		     $httpKOD = 201; //CREATED
              $jsonArray["mesaj"] = "eklendi";
 		 }
+		 
 		 else{
-		   
 		     $httpKOD = 400; //BAD REQ
              $jsonArray["hata"] = TRUE; // bir hata olduğu bildirilsin.
              $jsonArray["mesaj"] = "eklenmedi";
@@ -40,6 +40,7 @@ else if($istekMOD=="PUT") {
     sesYoksaCik("kullanici_tip","kurumsal");
     
      $gelenler=json_decode(strip_tags(file_get_contents("php://input")));
+     
      if(isset($gelenler->id)&&!empty($gelenler->id)&&!isset($gelenler->topguncid)){
         if($db->query("select * from envanter where id='$gelenler->id'")->rowCount()==0){
              $httpKOD = 400;
@@ -110,62 +111,66 @@ else if($istekMOD=="PUT") {
      
  }
 }
+
 else if($istekMOD=="DELETE"){
     
 sesYoksaCik("kullanici_tip","kurumsal");
        // parse_str(file_get_contents("php://input"),$veriler);
        // $bid=$veriler["id"];
        
-    if(isset(strip_tags($_GET["id"])) && !empty(trim(strip_tags($_GET["id"]))) &&!isset(strip_tags($_GET["silid"]))){
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"])) &&!isset($_GET["silid"])){
         $id=strip_tags($_GET["id"]);
- $envVarMi = $db->query("select * from envanter where id=$id");
- if($envVarMi->rowCount()==1){
-  $envsil = $db->query("delete from envanter where id=$id");
-           if($envsil->rowCount()==1){
-            $httpKOD = 200;
-            $jsonArray["mesaj"] = "silindi";
-         }else{
-         $httpKOD = 400;
-         $jsonArray["hata"] = TRUE;
-         $jsonArray["hataMesaj"] = "silinemedi";
-         }
-     }
-     else {
-     $httpKOD = 400; 
-     $jsonArray["hata"] = TRUE;
-     $jsonArray["hataMesaj"] = "kayıt bulunamadı";
-     }
- }
-elseif(!isset(strip_tags($_GET["id"]))&&isset(strip_tags($_GET["silid"]))&&!empty(strip_tags($_GET["silid"]))){
-$db->beginTransaction();
-    if (!is_array(strip_tags($_GET["silid"])))
-        strip_tags($_GET["silid"]) = array(strip_tags($_GET["silid"])); // if it is just one id not in an array, put it in an array so the rest of the code work for all cases
+        $envVarMi = $db->query("select * from envanter where id=$id");
+        if($envVarMi->rowCount()==1){
+            $envsil = $db->query("delete from envanter where id=$id");
+            if($envsil->rowCount()==1){
+                $httpKOD = 200;
+                $jsonArray["mesaj"] = "silindi";
+            }else{
+                $httpKOD = 400;
+                $jsonArray["hata"] = TRUE;
+                $jsonArray["hataMesaj"] = "silinemedi";
+            }
+        }
+        else{
+            $httpKOD = 400; 
+            $jsonArray["hata"] = TRUE;
+            $jsonArray["hataMesaj"] = "kayıt bulunamadı";
+        }
+    }
+ 
+    else if(!isset($_GET["id"]) && isset($_GET["silid"]) && !empty($_GET["silid"])){
+
+        $db->beginTransaction();
+        if (!is_array($_GET["silid"]))
+            $_GET["silid"] = array($_GET["silid"]); // if it is just one id not in an array, put it in an array so the rest of the code work for all cases
    
-   $envanterler=implode(',', strip_tags($_GET["silid"]));
-   $silsorgu=$db->prepare("DELETE FROM envanter WHERE id IN ($envanterler)");
-   $sonuc=$silsorgu->execute();
-   if($sonuc){
-       $db->commit();
-       $httpKOD = 200;
-       $jsonArray["mesaj"]="silindi";
-   }
-   else{
-       $db->rollBack();
-       $httpKOD = 200;
-       $jsonArray["mesaj"]="silinemedi,rollback";
-   }
-}
-else{
- $httpKOD = 400;
- $jsonArray["hata"] = TRUE; 
- $jsonArray["hataMesaj"] = "envanter id gönder";
- }
+        $envanterler=implode(',', $_GET["silid"]);
+        $silsorgu=$db->prepare("DELETE FROM envanter WHERE id IN ($envanterler)");
+        $sonuc=$silsorgu->execute();
+        if($sonuc){
+           $db->commit();
+           $httpKOD = 200;
+           $jsonArray["mesaj"]="silindi";
+        }
+        else{
+           $db->rollBack();
+           $httpKOD = 200;
+           $jsonArray["mesaj"]="silinemedi,rollback";
+        }
+    }
+
+    else{
+         $httpKOD = 400;
+         $jsonArray["hata"] = TRUE; 
+         $jsonArray["hataMesaj"] = "envanter id gönder";
+    }
 }
 
 else if($istekMOD=="GET"){
     // parse_str(file_get_contents("php://input"),$veriler);
        
-    if(isset(strip_tags($_GET["id"])) && !empty(trim(strip_tags($_GET["id"])))){
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
 	    $eid=strip_tags($_GET["id"]);
          $enVarMi = $db->query("select * from envanter where id='$eid'");
          if($enVarMi->rowCount()>0){
@@ -177,9 +182,11 @@ else if($istekMOD=="GET"){
            $json = file_get_contents($url);
            $jsonverilerim = json_decode($json, true);   
            $menuAd=$jsonverilerim["tabMenuBilgi"]["ad"];
+           //$tmkurumsalid=$jsonverilerim["tabMenuBilgi"]["kurumsal_id"];
            
            $jsonArray["envanterBilgi"]["bulunduguMenu"]=$menuAd;
-             
+           $jsonArray["envanterBilgi"]["kurumsal_id"]=$jsonverilerim["tabMenuBilgi"]["kurumsal_id"];
+           
              $httpKOD = 200;
              }else {
                  $httpKOD = 400;

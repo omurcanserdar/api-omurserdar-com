@@ -416,7 +416,7 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                                        $('.modSepetBody').html("<h2> SEPET BOŞ </h2>");
                                }
                                else{
-                                     $('.modSepetTitle').html("<h4>SEPETİM <small class='text-primary'>Sipariş verebilmek için sepet tutarı en az "+data.minalim+" ₺ olmalı !</small></h4>");
+                                     $('.modSepetTitle').html("<h4>SEPETİM <small class='text-primary'>Sipariş verebilmek için sepet tutarı en az "+data.minalim+" ₺ olmalı ! (<b>"+data.kurumsal+"</b>)</small></h4>");
                                      $('.modSepetBody').html(data.cevap);
                                     
                                }
@@ -2536,7 +2536,7 @@ $(document).ready(function(){
         <p class="lead p-5">Türkçe'de uygulama geliştirme arayüzü anlamına gelen API, sahip olduğumuz servis veya verileri dış dünyaya açıp başka uygulamaların-platformların kullanımına sunmak için belli kurallar çerçevesinde tanımlamalar yaptığımız arayüz dür.</p>
       </div>
       <div class="col-md-5">
-        <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" src="/gorsel/1.gif"/>
+        <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" src="/assets/images/1.gif"/>
         
        
       </div>
@@ -2569,7 +2569,7 @@ $(document).ready(function(){
         <p class="lead p-5">İstek sonucunda JSON veri döndürülür, dönen cevap işlenir. Örnek olarak <b><a href="https://api.omurserdar.com/api/kurumsal?id=1" target="_blank">https://api.omurserdar.com/api/kurumsal?id=1</a></b> adresindeki "1" id değerine sahip satır bilgileri JSON olarak döndürülüp işlendikten sonra bilgi gösterimi yapılmıştır. </p>
       </div>
       <div class="col-md-5 order-md-1">
-        <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" src="/gorsel/2.gif" />
+        <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" src="/assets/images/2.gif" />
       </div>
     </div>
     
@@ -2598,7 +2598,7 @@ $(document).ready(function(){
       </div>
       <div class="col-md-5 order-md-1">
         <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" 
-        src="/gorsel/3.webp" />
+        src="/assets/images/3.webp" />
       </div>
     </div>
     

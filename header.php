@@ -7,12 +7,22 @@
     <meta name="author" content="ömürcan">
     <title><?=$title?></title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/album/">
-    <!-- Bootstrap core CSS -->
-    <link href="https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" href="/gorsel/favicon.ico">
 
+<!-- Custom styles for this template -->
+
+    <!-- Bootstrap core CSS -->
+    
+   
+     <!--<link href="https://getbootstrap.com/docs/4.4/examples/album/album.css" rel="stylesheet"> -->
+     
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/stilim.css">
+    
+    
     <!-- Favicons -->
+     <link rel="icon" href="/assets/images/favicon.ico">
     <!--     
 <link rel="apple-touch-icon" href="https://getbootstrap.com//docs/4.4/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
 <link rel="icon" href="https://getbootstrap.com/docs/4.4/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
@@ -32,21 +42,12 @@
     <script src="https://getbootstrap.com/docs/4.4/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" type="text/javascript"></script> <!-- fa js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script> <!-- confirm -->
-    <script type="text/javascript" src="/js/jsfonksiyonlar.js"></script> 
+    <script type="text/javascript" src="/assets/js/jsfonksiyonlar.js"></script> 
    
-  <script type="text/javascript" src="/js/qr1.js"></script>
-  <script type="text/javascript" src="/js/qr2.js"></script>
+  <script type="text/javascript" src="/assets/js/qr1.js"></script>
+  <script type="text/javascript" src="/assets/js/qr2.js"></script>
     <!-- js fonksiyonlar -->
    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>  axios --> 
-   
-    
-    <!-- Custom styles for this template -->
-    <link href="https://getbootstrap.com/docs/4.4/examples/album/album.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/cosmo/bootstrap.css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/stilim.css">
-    
      
   </head>
   <body>
@@ -60,12 +61,19 @@
 
   <div class="navbar-collapse collapse show" id="navbarColor01" style="">
     <ul class="navbar-nav mr-auto">
+      
+      <!-- 
       <li class="nav-item">
-       <!--  <a class="nav-link" href="#">About</a> -->
-        <a class="nav-link" style="color:white" href="/raporlar"><i class="fas fa-file"></i> Raporlar</a>
+       <!--  <a class="nav-link" href="#">About</a> 
+         <a class="nav-link" style="color:white" href="/raporlar"><i class="fas fa-file"></i> Raporlar</a> 
       </li>
+      <li class="nav-item">
+          <a class="nav-link" style="color:white" target="_blank" href="https://github.com/omurserdarr"><i class="fab fa-github"></i> omurserdarr</a>
+      </li>  
+      -->
       
       <?php
+      require_once "fonksiyonlar.php";
       session_start();
       if(isset($_SESSION["kullanici_mail"])==false){
 ?>
@@ -80,10 +88,6 @@
   </div>
 </div>
 <?php } ?>
-        <li class="nav-item">
-            <a class="nav-link" style="color:white" target="_blank" href="https://github.com/omurserdarr"><i class="fab fa-github"></i> omurserdarr</a>
-        </li>
-
 
 
     </ul>
@@ -600,6 +604,8 @@ mesajKapat(diaKurKayitNo,2500);
         </div>
         <div class="d-flex flex-column text-center">
           <form id="loginform" method="post">
+                		<input type="hidden" name="enckey" id="enckey" value="<?=generateRandomKey()?>">
+
                <input type="radio" name="radiogiris" id="idRadBir" value="bireysel" checked/>Bireysel
                <input type="radio" name="radiogiris" id="idRadKur" value="kurumsal" /> Kurumsal
             <div class="form-group">
