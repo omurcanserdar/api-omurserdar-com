@@ -48,11 +48,20 @@ function HttpStatus($kod) {
     return $status[$kod] ? $status[$kod] : $status[500];
 }
 
-// Header ayarlama fonksiyonu 
+// API Gönderilecek Veri Header ayarlama fonksiyonu 
 function SetHeader($kod){
     header("HTTP/1.1 ".$kod." ".HttpStatus($kod));
     header("Content-Type: application/json; charset=utf-8;");
 }
+
+//API index header
+function beginAPIHeader(){
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET,POST,PUT,DELETE");
+header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+}
+
 
 function sesYoksaCik($param,$deger){
     session_start();

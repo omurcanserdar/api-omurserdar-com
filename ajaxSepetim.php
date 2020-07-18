@@ -10,6 +10,8 @@ if($_SESSION["kullanici_tip"]!="bireysel"){
 
 $birid=$_SESSION['kullanici_id'];
 
+
+//SEPET EKLE 
 if($btn=="btnsepetEkle"){ 
     //sepette giriş yapan kullanıcıya ait en az bir ürün varsa
     if(isset($_POST["id"])&& !empty($_POST["id"])){
@@ -81,6 +83,11 @@ if($btn=="btnsepetEkle"){
 	}
 }
 
+//SON SEPETEKLE
+
+
+//SEPETİMDEN KALDIR
+
 elseif($btn=="btnSepetEnvKaldir"){
     $kaldircevap=array();
     $kaldirilacakEnvId=$_POST["envid"];
@@ -116,8 +123,57 @@ elseif($btn=="btnSepetEnvKaldir"){
     exit;  
 }
 
+//SON SEPETİMDEN KALDIR
 
-if(isset($_GET["secim"]) && $_GET["secim"]=="btnSepetim"){
+//SEPETİMDEN 1 AZALT
+elseif($btn=="btnSepetEnvAzalt"){
+    
+    $mesaj="";
+    $azaltEnvId=strip_tags($_POST["envid"]);
+    
+    $sepetsor=$db->prepare("select * from sepet where envanter_id=:psepenvid and bireysel_id=:pbid");
+    $sepetsor->execute(array(':psepenvid'=>$azaltEnvId,':pbid'=>$birid));
+    $sepetenvsayisi=$sepetsor->rowCount();
+    
+    if($sepetenvsayisi>0){
+        $sepetcek=$sepetsor->fetch(PDO::FETCH_ASSOC);
+            if($azaltEnvId==$sepetcek["envanter_id"]){
+                
+                //env fiyatını al
+                $url = "https://api.omurserdar.com/api/envanter?id=$azaltEnvId";
+                $json = file_get_contents($url);
+                $jsonverilerim = json_decode($json, true);   
+                
+                //$envfiyat=$jsonverilerim["envanterBilgi"]["fiyat"];
+                //son env fiyat
+                //$silinecekTutar=floatval($val["fiyat"]);
+                //unset($_SESSION["sepet"][$select]);
+                
+                $guncelleEnv=$db->prepare("UPDATE sepet SET adet=adet-1 WHERE id=:psepid AND envanter_id=:psepenvid");
+                $guncelleEnv->execute(array(':psepid'=>$sepetcek["id"],':psepenvid'=>$azaltEnvId));
+                
+                if($guncelleEnv->rowCount()==1){
+                    //$azaltcevap["sepetkalanenvsayi"]=$sepetenvsayisi-1;
+                    $mesaj="azaldi";
+                    //$azaltcevap["silinenTutar"]=floatval($sepetcek["adet"]*floatval($envfiyat));
+                }
+                else{
+                $mesaj="islembasarisiz";
+                }
+            }
+        }
+        else{
+            $mesaj="envanter sayısı 0dan küçük";
+            exit;
+        }
+    echo $mesaj;
+    exit;  
+}
+//SON SEPETİMDEN 1 AZALT
+
+//SEPETİM
+
+elseif($_GET["secim"]=="btnSepetim"){
     try{
     if(isset($_SESSION["kullanici_tip"])&&$_SESSION["kullanici_tip"]=="bireysel"){
 	   $top=0;$k_min=0;
@@ -160,8 +216,16 @@ if(isset($_GET["secim"]) && $_GET["secim"]=="btnSepetim"){
                 
                 $ad=$kurBilgi["ad"];
                 $response.='<div class="card border-'.$renv.' mb-3 text-center" sepetenvid="'.$tblenvkume["id"].'" id="cardsepenv'.$tblenvkume["id"].'" style="max-width: 20rem;">
-                <div class="card-body">
-                 <span class="badge badge-success">'.$tblenvkume["ad"].'</span><hr>
+                <div class="card-body">';
+                
+                if($sepetcek["adet"]>1){
+                    $response.='<button type="button" class="btnAdetAzalt btn btn-outline-primary btn-sm card-link float-left" id="btnadetazalt'.$tblenvkume["id"].'" data-id="'.$tblenvkume["id"].'" alt="1 adet azalt" title="1 adet azalt"><i class="fas fa-minus"></i> </button>';
+                }
+                 $response.='<span class="badge badge-success">'.$tblenvkume["ad"].'</span>
+                 
+                 <button type="button" class="btnAdetArttir btn btn-outline-primary btn-sm card-link float-right" id="'.$tblenvkume["id"].'" data-id="'.$tblenvkume["id"].'" alt="1 adet arttır" title="1 adet arttır"><i class="fas fa-plus"></i> </button>
+                 
+                 <hr>
                  <span data-id="'.$tblenvkume["fiyat"].'" class="efiyat'.$tblenvkume["id"].' badge badge-info">her biri '.$tblenvkume["fiyat"].' &#8378; </span>
                  <span data-id="'.$sepetcek["adet"].'" class="eadet'.$tblenvkume["id"].' badge badge-warning">'.$sepetcek["adet"].' adet</span>
                  <span data-id="'.$sepetcek["adet"]*$tblenvkume["fiyat"].'" class="etutar'.$tblenvkume["id"].' badge badge-danger">toplam tutar '.$sepetcek["adet"]*$tblenvkume["fiyat"].' &#8378; </span>
@@ -205,5 +269,7 @@ $dizim["sayi"]=$sepetsor->rowCount();
 echo json_encode($dizim);
       }
 }
+
+//SON SEPETİM
 
 ?>

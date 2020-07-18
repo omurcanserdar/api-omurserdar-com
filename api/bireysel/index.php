@@ -1,8 +1,11 @@
 <?php
-include "../../db.php";
-include "../../fonksiyonlar.php";
+include $_SERVER["DOCUMENT_ROOT"]."/db.php";
+include $_SERVER["DOCUMENT_ROOT"]."/fonksiyonlar.php";
+
+beginAPIHeader(); //başlıklar ayarlandı
+
 $jsonArray = array(); // array değişkenimiz bunu en alta json objesine çevireceğiz. 
-$jsonArray["hata"] = FALSE; // Başlangıçta hata yok olarak kabul edelim. 
+$jsonArray["hata"] = false; // Başlangıçta hata yok 
  
 $httpKOD = 200; // HTTP Ok olarak durumu kabul edelim. 
 $istekMOD = $_SERVER["REQUEST_METHOD"]; // client tarafından bize gelen method
@@ -30,13 +33,13 @@ if($istekMOD=="POST"){
 		 }
 		 else{
 		     $httpKOD = 400;
-             $jsonArray["hata"] = TRUE; // bir hata olduğu bildirilsin.
+             $jsonArray["hata"] = true; //hata olduğu bildirilsin.
              $jsonArray["mesaj"] = "eklenmedi";
 		 }
     } //kullanici dbde varsa
     else{
              $httpKOD = 200;
-             $jsonArray["hata"] = TRUE; // bir hata olduğu bildirilsin.
+             $jsonArray["hata"] = true;
              $jsonArray["mesaj"] = "kullanicizatenmevcut";
     }
     
@@ -45,7 +48,7 @@ else if($istekMOD=="PUT") {
      $gelenler=json_decode(file_get_contents("php://input"));
         if($db->query("select * from bireysel where id='$gelenler->id'")->rowCount()==0){
              $httpKOD = 400;
-             $jsonArray["hata"] = TRUE;
+             $jsonArray["hata"] = true;
              $jsonArray["hataMesaj"] = "kayıt yok";
              }else{
                  $birguncelle=$db->prepare("UPDATE bireysel SET ad=:pad,soyad=:psoyad,email=:pmail,sifre=:psifre WHERE id=:pid");
@@ -56,17 +59,18 @@ else if($istekMOD=="PUT") {
                  "psifre" => $gelenler->sifre,
                  "pid" => $gelenler->id 
                  ));
-                 // güncelleme başarılı ise bilgi veriyoruz. 
+                 
+                // güncelleme başarılı ise
                  if($birguncelle->rowCount()>0){
-                     echo "güncellendi";
-                 $httpKOD = 200;
-                 $jsonArray["mesaj"] = "Güncelleme Başarılı";
-                 }
-                 else {
-                 // güncelleme başarısız ise bilgi veriyoruz. 
+                    echo "güncellendi";
+                    $httpKOD = 200;
+                    $jsonArray["mesaj"] = "Güncelleme Başarılı";
+                }
+                else{
+                // güncelleme başarısız ise bilgi
                  $httpKOD = 400;
                  $jsonArray["hata"] = TRUE;
-                 $jsonArray["hataMesaj"] = "Sistemde Hata Meydana Geldi";
+                 $jsonArray["mesaj"] = "Sistemde Hata Meydana Geldi";
                  }
  }
 }

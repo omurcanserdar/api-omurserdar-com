@@ -323,7 +323,7 @@ $(".btnsepetEkle").on("mouseover",(function(){ $( this ).css( "font-size", "22px
 $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px" ); }));
 
                               //sepete Ekleme   
-                                $('.btnsepetEkle').click(function(){
+                                $('.btnsepetEkle').on("click",function(){
                                         var pEnvId = $(this).attr('id');
                                         var pEnvFiyat=$(".efiyat"+pEnvId).data("id");
                                         var dsecim="btnsepetEkle";
@@ -540,6 +540,89 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                                  });
                                 });
                           //SEPETiMDEN KALDIR SON
+                          
+                          
+                //attır
+                          
+                $('.btnAdetArttir').on('click', function(){
+                   //$('.btnsepetEkle').trigger("click"); yüzlerce nesne var hangisi tetikelenecek :) :) 
+                             
+                             
+                    var pEnvId = $(this).attr('id');
+                    var pEnvFiyat=$(".efiyat"+pEnvId).data("id");
+                    var dsecim="btnsepetEkle";
+ 
+                    $.ajax({
+                         method: 'POST',
+                         url : "https://www.api.omurserdar.com/ajaxSepetim.php",
+                         //data : {secim:dsecim,id:pEnvId,fiyat:pEnvFiyat},
+                         data : {secim:dsecim,id:pEnvId},
+                         success: function(eklendiMi){
+                            if(eklendiMi=="arti"){
+                                   
+                            $("#sepetModal").unbind("shown.bs.modal");
+                            $("#sepetModal").modal("hide");
+                            $('.btnSepetim').trigger("click");
+                                           
+                            }
+                                        
+                            else{
+                                /*
+                                $.dialog({
+                                title: '<b class="text-danger"><i class="fas fa-times"></i> HATA </b>',
+                                content: 'Sepetine Eklenemedi :( ! '+eklendiMi,
+                                    });
+                                    */
+                                }
+                                
+                        }
+                    });
+                              
+                });
+                          
+               //son arttır
+               
+               $('.btnAdetAzalt').on('click', function(){
+                   //$('.btnsepetEkle').trigger("click"); yüzlerce nesne var hangisi tetikelenecek :) :) 
+                             
+                             
+                    var pEnvId = $(this).attr('data-id');
+                    //var pEnvFiyat=$(".efiyat"+pEnvId).data("id");
+                    var dsecim="btnSepetEnvAzalt";
+ 
+                    $.ajax({
+                         method: 'POST',
+                         url : "https://www.api.omurserdar.com/ajaxSepetim.php",
+                         //data : {secim:dsecim,id:pEnvId,fiyat:pEnvFiyat},
+                         data : {secim:dsecim,envid:pEnvId},
+                         success: function(resp){
+                             
+                            if(resp=="azaldi"){
+                                   
+                            $("#sepetModal").unbind("shown.bs.modal");
+                            $("#sepetModal").modal("hide");
+                            $('.btnSepetim').trigger("click");
+                                           
+                            }
+                                        
+                            else{
+                                alert(resp);
+                                /*
+                                $.dialog({
+                                title: '<b class="text-danger"><i class="fas fa-times"></i> HATA </b>',
+                                content: 'Sepetine Eklenemedi :( ! '+eklendiMi,
+                                    });
+                                    */
+                                }
+                                
+                        }
+                    });
+                              
+                });
+               
+               //azalt
+               
+               //son azalt
                                 
                                 
                                  }//btnsepetim success
@@ -2512,7 +2595,7 @@ $(document).ready(function(){
  
  <div class="jumbotron">
   <h1 class="display-3">Merhaba, AP!</h1>
-  <p class="lead"> Bu projede yiyecek/içecek siparişi verebilmek ya da satışa sunabilmek için API geliştirilmiş ve kullanılmıştır.</p><small>Örnek giriş bilgileri Kayıt&Giriş kısmındaki "Giriş Yap" linkine tıklanınca açılan modal da verilmiştir.</small>
+  <p class="lead"> Bu projede yiyecek/içecek siparişi verebilmek ya da satışa sunabilmek için <b>API</b> geliştirilmiş ve kullanılmıştır.</p><small>Örnek giriş bilgileri Kayıt&Giriş kısmındaki "Giriş Yap" linkine tıklanınca açılan modal da verilmiştir.</small>
 
 </div>
 
@@ -2533,7 +2616,7 @@ $(document).ready(function(){
           ?>
           
         <h2 class="featurette-heading text-primary"><b><?=$bireyselKume["ad"]?> <?=$bireyselKume["soyad"]?></b> - <span class="text-muted"><?=$bireyselKume["kullaniciadi"]?></span></h2>
-        <p class="lead p-5">Türkçe'de uygulama geliştirme arayüzü anlamına gelen API, sahip olduğumuz servis veya verileri dış dünyaya açıp başka uygulamaların-platformların kullanımına sunmak için belli kurallar çerçevesinde tanımlamalar yaptığımız arayüz dür.</p>
+        <p class="lead p-5"><b>Uygulama Geliştirme Arayüzü</b> anlamına gelen <b>API</b>, sahip olduğumuz servis veya verileri dış dünyaya açıp başka uygulamaların-platformların kullanımına sunmak için belli kurallar çerçevesinde tanımlamalar yaptığımız arayüzdür.</p>
       </div>
       <div class="col-md-5">
         <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" src="/assets/images/1.gif"/>

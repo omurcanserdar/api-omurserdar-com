@@ -1,29 +1,26 @@
-<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="<?=$desc?>">
     <meta name="author" content="ömürcan">
+    <!--<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">-->
     <title><?=$title?></title>
 
 
 <!-- Custom styles for this template -->
 
-    <!-- Bootstrap core CSS -->
-    
-   
-     <!--<link href="https://getbootstrap.com/docs/4.4/examples/album/album.css" rel="stylesheet"> -->
-     
-    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="/assets/css/bootstrap.css"> 
+    <link rel="stylesheet" href="/assets/css/jqueryconfirm.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome.min.css">
     <link rel="stylesheet" href="/assets/css/stilim.css">
     
     
     <!-- Favicons -->
      <link rel="icon" href="/assets/images/favicon.ico">
-    <!--     
+<!--     
 <link rel="apple-touch-icon" href="https://getbootstrap.com//docs/4.4/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
 <link rel="icon" href="https://getbootstrap.com/docs/4.4/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="https://getbootstrap.com/docs/4.4/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
@@ -33,22 +30,17 @@
 <meta name="msapplication-config" content="https://getbootstrap.com/docs/4.4/assets/img/favicons/browserconfig.xml">
 <meta name="theme-color" content="#563d7c">
 -->
-
- <!--  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script> 
-     <script>window.jQuery || document.write('<script src="https://getbootstrap.com/docs/4.4/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="https://getbootstrap.com/docs/4.4/dist/js/bootstrap.bundle.min.js"></script>
-      -->
-    <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script> -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://getbootstrap.com/docs/4.4/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" type="text/javascript"></script> <!-- fa js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script> <!-- confirm -->
-    <script type="text/javascript" src="/assets/js/jsfonksiyonlar.js"></script> 
+    
+    <!-- JS -->
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/fontawesome.all.min.js" type="text/javascript"></script>
+<script src="/assets/js/jqueryconfirm.min.js"></script> <!-- confirm -->
+<script src="/assets/js/jsfonksiyonlar.js" type="text/javascript"></script> 
+<script src="/assets/js/qr1.js" type="text/javascript"></script>
+<script src="/assets/js/qr2.js" type="text/javascript"></script>
    
-  <script type="text/javascript" src="/assets/js/qr1.js"></script>
-  <script type="text/javascript" src="/assets/js/qr2.js"></script>
-    <!-- js fonksiyonlar -->
-   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>  axios --> 
-     
+    
   </head>
   <body>
       
