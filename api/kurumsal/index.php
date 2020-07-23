@@ -41,49 +41,128 @@ $kurekle=$db->prepare("INSERT INTO kurumsal set il_id=:pil,ilce_id=:pilce,ad=:pa
     }
 }
 
+//GÜNCELLEME İSTEĞİ
 else if($istekMOD=="PUT") {
     $gelenler=json_decode(file_get_contents("php://input"));
-        if($db->query("select * from kurumsal where id='$gelenler->id'")->rowCount()==0){
+        if($db->query("select * from kurumsal where id='$gelenler->id' or email='$gelenler->email'")->rowCount()==0){
              $httpKOD = 400;
              $jsonArray["hata"] = TRUE;
              $jsonArray["mesaj"] = "kurumsal bulunamadı";
              }else{
-                 $kurguncelle=$db->prepare("UPDATE kurumsal SET adres=:padres,minAlimTutar=:pmin,acikMi=:pacik WHERE id=:pid");
-                 $kurguncelle->execute(array(
+                 
+                 
+                 //EĞER ŞİFRE GÜNCELLENECEK İSE
+                 if(isset($gelenler->sifre)){
+                     
+                    $sifre=generateRandomKey();
+                     
+                    $db->beginTransaction();
+                    
+                    $kurguncelle=$db->prepare("UPDATE kurumsal SET sifre=:psifre WHERE email=:pmail");
+                    $kurguncelle->execute(array("psifre"=>md5($sifre),
+                 "pmail" => $gelenler->email));
+                 
+                    if($kurguncelle) //SİFRE GUNCELLENDİ İSE 
+                        $emailGonderilecekMi=true; //EMAİL GÖNDERİM İŞLEM YAKALAMA İÇİN
+                 }
+                 
+                 //SON EĞER ŞİFRE GÜNCELLENECEK İSE
+                 
+                 
+                 //ŞİFRE GÜNCELLENMEYECEK İSE (örneğin kurumsal giriş-bilgilerim tab üzerinde düzenleme)
+                 else{
+                    $kurguncelle=$db->prepare("UPDATE kurumsal SET adres=:padres,minAlimTutar=:pmin,acikMi=:pacik WHERE id=:pid");
+                    $kurguncelle->execute(array(
                  "padres" => $gelenler->adres,
                  "pmin" => intval($gelenler->min),
                  "pacik" => $gelenler->acik,
-                 "pid" => $gelenler->id
-                 ));
-                 // güncelleme başarılı
+                 "pid" => $gelenler->id));
+                 }
+                 
+                 //SON ŞİFRE GÜNCELLENMEYECEK İSE
+                 
+                 
+                 //her iki durumda da güncelleme başarılı
                  if($kurguncelle->rowCount()>0){
-                 $httpKOD = 200;
-                 $jsonArray["mesaj"] = "güncellendi";
-                 }
-                 else {
-                 // güncelleme başarısız
-                 $httpKOD = 400;
-                 $jsonArray["hata"] = TRUE;
-                 $jsonArray["mesaj"] = "güncellenmedi";
-                 }
- }
+                     
+                    //ŞİFRE GÜNCELLENDİĞİNDE EMAİL GÖNDERİM İÇİN                 
+                    if($emailGonderilecekMi==true){
+                        
+                        //bilgileri al
+                        $url = "https://api.omurserdar.com/api/kurumsal?email=$gelenler->email";
+                        $json = file_get_contents($url);
+                        $jsonverilerim = json_decode($json, true);   
+                        $tblkurkume=$jsonverilerim["kurumsalbilgileri"];
+                    //bilgi al son
+                        
+                        $mesaj='<h3> Merhaba, '.$tblkurkume["ad"].'</h3> <br> Yeni Şifreniz: '.$sifre;
+                        if(!mailGonder("sifre@api.omurserdar.com","AP!",$gelenler->email,"sifre",$mesaj,"altbas")){
+                            
+                            $db->rollBack();
+                            echo "<br> ROLLBACK ÇALIŞTI<br>";
+                            exit;
+                             
+                        }
+                        else{
+                        //demekki mail gönderildi, değişiklikleri uygula
+                        $db->commit();
+                        }
+                    //SON ŞİFRE GÜNCELLENDİĞİNDE EMAİL GÖNDERİM İÇİN       
+                    }
+                 
+                     $httpKOD = 200;
+                     $jsonArray["hata"] = FALSE;
+                     $jsonArray["mesaj"] = "güncellendi";
+                 
+                }//SON HER İKİ GÜNCELLEME BAŞARILI İSE
+                 
+                else{ //HER İKİ güncelleme başarısız İSE
+                    $httpKOD = 400;
+                    $jsonArray["hata"] = TRUE;
+                    $jsonArray["mesaj"] = "güncellenmedi";
+                }
+    }//kurumsalbulunduise
 }
+//SON GÜNCELLEME İSTEĞİ
+
+
+//SİLME İSTEĞİ
 else if($istekMOD=="DELETE") {
        // parse_str(file_get_contents("php://input"),$veriler);
        // $bid=$veriler["id"];
 
 }
+//SON SİLME İSTEĞİ
 
 
+//BİLGİ ÇEKME İSTEĞİ
 else if($istekMOD=="GET"){
-  if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
-    $kid=$_GET["id"];
-    $kurVarMi = $db->query("select * from kurumsal where id='$kid'");
+  if((isset($_GET["id"]) && !empty(trim($_GET["id"]))) || isset($_GET["email"]) && !empty(trim($_GET["email"]))){
+      
+      if(isset($_GET["id"]) && isset($_GET["email"])){
+            $httpKOD = 400;
+            $jsonArray["hata"] = TRUE; 
+            $jsonArray["hataMesaj"] = "tek değer ver iki değer verdin";
+            
+            SetHeader($httpKOD);
+            $jsonArray[$httpKOD] = HttpStatus($httpKOD);
+            echo json_encode($jsonArray);
+            
+            exit;
+        }
+         
+        if(isset($_GET["id"]))
+            $kid=$_GET["id"];
+        else
+            $kemail=$_GET["email"];
+      
+      
+    $kurVarMi = $db->query("select * from kurumsal where id='$kid' or email='$kemail'");
     if($kurVarMi->rowCount()>0){
         $kurbilgiler=$db->query("select kurumsal.*,il.il_adi,ilce.ilce_adi from kurumsal,il,ilce where kurumsal.il_id=il.id 
             and kurumsal.ilce_id=ilce.id
             and ilce.il_id=il.id 
-            and kurumsal.id='$kid'")->fetch(PDO::FETCH_ASSOC);
+            and kurumsal.id='$kid' or email='$kemail'")->fetch(PDO::FETCH_ASSOC);
             $jsonArray["kurumsalbilgileri"] = $kurbilgiler;
             unset($jsonArray["kurumsalbilgileri"]["sifre"]);
             
@@ -140,7 +219,7 @@ else if($istekMOD=="GET"){
 ///$jsonArray["kurumsalTabVerilerim"] = json_encode($f,JSON_FORCE_OBJECT);
              $httpKOD = 200;
              }else {
-                 $httpKOD = 400;
+                 $httpKOD = 200;
                  $jsonArray["hata"] = TRUE;
                  $jsonArray["hataMesaj"] = "Üye bulunamadı";
                     }
@@ -148,22 +227,18 @@ else if($istekMOD=="GET"){
     else {
      $httpKOD = 400;
      $jsonArray["hata"] = TRUE; 
-     $jsonArray["hataMesaj"] = "kurumsal id gönder";
+     $jsonArray["hataMesaj"] = "Kurumsal id ya da email gönder";
  }
 }
+//SON BİLGİ ÇEKME İSTEĞİ
 
 
-
-
-
+baslikAyarlaJSONyaz($httpKOD,$jsonArray);
+/*
 SetHeader($httpKOD);
 $jsonArray[$httpKOD] = HttpStatus($httpKOD);
 echo json_encode($jsonArray);
-
-
-
-
-
+*/
 
 
 ?>

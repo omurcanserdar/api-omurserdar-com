@@ -1,5 +1,75 @@
 <?php 
 
+
+//API İSTEK SONUNDA BAŞLIK AYARLA VE JSON YAZ
+
+function baslikAyarlaJSONyaz($httpKOD,$jsonparam){
+SetHeader($httpKOD);
+$jsonparam[$httpKOD] = HttpStatus($httpKOD);
+echo json_encode($jsonparam);
+}
+
+//SON API İSTEK SONUNDA BAŞLIK AYARLA VE JSON DÖNDÜR
+
+//mail gönder 
+
+function mailGonder($gonderici,$gondericiUsername=null,$alici,$subject=null,$body,$altbody=null){
+    
+    require $_SERVER['DOCUMENT_ROOT']."/class/class.phpmailer.php";
+                
+    //EMAİL
+    $mail = new PHPMailer();
+    $mail->IsSMTP();
+    $mail->SMTPDebug = 1; // Hata ayıklama değişkeni: 1 = hata ve mesaj gösterir, 2 = sadece mesaj gösterir
+    $mail->SMTPAuth = true; //SMTP doğrulama olmalı ve bu değer değişmemeli
+    $mail->SMTPSecure = 'ssl'; // Normal bağlantı için tls , güvenli bağlantı için ssl yazın
+    $mail->Host = "api.omurserdar.com"; // Mail sunucusunun adresi (IP de olabilir)
+    $mail->Port = 465; // Normal bağlantı için 587, güvenli bağlantı için 465 yazın
+    $mail->IsHTML(true);
+    //$mail->SetLanguage("tr", "phpmailer/language");
+    //$mail->CharSet  ="utf-8";
+    
+    $mail->Username = $gonderici; // Gönderici adresinizin sunucudaki kullanıcı adı (e-posta adresiniz)
+    $mail->Password = "Serdar*1461"; // Mail adresimizin sifresi
+                
+                //MAİL İCERİK
+    $mail->Subject = $subject; // Email konu başlığı
+    $mail->Body = $body; // Mailin içeriği
+    
+    //$mail->AltBody = "This is the plain text version of the email content";
+              
+    /*CC ÇOKLU 
+              
+    $katilimcilar = array(
+    'person1@domain.com' => 'Person One',
+    'person2@domain.com' => 'Person Two',
+     // ..
+    );
+    foreach($katilimcilar as $email => $name){
+        $mail->AddCC($email, $name);
+    }
+              
+    SON CC ÇOKLU */ 
+    // TEK CC $mail->addCC("cc@example.com"); 
+              
+    //CEVAP ADRESİ $mail->AddReplyTo("cevap@api.omurserdar.com", "Cevap Adresi");
+              
+    $mail->AddAddress($alici); //mail alıcı adres
+    $mail->SetFrom($gonderici, $gondericiUsername);
+    // Mail atıldığında gorulecek isim ve email
+                
+    if($mail->Send()){
+        return true;
+    }
+    else{
+        echo "Email Gönderim Hatasi: ".$mail->ErrorInfo;
+        return false;
+    }
+    
+}
+
+//son şifre mail gönder
+
 // https://tools.ietf.org/html/rfc7231
 function HttpStatus($kod) {
  $status = array(
@@ -63,7 +133,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 }
 
 
-function sesYoksaCik($param,$deger){
+function sesYoksaCik($param,$deger=null){
     session_start();
     if(!isset($_SESSION[$param])||$_SESSION[$param]!=$deger||empty($_SESSION[$param])){
         $jsonArray=array();
@@ -75,6 +145,22 @@ function sesYoksaCik($param,$deger){
         echo json_encode($jsonArray);
         exit;
     }
+}
+
+function genelSesYoksaCik($param){
+    session_start();
+    if(!isset($_SESSION[$param])){
+        $jsonArray=array();
+        $httpKOD = 403; //forbidden
+        SetHeader($httpKOD);
+        $jsonArray[$httpKOD] = HttpStatus($httpKOD);
+        $jsonArray["hata"]=true;
+        $jsonArray["mesaj"]="oturumhata";
+        echo json_encode($jsonArray);
+        exit;
+    }
+    else
+    return true;
 }
 
 

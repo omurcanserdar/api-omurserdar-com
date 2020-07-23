@@ -34,6 +34,7 @@
     <!-- JS -->
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/js/bootstrap.bundle.min.js"></script>
+
 <script src="/assets/js/fontawesome.all.min.js" type="text/javascript"></script>
 <script src="/assets/js/jqueryconfirm.min.js"></script> <!-- confirm -->
 <script src="/assets/js/jsfonksiyonlar.js" type="text/javascript"></script> 
@@ -607,12 +608,106 @@ mesajKapat(diaKurKayitNo,2500);
             <div class="form-group">
               <input type="password" class="form-control" id="password1" name="sifre1" placeholder="Şifre Girin">
             </div>
-            <button type="button" id="btngirisyap" class="btn btn-info btn-block btn-round">Giriş Yap</button>
+            <button type="button" id="btngirisyap" class="float-left btn btn-info col-md-8">Giriş Yap</button>
+            <a href="/sifremiunuttum" class="ml-1 btn btn-outline-danger">Şifremi Unuttum</a>
             <center><div class="loader"></div></center>
             
             <p>bireysel-> email:hesap@bireysel.com ; şifre:api</p>
             <p>kurumsal-> email:hesap@kurumsal.com ; şifre:api</p>
           </form>
+          
+          
+          
+          <!-- ŞİFRE İŞLEM BUTON TIK-->
+          
+          <script type="text/javascript">
+          
+          $(document).ready(function() {
+          
+          $("#btnsifremiunuttum").on("click",function(){
+               $('#loginModal').modal('hide');
+                  $.confirm({
+                type:'blue',
+                title: '<b class="text-info">Menü Ekle</b>',
+                content: '<form action="" class="formName">' +
+                '<div class="form-group"><label>Menü Adı: </label>' +
+                '<input type="text" placeholder="Menü adı girin" class="ekletabad form-control" required />' +
+                '</div></form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Gönder',
+                        btnClass: 'btn-blue',
+                        action: function () {
+                            var kurid=$(".kid").attr("data-id");
+                            var ekletad=$('.ekletabad').val().trim();
+                             if(!ekletad){
+                                var diMenuAdBos=$.dialog('<b class="text-danger">Menü adı boş bırakılamaz! </b>');
+                                mesajKapat(diMenuAdBos);
+                                return false;
+                            }
+                           
+                           //var dobje={"kid":kurid,"ad":ekletad};
+                            //dobje=JSON.stringify(dobje);
+                            
+                                 $.ajax({
+                                method: 'POST',
+                                url : "https://www.api.omurserdar.com/api/tabmenu/",
+                                data : {kid:kurid,ad:ekletad},
+                                //contentType: "application/json",
+                                
+                                success: function(apitabekle){
+                                    if(apitabekle.mesaj=="eklendi"){
+                                       var eklenenid=apitabekle.eklenen_tab_id;
+                                       /* tetikleyici geldi, önemsiz ekleme animasyonu
+                                       var ekletabMenuBos="";
+                    ekletabMenuBos+='<div id="cardtab'+eklenenid+'" class="card border-info mb-2 ml-2 col-md-4" style="max-width: 20rem;"><div class="card-body">';
+                    ekletabMenuBos+='<h2 class="card-title text-info" id="ma'+eklenenid+'"><b>'+ekletad+'</b></h2>';
+                    ekletabMenuBos+='<button type="button" id="'+ekletad+'" data-id="'+eklenenid+'" class="btntabduzenle btn btn-outline-primary pr-2 mr-2"><i class="fas fa-edit"></i> Düzenle</button>';
+                    ekletabMenuBos+='<button type="button" id="'+ekletad+'" data-id="'+eklenenid+'" class="btntabsil btn btn-outline-danger btn'+eklenenid+' pr-2 mr-2"><i class="fas fa-trash-alt"></i> Sil</button> </div></div>';
+                    $(".sipmenu2Div").append(ekletabMenuBos).fadeIn("normal");
+                    */
+                            
+                                var diMenuEkle=$.dialog({
+                                    type:'green',
+                                    title: '<b class="text-success">Eklendi</b>',
+                                    content: ekletad+' isimli menü eklendi.'
+                                });
+                                mesajKapat(diMenuEkle);
+                                $('.nav-pills a[href="#pills-kurtabMenuler"]').trigger('click');
+                                    }
+                                    else{ 
+                                        var diMenuEkleHata=$.dialog("eklenemedi"); 
+                                        mesajKapat(diMenuEkleHata);
+                                    }
+                                    
+                                }
+                                 })
+                        }
+                    },
+                    cancel: {
+                         text:'Kapat'
+                    },
+                },
+                onContentReady: function () {
+                    // bind to events
+                    var jc = this;
+                    this.$content.find('form').on('submit', function (e) {
+                        // if the user submits the form by pressing enter in the field.
+                        e.preventDefault();
+                        jc.$$formSubmit.trigger('click'); // reference the button and click it
+                    });
+                }
+            });
+              
+          });
+          });
+          </script>
+          <!--SON ŞİFRE İŞLEM BUTON TIK -->
+          
+          
+          
+          
+          
           
           <!-- LOGIN JS -->
          <script type="text/javascript">

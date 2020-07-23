@@ -28,8 +28,9 @@ $(document).ready(function() {
 });
 </script>
 
-
 <!-- YUKARI ÇIK BUTON BİTİŞ--> 
+
+
 
 </body>
 </html>

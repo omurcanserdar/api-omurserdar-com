@@ -44,13 +44,36 @@ if($istekMOD=="POST"){
     }
     
 }
+
+//İSTEK GÜNCELLE
 else if($istekMOD=="PUT") {
      $gelenler=json_decode(file_get_contents("php://input"));
-        if($db->query("select * from bireysel where id='$gelenler->id'")->rowCount()==0){
+        if($db->query("select * from bireysel where id='$gelenler->id' or email='$gelenler->email'")->rowCount()==0){
              $httpKOD = 400;
              $jsonArray["hata"] = true;
-             $jsonArray["hataMesaj"] = "kayıt yok";
+             $jsonArray["hataMesaj"] = "bireysel bulunamadı";
              }else{
+                 
+                 //EĞER ŞİFRE GÜNCELLENECEK İSE
+                 if(isset($gelenler->sifre)){
+                     
+                    $sifre=generateRandomKey();
+                     
+                    $db->beginTransaction();
+                    
+                    $birguncelle=$db->prepare("UPDATE bireysel SET sifre=:psifre WHERE email=:pmail");
+                    $birguncelle->execute(array("psifre"=>md5($sifre),
+                 "pmail" => $gelenler->email));
+                 
+                    if($birguncelle) //SİFRE GUNCELLENDİ İSE 
+                        $emailGonderilecekMi=true; //EMAİL GÖNDERİM İŞLEM YAKALAMA İÇİN
+                 }
+                 
+                 //SON EĞER ŞİFRE GÜNCELLENECEK İSE
+                 
+                 
+                 //ŞİFRE GÜNCELLENMEYECEK İSE (örneğin bireysel giriş-bilgilerim tab üzerinde düzenleme)
+                 else{
                  $birguncelle=$db->prepare("UPDATE bireysel SET ad=:pad,soyad=:psoyad,email=:pmail,sifre=:psifre WHERE id=:pid");
                  $birguncelle->execute(array(
                  "pad" => $gelenler->ad,
@@ -60,21 +83,54 @@ else if($istekMOD=="PUT") {
                  "pid" => $gelenler->id 
                  ));
                  
-                // güncelleme başarılı ise
+             }
+             //SON ŞİFRE GÜNCELLENMEYECEK İSE
+             
+             //her iki durumda da güncelleme başarılı
                  if($birguncelle->rowCount()>0){
-                    echo "güncellendi";
-                    $httpKOD = 200;
-                    $jsonArray["mesaj"] = "Güncelleme Başarılı";
+                     
+                     //ŞİFRE GÜNCELLENDİĞİNDE EMAİL GÖNDERİM İÇİN                 
+                    if($emailGonderilecekMi==true){
+                        
+                    //bilgileri al
+                        $url = "https://api.omurserdar.com/api/bireysel?email=$gelenler->email";
+                        $json = file_get_contents($url);
+                        $jsonverilerim = json_decode($json, true);   
+                        $tblbirkume=$jsonverilerim["bireyselbilgileri"];
+                    //bilgi al son
+                        
+                        $mesaj='<h3> Merhaba, '.$tblbirkume["ad"]." ".$tblbirkume["soyad"].' </h3> <br> Yeni Şifreniz: '.$sifre;
+                        if(!mailGonder("sifre@api.omurserdar.com","AP!",$gelenler->email,"sifre",$mesaj,"altbas")){
+                            
+                            $db->rollBack();
+                            echo "<br> ROLLBACK ÇALIŞTI<br>";
+                            exit;
+                             
+                        }
+                        else{
+                        //demekki mail gönderildi, değişiklikleri uygula
+                        $db->commit();
+                        }
+                    //SON ŞİFRE GÜNCELLENDİĞİNDE EMAİL GÖNDERİM İÇİN  
+                 
+                    }
+                 
+                     $httpKOD = 200;
+                     $jsonArray["hata"] = FALSE;
+                     $jsonArray["mesaj"] = "güncellendi";
+                 
+                }//SON HER İKİ GÜNCELLEME BAŞARILI İSE
+                 
+                else{ //HER İKİ güncelleme başarısız İSE
+                    $httpKOD = 400;
+                    $jsonArray["hata"] = TRUE;
+                    $jsonArray["mesaj"] = "güncellenmedi";
                 }
-                else{
-                // güncelleme başarısız ise bilgi
-                 $httpKOD = 400;
-                 $jsonArray["hata"] = TRUE;
-                 $jsonArray["mesaj"] = "Sistemde Hata Meydana Geldi";
-                 }
- }
+    }//kurumsalbulunduise
 }
+//SON GÜNCELLEME İSTEĞİ
 
+//İSTEK DELETE
 else if($istekMOD=="DELETE") {
         parse_str(file_get_contents("php://input"),$veriler);
     if(isset($veriler["id"]) && !empty(trim($veriler["id"]))) {
@@ -104,26 +160,48 @@ else if($istekMOD=="DELETE") {
  $jsonArray["hataMesaj"] = "bireysel id değerini gönder";
  }
 }
+//SON İSTEK DELETE
 
+//İSTEK BİLGİ ÇEKME
 else if($istekMOD=="GET"){
+    
+
       // parse_str(file_get_contents("php://input"),$veriler);
      //  $kullad=$veriler["kullaniciadi"];
-    if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
-         $bid=$_GET["id"];
-         $birVarMi = $db->query("select * from bireysel where id='$bid'");
+    if((isset($_GET["id"]) && !empty(trim($_GET["id"]))) || isset($_GET["email"]) && !empty(trim($_GET["email"]))){
+        
+        
+        if(isset($_GET["id"]) && isset($_GET["email"])){
+            $httpKOD = 400;
+            $jsonArray["hata"] = TRUE; 
+            $jsonArray["hataMesaj"] = "tek değer ver iki değer verdin";
+            
+            SetHeader($httpKOD);
+            $jsonArray[$httpKOD] = HttpStatus($httpKOD);
+            echo json_encode($jsonArray);
+            
+            exit;
+        }
+         
+        if(isset($_GET["id"]))
+            $bid=$_GET["id"];
+        else
+            $bemail=$_GET["email"];
+            
+         $birVarMi = $db->query("select * from bireysel where id='$bid' or email='$bemail'");
          //$birVarMi->debugDumpParams();
          if($birVarMi->rowCount()>0){
              //$birbilgiler = $db->query("select * from  bireysel where id='$bid' ")->fetch(PDO::FETCH_ASSOC);
              $birbilgiler = $db->query("SELECT bireysel.*,il.il_adi,ilce.ilce_adi FROM bireysel,il,ilce where bireysel.il_id=il.id 
 and bireysel.ilce_id=ilce.id
 and ilce.il_id=il.id 
-and bireysel.id='$bid'")->fetch(PDO::FETCH_ASSOC);
+and bireysel.id='$bid' or email='$bemail'")->fetch(PDO::FETCH_ASSOC);
              $jsonArray["bireyselbilgileri"] = $birbilgiler;
              unset($jsonArray["bireyselbilgileri"]["sifre"]);
             // $jsonArray["sepet"]=null;
              $httpKOD = 200;
              }else {
-                 $httpKOD = 400;
+                 $httpKOD = 200;
                  $jsonArray["hata"] = TRUE;
                  $jsonArray["hataMesaj"] = "Üye bulunamadı";
                     }
@@ -131,12 +209,17 @@ and bireysel.id='$bid'")->fetch(PDO::FETCH_ASSOC);
     else {
      $httpKOD = 400;
      $jsonArray["hata"] = TRUE; 
-     $jsonArray["hataMesaj"] = "bireysel id gönder";
+     $jsonArray["hataMesaj"] = "Bireysel id ya da email gönder";
  }
 }
+//SON İSTEK BİLGİ ÇEKME
 
 
+baslikAyarlaJSONyaz($httpKOD,$jsonArray);
+
+/*
 SetHeader($httpKOD);
 $jsonArray[$httpKOD] = HttpStatus($httpKOD);
 echo json_encode($jsonArray);
+*/
 ?>
