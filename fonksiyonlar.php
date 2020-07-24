@@ -1,5 +1,16 @@
 <?php 
 
+//session yoket ve aktif sayfayı yenile
+
+function sesDestYon(){
+    session_start();
+    session_destroy();
+    //$root=$_SERVER["DOCUMENT_ROOT"];
+    //api.omurserdar.com
+    header("Location=api.omurserdar.com");
+}
+
+//
 
 //API İSTEK SONUNDA BAŞLIK AYARLA VE JSON YAZ
 
@@ -30,7 +41,7 @@ function mailGonder($gonderici,$gondericiUsername=null,$alici,$subject=null,$bod
     //$mail->CharSet  ="utf-8";
     
     $mail->Username = $gonderici; // Gönderici adresinizin sunucudaki kullanıcı adı (e-posta adresiniz)
-    $mail->Password = "Serdar*1461"; // Mail adresimizin sifresi
+    $mail->Password = "*****"; // Mail adresimizin sifresi
                 
                 //MAİL İCERİK
     $mail->Subject = $subject; // Email konu başlığı

@@ -106,6 +106,7 @@ else if($istekMOD=="PUT") {
                         else{
                         //demekki mail gönderildi, değişiklikleri uygula
                         $db->commit();
+                        //sesDestYon(); api sayfasından yönlendirme yapmam saçma
                         }
                     //SON ŞİFRE GÜNCELLENDİĞİNDE EMAİL GÖNDERİM İÇİN       
                     }

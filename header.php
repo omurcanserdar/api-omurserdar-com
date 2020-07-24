@@ -127,7 +127,11 @@
   <div class="dropdown-content text-center">
        <!--<a class="dropdown-item" style="color:black" href="/profilim"><i class="fas fa-user-circle"></i> Profilim</a>
         <div class="dropdown-divider"></div>-->
+        
+         <a href="/sifreislem"><i class="fas fa-key"></i> Şifremi Sıfırla</a>
+         <div class="dropdown-divider"></div>
     <a href="/cikis"><i class="fas fa-power-off"></i> Çıkış Yap</a>
+     
   </div>
 </div></ul>
             <?php }  ?>
@@ -609,7 +613,7 @@ mesajKapat(diaKurKayitNo,2500);
               <input type="password" class="form-control" id="password1" name="sifre1" placeholder="Şifre Girin">
             </div>
             <button type="button" id="btngirisyap" class="float-left btn btn-info col-md-8">Giriş Yap</button>
-            <a href="/sifremiunuttum" class="ml-1 btn btn-outline-danger">Şifremi Unuttum</a>
+            <a href="/sifreislem" class="ml-1 btn btn-outline-danger">Şifremi Unuttum</a>
             <center><div class="loader"></div></center>
             
             <p>bireysel-> email:hesap@bireysel.com ; şifre:api</p>

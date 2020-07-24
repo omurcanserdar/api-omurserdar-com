@@ -6,7 +6,7 @@ RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
 
 #cikis
 RewriteRule ^cikis$ cikis.php [NC] 
-RewriteRule ^sifremiunuttum$ sifre.php [NC] 
+RewriteRule ^sifreislem$ sifre.php [NC] 
 
 #hata sayfasi
 ErrorDocument 404 http://www.omurserdar.com/404.php

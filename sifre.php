@@ -3,7 +3,7 @@
  $desc="Şifremi Unuttum";
  include "header.php";
  ?>
- <form>
+ 
      
      <div class="container">
          <h1 class="text-danger">Şifre İşlemleri<small class="text-info"> işlem yapılacak üyelik tipini ve üyelik email adresini belirtin</small></h1><hr>
@@ -13,13 +13,54 @@
         <div class="card">
           <div class="card-header bg-primary text-white text-center"><i class="fas fa-edit"></i> Şifre İşlem</div>
           <div class="card-body float-left">
-              
+             
+             <?php
+              if(isset($_SESSION["kullanici_tip"])){
+             ?>
+               <form>
               <div class="form-group">
+                  
+        <label for="formGroupExampleInput">Üyelik Tipi:  </label>
      
+    
+            
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="radiouyetip" <?=$_SESSION["kullanici_tip"]=="bireysel" ? "checked": "" ?> value="bireysel" disabled>
+            <label class="form-check-label" for="inlineRadio1">Bireysel</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="radiouyetip" <?=$_SESSION["kullanici_tip"]=="kurumsal" ? "checked": "" ?> value="kurumsal" disabled>
+            <label class="form-check-label" for="inlineRadio2">Kurumsal</label>
+        </div>
+      
+    </div>
+    
+    <div class="form-group">
+        
+        <div class="form-row">
+            <label for="formGroupExampleInput">Üye Email:  </label>  
+            <div class="col">
+                <input type="email" class="form-control" placeholder="Email" id="iemail" value="<?=$_SESSION["kullanici_mail"]?>" disabled>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <button type="button" id="btnsifreuyesorgu" class="mt-1 btn btn-info btn-block"> Gönder</button>
+    </div>
+            </form>
+            
+            
+            <? }else{
+            ?>
+            
+             <form>
+              <div class="form-group">
+                  
         <label for="formGroupExampleInput">Üyelik Tipi:  </label>
      
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="radiouyetip" checked value="bireysel">
+            <input class="form-check-input" type="radio" name="radiouyetip" value="bireysel" checked>
             <label class="form-check-label" for="inlineRadio1">Bireysel</label>
         </div>
         <div class="form-check form-check-inline">
@@ -34,7 +75,7 @@
         <div class="form-row">
             <label for="formGroupExampleInput">Üye Email:  </label>  
             <div class="col">
-                <input type="email" class="form-control" placeholder="Email" id="iemail" value="omurserdarr@gmail.com">
+                <input type="email" class="form-control" placeholder="Email adresi girin" id="iemail">
             </div>
         </div>
     </div>
@@ -42,12 +83,15 @@
     <div class="form-group">
         <button type="button" id="btnsifreuyesorgu" class="mt-1 btn btn-info btn-block"> Gönder</button>
     </div>
+            </form>
+            <?} ?>
+            
             
           </div>
         </div>
     </div>
     
- </form>
+ 
  
  </div>
  
@@ -87,8 +131,17 @@
     
     if(!dra)
         secimhatadurum+="Üyelik Tipi ";
-    if(!dad)
+    else if(!dad)
         secimhatadurum+="Email";
+    
+    /*
+    function validateEmail(email) {
+        var re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    }
+    console.log(validateEmail(dad)); //TRUE yada FALSE 
+    */
+    
     
     if(!dra||!dad){
         var diBos=$.dialog('<b class="text-danger">'+secimhatadurum+' boş geçilemez</b>');
@@ -151,8 +204,22 @@
                                             type:'info',    
                                             title: '<b class="text-info"          >Mail Gönderildi</b>',
                                             content:  "<p class='lead font-weight-bolder'> Şifre rastgele oluşturulup email adresinize gönderilmiştir </p>",
+                                            
+                                            onClose: function () {
+                                            // before the modal is hidden.
+                                            
+                                            window.location.href = "https://www.api.omurserdar.com/cikis";
+                                        },
+                                            
                                         });
-                                        mesajKapat(diaSifregonderildiMail,4000);
+                                        mesajKapat(diaSifregonderildiMail,3000);
+                                        
+                                        /* onClose ile yapıyorum bu işi
+                                        setTimeout(function(){ 
+                                           window.location.href = "https://www.api.omurserdar.com";
+                                        }, 3000);
+                                        */
+                                        
                                         
                                     }
                                 }//GÜNCELLE SUCCESS
