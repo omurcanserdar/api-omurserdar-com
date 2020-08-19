@@ -449,12 +449,13 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                                         //var pt = $(".tutar").attr('id');
                                         //alert(pEnvId);
                                         var dsecim="btnSiparisVer";
-                                        var dtutar = $(".toptutar").data('id');
+                                        //var dtutar = $(".toptutar").data('id');
                                         //alert("toptutar: "+dtutar);
                                    $.ajax({
                          method: 'POST',
                          url : "https://www.api.omurserdar.com/ajaxSiparis.php",
-                         data : {secim:dsecim,toplamtutar:dtutar},
+                         //data : {secim:dsecim,toplamtutar:dtutar},
+                         data : {secim:dsecim},
                          success: function(data){
                               data=JSON.parse(data);
                              if(data.cevap=="eklendi"){  

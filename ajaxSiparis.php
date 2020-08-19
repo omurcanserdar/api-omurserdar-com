@@ -46,8 +46,12 @@ $eklencek=array("siparisKod"=>$sipKod,
                 
 array_push($eklenceklerDizi,$eklencek);
 }
+ 
+$sepettutar=$db->query("select round(sum(envanter.fiyat*sepet.adet),2) as tutar from sepet,envanter where sepet.envanter_id=envanter.id and sepet.bireysel_id=$birid");
+$sepettutarcek=$sepettutar->fetch(PDO::FETCH_ASSOC);
+$tutar=$sepettutarcek["tutar"];
     
-if($_POST["toplamtutar"]>=$kurumsalminalim){
+if($tutar>=$kurumsalminalim){
     
     //ilişkilendirmelerden sonra $pdoStatement->errorInfo(); ile sipariş tablosuna kayıt oluşturmadan sipariş detay tablosuna kayıt oluşturamam (Cannot add or update a child row: a foreign key constraint fails) 
     //$cokluekleexecSorgu=pdoMultiInsert('siparisDetay', $eklenceklerDizi, $db);
@@ -56,7 +60,7 @@ if($_POST["toplamtutar"]>=$kurumsalminalim){
     
     $sipeklesorgu = $db->prepare("INSERT INTO siparis SET siparisKod = ?,bireysel_id = ?,
         kurumsal_id = ?,durum_id = ?,toplamTutar=?");
-        $sipekleexec = $sipeklesorgu->execute(array($sipKod,$birid,$kid,1,$_POST["toplamtutar"]));
+        $sipekleexec = $sipeklesorgu->execute(array($sipKod,$birid,$kid,1,$tutar));
     
     if($sipekleexec){
         if(pdoMultiInsert('siparisDetay', $eklenceklerDizi, $db)){
