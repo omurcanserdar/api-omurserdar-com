@@ -143,7 +143,7 @@ else if($istekMOD=="GET"){
       if(isset($_GET["id"]) && isset($_GET["email"])){
             $httpKOD = 400;
             $jsonArray["hata"] = TRUE; 
-            $jsonArray["hataMesaj"] = "tek değer ver iki değer verdin";
+            $jsonArray["hataMesaj"] = "yalnızca bir değer verin";
             
             SetHeader($httpKOD);
             $jsonArray[$httpKOD] = HttpStatus($httpKOD);
@@ -156,7 +156,8 @@ else if($istekMOD=="GET"){
             $kid=$_GET["id"];
         else
             $kemail=$_GET["email"];
-      
+    
+    
       
     $kurVarMi = $db->query("select * from kurumsal where id='$kid' or email='$kemail'");
     if($kurVarMi->rowCount()>0){
@@ -167,6 +168,9 @@ else if($istekMOD=="GET"){
             $jsonArray["kurumsalbilgileri"] = $kurbilgiler;
             unset($jsonArray["kurumsalbilgileri"]["sifre"]);
             
+            if(!isset($kid))
+        $kid=$jsonArray["kurumsalbilgileri"]["id"];
+            
             $tabAdveSayi=$db->prepare("select tabMenu.id,tabMenu.ad,COUNT(tabMenu.id) as envsayi FROM envanter,tabMenu,kurumsal
              WHERE envanter.tabMenu_id=tabMenu.id AND 
              tabMenu.kurumsal_id=kurumsal.id AND 
@@ -174,6 +178,17 @@ else if($istekMOD=="GET"){
              GROUP BY tabMenu.ad
              ORDER BY tabMenu.id");
             $tabAdveSayi->execute(array($kid));
+            
+    $yildiz=$db->query("SELECT degerlendirme.* FROM degerlendirme,siparis where degerlendirme.siparisKod=siparis.siparisKod and siparis.kurumsal_id='$kid'");
+    
+    if($yildiz->rowCount()>0){
+        $ortlar=$db->query("SELECT ROUND(avg(hiz)) as orthiz,ROUND(avg(lezzet)) as ortlezzet FROM degerlendirme,siparis where degerlendirme.siparisKod=siparis.siparisKod and siparis.kurumsal_id='$kid'")->fetchAll();
+        $jsonArray["degerlendirme"]["ortalamahiz"]=$ortlar[0]["orthiz"];
+        $jsonArray["degerlendirme"]["ortalamalezzet"]=$ortlar[0]["ortlezzet"];
+        $jsonArray["degerlendirme"]["sayi"]=$yildiz->rowCount();
+        $jsonArray["degerlendirme"]["bilgiler"]=$yildiz->fetchAll(PDO::FETCH_ASSOC);
+    }
+         
   
  $jsonArray["kurumsalTumTab"]=array();
  $jsonArray["kurumsalTab"]=array();

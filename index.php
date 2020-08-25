@@ -261,6 +261,8 @@ $('.nav-pills a[href="#pills-cevrem"]').on('click',function(){
                 '<button acikmi='+kurbilgi.acikMi+' type="button" data-id="'+kurbilgi.id+'" class="btnkurAd btn btn-outline-'+renk+" btn-block "+butdurum+'" durum='+butdurum+'>'+kurbilgi.ad+'</button></div>'+
                 '<div class="card-footer text-muted"><p class="card-text"><i class="fas fa-map-pin"></i> '+kurbilgi.adres+'<hr/>'+
                 '<span class="badge badge-pill badge-'+ilcerenk+' btn-block">'+kurbilgi.ilce_adi+'</span></p>'+
+                '<a href="/kurumsal/'+kurbilgi.kullaniciadi+'" class="btn btn-outline-'+renk+' btn-block btn-sm">İncele <i class="fas fa-arrow-circle-right"></i></a>'+
+                
                 '</div></div>';
                 
                 });//each 
@@ -653,9 +655,10 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
   <!-- SİPARİSLERİM JS -->
   <script type="text/javascript">
        $(document).ready(function(){
+           
            $('.nav-pills a[href="#pills-siparislerim"]').click(function(){
-               
-           var birid=$(".bid").data("id");
+            var birid=$(".bid").data("id");
+            
             $.ajax({
      method: 'GET',
      url : "https://www.api.omurserdar.com/api/siparislerim",
@@ -667,13 +670,48 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
              $(".sipcard").html("<h2 class='text-info'> Sipariş Yok </h2>");
          }
          if(dataSip.hata==false && dataSip.sayi>0){  
-     var veri='<table class="table table-striped"><thead class="thead-dark"><tr><th scope="col">siparisKod</th><th scope="col">ad</th><th scope="col">tanim</th><th scope="col">tarih</th><th scope="col">toplamTutar</th></tr></thead><tbody><tr>';
+     var veri='<table class="table table-striped"><thead class="thead-dark"><tr><th scope="col"><i class="fas fa-key"></i> Sipariş Kod</th><th scope="col"><i class="fas fa-store-alt"></i> Kurumsal Üye </th><th scope="col"><i class="fas fa-dolly"></i> Sipariş Durumu</th><th scope="col"><i class="fas fa-calendar-alt"></i> Sipariş Tarihi</th><th scope="col"><i class="fas fa-lira-sign"></i> Toplam Tutar</th></tr></thead><tbody><tr>';
       var metin="";
   
      for (i in dataSip.siparislerKume) { // class="atablosipKod
-          metin+='<td><a style="font-size: 15px;" class="atablosipKod btn btn-outline-primary btn-sm" data-id="'+dataSip.siparislerKume[i].siparisKod+'" href="javascript:void(0);" data-toggle="modal" data-target="#siparisDetayModal">'+dataSip.siparislerKume[i].siparisKod+'</a></td>';
+          metin+='<td><a style="font-size: 15px;" class="atablosipKod btn btn-outline-primary btn-sm" title="sipariş özeti için tıklayın" data-id="'+dataSip.siparislerKume[i].siparisKod+'" href="javascript:void(0);" data-toggle="modal" data-target="#siparisDetayModal">'+dataSip.siparislerKume[i].siparisKod+'</a></td>';
           metin+='<td>'+dataSip.siparislerKume[i].ad+'</td>';
-          metin+='<td>'+dataSip.siparislerKume[i].tanim+durumagoreyaz(dataSip.siparislerKume[i].tanim)+'</td>';
+          metin+='<td>'+dataSip.siparislerKume[i].tanim+durumagoreyaz(dataSip.siparislerKume[i].tanim);
+            if(dataSip.siparislerKume[i].tanim=="Tamamlandı")
+            {
+            
+            var butonyazi="";
+            //bilgileri al
+           $.ajax({
+               async: false, //{} içerisinde değişkeni doldurdum ve dışarıda kullandım https://stackoverflow.com/questions/1457690/jquery-ajax-success-anonymous-function-scope https://stackoverflow.com/questions/16805306/jquery-return-ajax-result-into-outside-variable/16805366
+            method: 'GET',
+            url : "https://www.api.omurserdar.com/api/degerlendirme/index.php",
+            data : {sipariskod:dataSip.siparislerKume[i].siparisKod},
+            contentType: "application/json",
+            success: function(data){
+                
+                    
+                if(data.degsay==0)
+                    //butonyazi="Değerlendir";
+                    //metin+="<br> <a href='/degerlendir/"+dataSip.siparislerKume[i].siparisKod+"' class='btn btn-outline-info btn-block btn-sm'> degerlendir </a>";
+                    metin+="<br> <button type='button' class='btn btn-outline-info btn-block btn-sm btndegerlendir' sipkod='"+dataSip.siparislerKume[i].siparisKod+"'><i class='fas fa-thumbs-up'></i> değerlendir </a>";
+                else{
+                    //butonyazi="Değerlendirmeyi gör";
+                
+                    metin+='<div class="btn-group mt-1 ml-1"><button type="button" class="btn btn-outline-danger btn-block btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i> Değerlendirme İşlemleri</button><div class="dropdown-menu"><a data-id="'+data.degerlendirme.id+'" id="'+dataSip.siparislerKume[i].siparisKod+'" class="dropdown-item ddowndeggor" href="javascript:void(0);"><i class="fas fa-eye"></i> görüntüle </a><a <a data-id="'+data.degerlendirme.id+'" id="'+dataSip.siparislerKume[i].siparisKod+'" class="dropdown-item ddowndegduz" href="javascript:void(0);"><i class="fas fa-edit"></i> güncelle</a><a <a data-id="'+data.degerlendirme.id+'" id="'+dataSip.siparislerKume[i].siparisKod+'" class="dropdown-item ddowndegsil" href="javascript:void(0);"><i class="fas fa-trash"></i> sil</a></div>';
+                }
+                    
+                    
+                    
+                }
+            });
+            //metin+="<br> <a href='/degerlendir/"+dataSip.siparislerKume[i].siparisKod+"' class='btn btn-outline-info btn-block btn-sm'>"+butonyazi+" </a>";
+            //
+ 
+            }
+            console.log(metin);
+                metin+="</td>";
+
           metin+='<td class="sipTarih'+dataSip.siparislerKume[i].siparisKod+'" data-id="'+dataSip.siparislerKume[i].sipTarih+'">'+tr_tarih(dataSip.siparislerKume[i].sipTarih)+'</td>'; 
           metin+='<td class="sipTutar'+dataSip.siparislerKume[i].siparisKod+'" data-id="'+dataSip.siparislerKume[i].toplamTutar+'">'+dataSip.siparislerKume[i].toplamTutar+'  &#8378</td></tr>';
         }
@@ -681,13 +719,327 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
     
     $(".sipcard").html(veri+metin);
     
+    
+    //ddowndeggor click
+    $('.ddowndeggor').on('click', function(){
+    
+    var sipkod=$(this).attr("id");
+    
+    $.ajax({
+        method: 'GET',
+        url : "https://www.api.omurserdar.com/api/degerlendirme",
+        data : {sipariskod:sipkod},
+        success: function(datasipdeger){
+  
+            var hizyildiz="";
+            for(j=0;j<datasipdeger.degerlendirme.hiz;j++)
+                    hizyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
+			for(k=0; k<(10-datasipdeger.degerlendirme.hiz); k++)
+					hizyildiz+='<span><i class="far fa-star"></i></span>';
+					
+			var lezzetyildiz="";
+            for(j=0;j<datasipdeger.degerlendirme.lezzet;j++)
+                    lezzetyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
+			for(k=0; k<(10-datasipdeger.degerlendirme.lezzet); k++)
+					lezzetyildiz+='<span><i class="far fa-star"></i></span>';		
+					
+  
+        var dikurdeggor=$.dialog({
+            type:'purple',
+            title: '<b class="text-info">Değerlendirme Bilgileri</b>',
+            content: 'HIZ: '+hizyildiz+' <br> LEZZET: '+lezzetyildiz+' <br> YORUM: '+datasipdeger.degerlendirme.yorum
+         });
+         
+         mesajKapat(dikurdeggor,"7000");
+   
+             }
+             });
+    
+         
+         
+                
+                
+    });
+    //son ddowndeggor
+    
+    //ddowndegduz
+    $(".ddowndegduz").on("click",function(){
+           var sipkop=$(this).attr("id"); 
+           //var degyorum=$(".yorum").html();
+            
+           //bilgileri al
+           $.ajax({
+            method: 'GET',
+            url : "https://www.api.omurserdar.com/api/degerlendirme/index.php",
+            data : {sipariskod:sipkop},
+            contentType: "application/json",
+            success: function(data){
+                var bilgi=data.degerlendirme;
+                //var hizyildiz="";
+                /*
+                for(j=0;j<bilgi.hiz;j++)
+                    hizyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
+				for(k=0; k<(10-bilgi.hiz); k++)
+					hizyildiz+='<span><i class="far fa-star"></i></span>';
+                */
+                //confirm  
+                    $.confirm({
+                type:'purple',
+                title: '<b class="text-info"> Sipariş Değerlendirme Düzenleme</b>',
+                content: '' +
+                '<form action="" class="formName">' +
+                '<div class="form-group">' +
+                '<label>Hız: </label>' +
+                '<input type="number" step="any" min="1" max="10" value="'+bilgi.hiz+'" class="form-control hizduz" required />' +
+                '</div>'+
+                
+                '<div class="form-group">' +
+                '<label>Lezzet </label>' +
+                '<input type="number" step="any" min="1" max="10" value="'+bilgi.lezzet+'" class="form-control lezzetduz" required />' +
+                '</div>'+
+                
+                '<div class="form-group">' +
+                '<label>Yorum:  </label>' +
+                '<textarea class="form-control" id="duzenleyorum">'+bilgi.yorum+'</textarea>' +
+                 '</div>' +
+                '</form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Gönder',
+                        btnClass: 'btn-blue',
+                        action: function(){
+                             
+                              var phiz=$(".hizduz").val();
+                             
+                            if(!phiz || phiz<1 || phiz>10){
+                                var diDegHiz=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
+                                mesajKapat(diDegHiz);
+                                return false;
+                            }
+                             
+                            var plezzet=$(".lezzetduz").val();
+                             
+                            if(!plezzet || plezzet<1 || plezzet>10){
+                                var diDegLezzet=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
+                                mesajKapat(diDegLezzet);
+                                return false;
+                            } 
+                             
+                            var pyorum=$.trim($("#duzenleyorum").val());
+                            
+                            if(!pyorum){
+                                var diDegYorum=$.dialog('<b class="text-danger"> Yorum alanı boş bırakılamaz</b>');
+                                mesajKapat(diDegYorum);
+                                return false;
+                            } 
+                             
+                             //burada put işlemi olacak
+                             
+                             var dobje={"id":bilgi.id,"hiz":phiz,"lezzet":plezzet,"yorum":pyorum};
+                            dobje=JSON.stringify(dobje);
+                            //alert(dobje);
+                                 $.ajax({
+                                method: 'PUT',
+                                url : "https://www.api.omurserdar.com/api/degerlendirme/",
+                                //dataType: "json",
+                                //contentType: "application/json"
+                                data : dobje,
+                                success: function(apidegduzenle){
+                                    if(apidegduzenle.mesaj=="güncellendi"){
+                                var didegGuncellendi=$.dialog({
+                                    type:'green',
+                                    title: '<b class="text-success">Güncellendi</b>',
+                                    content: 'Değerlendirme Güncellendi',
+                                    onClose: function () {
+                                        
+                                        window.location.replace("https://api.omurserdar.com");
+                                                 }
+                                            });
+                                    
+                                                mesajKapat(didegGuncellendi);
+                            //$('.nav-pills a[href="#pills-kurbilgilerim"]').trigger('click'); 
+                                }
+                                
+                                }
+                                });
+                             //put işlemi son
+                             
+                    } //dialog action
+                    },
+                cancel: {
+                         text:'İptal et'
+                    },
+             
+            }
+            }); //confirm
+                
+                
+            }
+           });
+           //bilgileri al son
+           
+           
+        });
+    //son ddowndegduz
+    
+    //ddowndegsil
+     $(".ddowndegsil").on("click",function(){
+         
+        var degid=$(this).attr("data-id"); 
+        
+        $.confirm({
+            type:'red',    
+            title: '<b class="text-danger">Silmek istediğine emin misin?</b>',
+            content:  "<b class='text-danger'> Değerlendirme Silinecek </b><br>",
+            buttons: {
+                evet: {
+                    text: 'Evet, sil',
+                    btnClass: 'btn-danger',
+                    action: function () {
+                            $.ajax({
+                            method: 'DELETE',
+                            url : "https://www.api.omurserdar.com/api/degerlendirme/index.php?id="+degid,
+                            success: function(apidegsil){
+                                if(apidegsil.mesaj=="silindi"){
+                                        
+                                    var diaDegSil=$.dialog({
+                                        type:'dark',    
+                                        title: '<b class="text-info"          >Silindi</b>',
+                                        content:  "<b class='text-info'> Değerlendirme silinmiştir </b>",
+                                        
+                                        onClose: function () {
+                                        
+                                        window.location.replace("https://api.omurserdar.com");
+                                                 }
+                                            });
+                                                mesajKapat(diaDegSil);
+                                            }
+                                        
+                                    }//delete success
+                                 });
+                                 
+                        }
+                    },
+                    cancel: {
+                         text:'İptal et'
+                    }
+                }
+            });
+         
+     });
+    //son ddowndegsil
+    
+    //btndegerlendir click
+    $(".btndegerlendir").on("click",function(){
+        
+        var sipkod=$(this).attr("sipkod");
+        //confirm deg
+                    $.confirm({
+                type:'purple',
+                title: '<b class="text-info"> Sipariş Değerlendirme</b>',
+                content: '' +
+                '<form action="" class="formName">' +
+                '<div class="form-group">' +
+                '<label>Hız: </label>' +
+                '<input type="number" step="any" min="1" max="10" value="1" class="form-control inphiz" required />' +
+                '</div>'+
+                
+                '<div class="form-group">' +
+                '<label>Lezzet: </label>' +
+                '<input type="number" step="any" min="1" max="10" value="1" class="form-control inplezzet" required />' +
+                '</div>'+
+                
+                '<div class="form-group">' +
+                '<label>Yorum: </label>' +
+                '<textarea class="form-control" id="tareyorum" placeholder="Yorumunuzu yazın"></textarea>' +
+                 '</div>' +
+                '</form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Gönder',
+                        btnClass: 'btn-blue',
+                        action: function(){
+                             
+                            var phiz=$(".inphiz").val();
+                             
+                            if(!phiz || phiz<1 || phiz>10){
+                                var diDegHiz=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
+                                mesajKapat(diDegHiz);
+                                return false;
+                            }
+                             
+                            var plezzet=$(".inplezzet").val();
+                             
+                            if(!plezzet || plezzet<1 || plezzet>10){
+                                var diDegLezzet=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
+                                mesajKapat(diDegLezzet);
+                                return false;
+                            } 
+                             
+                            var pyorum=$.trim($("#tareyorum").val());
+                            
+                            if(!pyorum){
+                                var diDegYorum=$.dialog('<b class="text-danger"> Yorum alanı boş bırakılamaz</b>');
+                                mesajKapat(diDegYorum);
+                                return false;
+                            } 
+                            
+                             //burada post işlemi olacak
+                             
+                             
+                             
+                              $.ajax({
+                         method: 'POST',
+                         url : "https://www.api.omurserdar.com/api/degerlendirme/index.php",
+                         //data : {secim:dsecim,id:pEnvId,fiyat:pEnvFiyat},
+                         data : {sipariskod:sipkod,hiz:phiz,lezzet:plezzet,yorum:pyorum},
+                         success: function(datadegekle){
+                             if(datadegekle.mesaj=="eklendi"){  
+                                            var diaDegEklendi=$.dialog({
+                                //autoClose: 'cancelAction|8000',
+                                type:'green',
+                                title: '<b class="text-success"> <i class="fas fa-check-circle"></i> Harika </b>',
+                                content: 'Değerlendirme Eklendi',
+                                onClose: function () {
+                                        //eklendikten sonra tab click tetiklen
+                                        //$('.nav-tabs a[href="#pills-siparislerim"]').trigger("click");
+                                        
+                                        window.location.replace("https://api.omurserdar.com");
+                                                 }
+                                            });
+                                                mesajKapat(diaDegEklendi);
+                                            }
+                            else{
+                        $.dialog({
+                        title: '<b class="text-danger"><i class="fas fa-times"></i> HATA </b>',
+                        content: 'Değerlendirilme Eklenemedi :( ! '+datadegekle.mesaj
+                                          });
+                                        }
+                                 }
+                                 });
+                             
+                             //post işlemi son
+                             
+                    } //dialog action
+                    },
+                cancel: {
+                         text:'İptal et'
+                    },
+             
+            }
+            }); 
+        
+        //son confrim deg
+    });
+    //btndegerlendir click son
+    
      //sipariş modal
      $('.atablosipKod').click(function(){
          var kod=$(this).data("id");
          var tarih=$('.sipTarih'+kod).data("id");
          var tutar=$('.sipTutar'+kod).data("id");
          
-         $(".siparisDetayModTit").html("<b class='text-danger'>"+kod+"</b> siparişine ait bilgiler");
+         $(".siparisDetayModTit").html("<b class='text-danger'>"+kod+"</b> sipariş koduna ait bilgiler");
           $.ajax({
             method: 'GET',
             url : "https://www.api.omurserdar.com/api/siparislerim/siparisEnvanterler.php",
@@ -701,13 +1053,13 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                     for (i in dataSipEnv.EnvnaterlerVeSiparisler){
                         metin+='<div class="card border-info mb-3" style="max-width: 20rem;"><div class="card-body">';
                         metin+='<span class="ml-2 badge badge-success">Envanter: '+dataSipEnv.EnvnaterlerVeSiparisler[i].envanter_ad+'</span><hr>';
-                        metin+='<span class="ml-2 badge badge-info">Kurumsal:</span> <span class="ml-2 badge badge-primary">'+dataSipEnv.EnvnaterlerVeSiparisler[i].kurumsal_ad+'</span>';
+                        //metin+='<span class="ml-2 badge badge-info">Kurumsal:</span> <span class="ml-2 badge badge-primary">'+dataSipEnv.EnvnaterlerVeSiparisler[i].kurumsal_ad+'</span>';
                             metin+='<span class="ml-2 badge badge-warning">Adet: '+dataSipEnv.EnvnaterlerVeSiparisler[i].adet+'</span>';
                             metin+='<span class="ml-2 badge badge-danger">Tutar: '+dataSipEnv.EnvnaterlerVeSiparisler[i].tutar+' &#8378 </span></div></div>';
                             }//for
                             
                       $(".siparisDetayModBody").html(metin+"</center>");
-                        $(".siparisDetayModFooter").html("SİPARİŞ TARİH: "+tr_tarih(tarih)+' TUTAR: '+tutar+" &#8378");
+                        $(".siparisDetayModFooter").html("KURUMSAL ÜYE: "+dataSipEnv.durum.kad+" | SİPARİŞ TARİH: "+tr_tarih(tarih)+' | TUTAR: '+tutar+" &#8378");
                      
                       $('#siparisDetayModal').modal("show");
                              } //if false
@@ -2411,21 +2763,99 @@ $(document).ready(function(){
              $(".sipkurDiv").html("<h2 class='text-info'> Sipariş Yok </h2>");
          }
          if(dataSipKur.hata==false && dataSipKur.sayi>0){  
-     var veri='<table class="table table-striped"><thead class="thead-dark"><tr><th scope="col">siparisKod</th><th scope="col">ad</th><th scope="col">tanim</th><th scope="col">tarih</th><th scope="col">toplamTutar</th><th scope="col">İŞLEMLER</th> </tr></thead><tbody><tr>';
+     var veri='<table class="table table-striped"><thead class="thead-dark"><tr><th scope="col"><i class="fas fa-key"></i> Sipariş Kodu</th><th scope="col"><i class="fas fa-user"></i> Sipariş Sahibi</th><th scope="col"><i class="fas fa-dolly"></i> Sipariş Durumu</th><th scope="col"><i class="fas fa-calendar-alt"></i> Sipariş Tarihi </th><th scope="col"> <i class="fas fa-lira-sign"></i> Toplam Tutar</th><th scope="col"><i class="fas fa-cogs"></i> İşlem</th> </tr></thead><tbody><tr>';
       var metin="";
       
     for (i in dataSipKur.siparislerKume) {
-          metin+='<td><a style="font-size: 15px;" class="atablosipKod btn btn-outline-primary btn-sm" data-id="'+dataSipKur.siparislerKume[i].siparisKod+'" href="javascript:void(0);" data-toggle="modal" data-target="#siparisDetayModal">'+dataSipKur.siparislerKume[i].siparisKod+'</a></td>';
+          metin+='<td><a style="font-size: 15px;" class="atablosipKod btn btn-outline-primary btn-sm" title="sipariş özeti için tıklayın" data-id="'+dataSipKur.siparislerKume[i].siparisKod+'" href="javascript:void(0);" data-toggle="modal" data-target="#siparisDetayModal">'+dataSipKur.siparislerKume[i].siparisKod+'</a></td>';
+          
           metin+='<td>'+dataSipKur.siparislerKume[i].ad+'</td>';
-          metin+='<td class="sipDurum'+dataSipKur.siparislerKume[i].siparisKod+'">'+dataSipKur.siparislerKume[i].tanim+durumagoreyaz(dataSipKur.siparislerKume[i].tanim)+'</td>';
+          metin+='<td class="sipDurum'+dataSipKur.siparislerKume[i].siparisKod+'">'+dataSipKur.siparislerKume[i].tanim+durumagoreyaz(dataSipKur.siparislerKume[i].tanim);
+          if(dataSipKur.siparislerKume[i].tanim=="Tamamlandı"){
+              
+             $.ajax({
+             method: 'GET',
+             async:false,
+             url : "https://www.api.omurserdar.com/api/degerlendirme",
+             data : {sipariskod:dataSipKur.siparislerKume[i].siparisKod},
+             success: function(datasipdeger){
+                if(datasipdeger.degsay==1)
+                    metin+="<button type='button' id='"+dataSipKur.siparislerKume[i].siparisKod+"' class='btnkurdeggor btn btn-info btn-block btn-sm mt-1 ml-1 text-white'><i class='fas fa-eye'></i> değerlendirmeyi gör</button>";
+   
+             }
+             });
+          }
+          
+          metin+='</td>';
+          
           //metin+='<td class="sipTarih'+dataSipKur.siparislerKume[i].siparisKod+'" data-id="'+dataSipKur.siparislerKume[i].sipTarih+'">'+dataSipKur.siparislerKume[i].sipTarih+'</td>'; 
+          
           metin+='<td class="sipTarih'+dataSipKur.siparislerKume[i].siparisKod+'" data-id="'+dataSipKur.siparislerKume[i].sipTarih+'">'+tr_tarih(dataSipKur.siparislerKume[i].sipTarih)+'</td>'; 
+          
           metin+='<td class="sipTutar'+dataSipKur.siparislerKume[i].siparisKod+'" data-id="'+dataSipKur.siparislerKume[i].toplamTutar+'">'+dataSipKur.siparislerKume[i].toplamTutar+' &#8378; </td>';
-           metin+='<td><button type="button" class="btn btn-outline-primary btnksipduzenle btnks'+dataSipKur.siparislerKume[i].siparisKod+'" sipdur="'+dataSipKur.siparislerKume[i].sipdurumid+'" data-id="'+dataSipKur.siparislerKume[i].siparisKod+'"> <i class="fas fa-edit"></i> güncelle </button></td></tr>';
+          
+          var statu="";
+          if(dataSipKur.siparislerKume[i].tanim=="Tamamlandı"){
+            
+            metin+='<td><button disabled type="button" class="btn btn-outline-primary btnksipduzenle btnks'+dataSipKur.siparislerKume[i].siparisKod+'" sipdur="'+dataSipKur.siparislerKume[i].sipdurumid+'" data-id="'+dataSipKur.siparislerKume[i].siparisKod+'"> <i class="fas fa-edit"></i> güncelle </button>';
+            
+           
+            
+             metin+="</td></tr>"
+            
+          }
+          else{
+              metin+='<td><button type="button" class="btn btn-outline-primary btnksipduzenle btnks'+dataSipKur.siparislerKume[i].siparisKod+'" sipdur="'+dataSipKur.siparislerKume[i].sipdurumid+'" data-id="'+dataSipKur.siparislerKume[i].siparisKod+'"> <i class="fas fa-edit"></i> güncelle </button></td></tr>';
+          }
+          
+           
+          
         }
     metin+='</tbody></table>';
     $(".sipkurDiv").html(veri+metin);
     
+    
+    //btnkurdeggor click
+    $('.btnkurdeggor').on('click', function(){
+    
+    var sipkod=$(this).attr("id");
+    
+    $.ajax({
+        method: 'GET',
+        url : "https://www.api.omurserdar.com/api/degerlendirme",
+        data : {sipariskod:sipkod},
+        success: function(datasipdeger){
+  
+            var hizyildiz="";
+            for(j=0;j<datasipdeger.degerlendirme.hiz;j++)
+                    hizyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
+			for(k=0; k<(10-datasipdeger.degerlendirme.hiz); k++)
+					hizyildiz+='<span><i class="far fa-star"></i></span>';
+					
+			var lezzetyildiz="";
+            for(j=0;j<datasipdeger.degerlendirme.lezzet;j++)
+                    lezzetyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
+			for(k=0; k<(10-datasipdeger.degerlendirme.lezzet); k++)
+					lezzetyildiz+='<span><i class="far fa-star"></i></span>';		
+					
+  
+        var dikurdeggor=$.dialog({
+            type:'purple',
+            title: '<b class="text-info">Değerlendirme Bilgileri</b>',
+            content: 'HIZ: '+hizyildiz+' <br> LEZZET: '+lezzetyildiz+' <br> YORUM: '+datasipdeger.degerlendirme.yorum
+         });
+         
+         mesajKapat(dikurdeggor,"7000");
+   
+             }
+             });
+    
+         
+         
+                
+                
+    });
+    //son btnkurdeggor
     
     //btnksipduzenle click
       $('.btnksipduzenle').on('click', function(){
@@ -2449,7 +2879,7 @@ $(document).ready(function(){
                 
             //btnksipduzenle düzenleme form dialog
              $.confirm({
-                 type:'purple',
+                type:'purple',
                 title: '<b class="text-info">'+sipkod+' kodlu Sipariş Durum Düzenleme</b>',
                 content: '' +
                 '<form action="" class="formName">' +
@@ -2493,9 +2923,15 @@ $(document).ready(function(){
                                 var diSipDurumGuncellendi=$.dialog({
                                     type:'green',
                                     title: '<b class="text-success"> Güncellendi <b>',
-                                    content: 'Sipariş Durum Güncellendi'
-                                });
-                                mesajKapat(diSipDurumGuncellendi);
+                                    content: 'Sipariş Durum Güncellendi',
+                                    onClose: function () {
+                                      $('.nav-pills a[href="#pills-kursiparislerim"]').trigger('click');
+                                                 }
+                                            });
+                                    
+                                                mesajKapat(diSipDurumGuncellendi);
+                          
+                                
                                     }
                                 }
                                  })
@@ -2530,7 +2966,7 @@ $(document).ready(function(){
          var tarih=$('.sipTarih'+kod).data("id");
          var tutar=$('.sipTutar'+kod).data("id");
          
-         $(".siparisDetayModTit").html("<b class='text-danger'>"+kod+"</b> siparişine ait bilgiler");
+         $(".siparisDetayModTit").html("<b class='text-danger'>"+kod+"</b> sipariş koduna ait bilgiler");
           $.ajax({
             method: 'GET',
             url : "https://www.api.omurserdar.com/api/siparislerim/siparisEnvanterler.php",
@@ -2542,13 +2978,13 @@ $(document).ready(function(){
                     for (i in dataSipEnv.EnvnaterlerVeSiparisler){
                         metin+='<div class="card border-info mb-3" style="max-width: 20rem;"><div class="card-body">';
                         metin+='<span class="ml-2 badge badge-success">Envanter: '+dataSipEnv.EnvnaterlerVeSiparisler[i].envanter_ad+'</span><hr>';
-                        metin+='<span class="ml-2 badge badge-info">Bireysel:</span> <span class="ml-2 badge badge-primary">'+dataSipEnv.EnvnaterlerVeSiparisler[i].bireysel_ad+'</span>';
+                        //metin+='<span class="ml-2 badge badge-info">Bireysel:</span> <span class="ml-2 badge badge-primary">'+dataSipEnv.EnvnaterlerVeSiparisler[i].bireysel_ad+'</span>';
                             metin+='<span class="ml-2 badge badge-warning">Adet: '+dataSipEnv.EnvnaterlerVeSiparisler[i].adet+'</span>';
                             metin+='<span class="ml-2 badge badge-danger">Tutar: '+dataSipEnv.EnvnaterlerVeSiparisler[i].tutar+' &#8378 </span></div></div>';
                             }//for
                             
                       $(".siparisDetayModBody").html(metin+"</center>");
-                        $(".siparisDetayModFooter").html("SİPARİŞ TARİH: "+tr_tarih(tarih)+' TUTAR: '+tutar+" &#8378");
+                        $(".siparisDetayModFooter").html("Sipariş Sahibi: "+dataSipEnv.durum.bad+" | SİPARİŞ TARİH: "+tr_tarih(tarih)+' | TUTAR: '+tutar+" &#8378");
                      
                       $('#siparisDetayModal').modal("show");
                              } //if false

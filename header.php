@@ -55,11 +55,12 @@
   <div class="navbar-collapse collapse show" id="navbarColor01" style="">
     <ul class="navbar-nav mr-auto">
       
-      <!-- 
+      
       <li class="nav-item">
-       <!--  <a class="nav-link" href="#">About</a> 
-         <a class="nav-link" style="color:white" href="/raporlar"><i class="fas fa-file"></i> Raporlar</a> 
+       <a class="nav-link" style="color:white" href="/kurumsallar">Kurumsallar</a> 
+       <!--<a class="nav-link" style="color:white" href="/raporlar"><i class="fas fa-file"></i> Raporlar</a> -->
       </li>
+      <!-- 
       <li class="nav-item">
           <a class="nav-link" style="color:white" target="_blank" href="https://github.com/omurserdarr"><i class="fab fa-github"></i> omurserdarr</a>
       </li>  
@@ -99,8 +100,8 @@
         </li>
         </ul>
         <script>
-        
-        //1,5 saniyede bir sepet sayiya eris ve güncelle
+        //1,5 saniye idi (1500)
+        //10 saniyede bir sepet sayiya eris ve güncelle
         var pbid=$(".bid").attr("data-id");
             function sepetSayiEris(){
             $.ajax({
@@ -114,15 +115,15 @@
                 }
             });
             }
-            setInterval(sepetSayiEris, 1500);
-        //son 1,5 saniyede bir sepet sayiya eris ve güncelle
+            setInterval(sepetSayiEris, 10000);
+        //son 10 saniyede bir sepet sayiya eris ve güncelle
         </script>
     <? } ?>
     
     <ul class="navbar-nav mx-auto">
 <div class="dropdown2">
      <li class="nav-item">
-  <a class="nav-link text-white"><small><?=$_SESSION["kullanici_tip"]?></small> | <?=$_SESSION["kullanici_mail"]?></a>
+  <a class="nav-link text-white"><small><?=$_SESSION["kullanici_tip"]?></small> | <?=$_SESSION["kullanici_mail"]?> <i class="fas fa-chevron-down"></i></a>
 </li>
   <div class="dropdown-content text-center">
        <!--<a class="dropdown-item" style="color:black" href="/profilim"><i class="fas fa-user-circle"></i> Profilim</a>
@@ -612,10 +613,10 @@ mesajKapat(diaKurKayitNo,2500);
             <div class="form-group">
               <input type="password" class="form-control" id="password1" name="sifre1" placeholder="Şifre Girin">
             </div>
-            <button type="button" id="btngirisyap" class="float-left btn btn-info col-md-8">Giriş Yap</button>
-            <a href="/sifreislem" class="ml-1 btn btn-outline-danger">Şifremi Unuttum</a>
+            <button type="button" id="btngirisyap" class="float-left btn btn-info col-md-7"><i class="fas fa-door-open"></i> Giriş Yap</button>
+            <a href="/sifreislem" class="float-right ml-1 btn btn-outline-danger"><i class="fas fa-key"></i> Şifremi Unuttum</a>
             <center><div class="loader"></div></center>
-            
+            <br> <br> <br>
             <p>bireysel-> email:hesap@bireysel.com ; şifre:api</p>
             <p>kurumsal-> email:hesap@kurumsal.com ; şifre:api</p>
           </form>

@@ -5,8 +5,11 @@ RewriteCond %{SERVER_PORT} 80
 RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
 
 #cikis
+RewriteRule ^kurumsal/([a-zA-Z-0-9-]+)$ kurumsaldetay.php?username=$1
+#RewriteRule ^degerlendir/([0-9]+)$ siparisdegerlendir.php?sipkod=$1
+RewriteRule ^kurumsallar$ kurumsallar.php [NC] 
+RewriteRule ^sifreislem$ sifre.php [NC]
 RewriteRule ^cikis$ cikis.php [NC] 
-RewriteRule ^sifreislem$ sifre.php [NC] 
 
 #hata sayfasi
 ErrorDocument 404 http://www.omurserdar.com/404.php

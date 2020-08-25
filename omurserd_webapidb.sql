@@ -2,10 +2,10 @@
 -- version 4.9.5
 -- https://www.phpmyadmin.net/
 --
--- Anamakine: localhost:3306
--- Üretim Zamanı: 17 Tem 2020, 22:42:58
--- Sunucu sürümü: 10.3.23-MariaDB
--- PHP Sürümü: 7.3.6
+-- Host: localhost:3306
+-- Generation Time: Aug 25, 2020 at 04:10 PM
+-- Server version: 10.3.23-MariaDB
+-- PHP Version: 7.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -19,25 +19,107 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Veritabanı: `omurserd_webapidb`
+-- Database: `omurserd_webapidb`
 --
 CREATE DATABASE IF NOT EXISTS `omurserd_webapidb` DEFAULT CHARACTER SET utf8 COLLATE utf8_turkish_ci;
 USE `omurserd_webapidb`;
 
 DELIMITER $$
 --
--- Yordamlar
+-- Procedures
 --
-DROP PROCEDURE IF EXISTS `sp_kurumsalTabMenuOrtMinMax`$$
-CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_kurumsalTabMenuOrtMinMax` (`k_id` INT)  BEGIN
+CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_envkiminsepetinde` (`penvid` INT)  BEGIN
+
+SELECT bireysel.ad from sepet,envanter,bireysel
+WHERE sepet.bireysel_id=bireysel.id
+AND envanter.id=sepet.envanter_id
+AND envanter.id=penvid
+ORDER BY bireysel.ad;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_kurumsalTabMenuOrtMinMax` (IN `k_id` INT)  BEGIN
     SELECT tabMenu.ad,COUNT(envanter.id) as ENVANTERSAYISI, ROUND(AVG(fiyat),2) as ORTALAMAFIYAT,MIN(fiyat) AS ENDUSUKFIYAT, MAX(fiyat) as ENYUKSEKFIYAT 
     FROM envanter,tabMenu,kurumsal
     WHERE envanter.tabMenu_id=tabMenu.id
     AND tabMenu.kurumsal_id=kurumsal.id
-    AND envanter.kurumsal_id=kurumsal.id
     AND kurumsal.id=k_id
     GROUP BY tabMenu.ad
     ORDER BY ENVANTERSAYISI DESC;
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_max5envanter` (`pid` INT)  BEGIN
+ 
+DECLARE kurumsalid INT;
+SET kurumsalid=(SELECT id from kurumsal where id=pid);
+
+IF kurumsalid IS NOT NULL
+    THEN 
+	SELECT tabMenu.ad menuad,envanter.ad,envanter.fiyat
+    FROM envanter,kurumsal,tabMenu
+    WHERE EXISTS (SELECT id FROM kurumsal WHERE id=kurumsalid) AND
+    kurumsal.id=tabMenu.kurumsal_id AND
+    envanter.tabMenu_id=tabMenu.id AND 
+    kurumsal.id=kurumsalid
+    ORDER BY envanter.fiyat DESC
+    LIMIT 0,5;
+    END IF;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_maxenvanter` (`pid` INT)  BEGIN
+ 
+DECLARE kurumsalid INT;
+SET kurumsalid=(SELECT id from kurumsal where id=pid);
+
+IF kurumsalid IS NOT NULL
+    THEN 
+	   SELECT tabMenu.ad menuad,envanter.ad,fiyat
+    FROM envanter,kurumsal,tabMenu
+    WHERE EXISTS (SELECT id FROM kurumsal WHERE id=kurumsalid) AND
+    kurumsal.id=tabMenu.kurumsal_id AND
+    envanter.tabMenu_id=tabMenu.id AND
+    kurumsal.id=kurumsalid
+    GROUP BY fiyat desc
+    LIMIT 1;
+    END IF;
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_min5envanter` (`pid` INT)  BEGIN
+ 
+DECLARE kurumsalid INT;
+SET kurumsalid=(SELECT id from kurumsal where id=pid);
+
+IF kurumsalid IS NOT NULL
+    THEN 
+	SELECT tabMenu.ad menuad,envanter.ad,envanter.fiyat
+    FROM envanter,kurumsal,tabMenu
+    WHERE EXISTS (SELECT id FROM kurumsal WHERE id=kurumsalid) AND
+    kurumsal.id=tabMenu.kurumsal_id AND
+    envanter.tabMenu_id=tabMenu.id AND 
+    kurumsal.id=kurumsalid
+    ORDER BY envanter.fiyat
+    LIMIT 0,5;
+    END IF;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` PROCEDURE `sp_minenvanter` (`pid` INT)  BEGIN
+ 
+DECLARE kurumsalid INT;
+SET kurumsalid=(SELECT id from kurumsal where id=pid);
+
+IF kurumsalid IS NOT NULL
+    THEN 
+	   SELECT tabMenu.ad menuad,envanter.ad,fiyat
+    FROM envanter,kurumsal,tabMenu
+    WHERE EXISTS (SELECT id FROM kurumsal WHERE id=kurumsalid) AND
+    kurumsal.id=tabMenu.kurumsal_id AND
+    envanter.tabMenu_id=tabMenu.id AND
+    kurumsal.id=kurumsalid
+    GROUP BY fiyat
+    LIMIT 1;
+    END IF;
 END$$
 
 DELIMITER ;
@@ -45,10 +127,9 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `bireysel`
+-- Table structure for table `bireysel`
 --
 
-DROP TABLE IF EXISTS `bireysel`;
 CREATE TABLE `bireysel` (
   `id` int(11) UNSIGNED NOT NULL,
   `il_id` tinyint(2) UNSIGNED NOT NULL,
@@ -62,42 +143,48 @@ CREATE TABLE `bireysel` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
--- Tablo döküm verisi `bireysel`
+-- Dumping data for table `bireysel`
 --
 
 INSERT INTO `bireysel` (`id`, `il_id`, `ilce_id`, `ad`, `soyad`, `kullaniciadi`, `email`, `sifre`, `kayit_tarihi`) VALUES
-(1, 34, 422, 'Ömürcan', 'Serdar', 'omurserdarr', 'omurserdarr@gmail.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-04-09 17:56:43'),
+(1, 34, 422, 'Ömürcan', 'Serdar', 'omurserdarr', 'omurserdarr@gmail.com', '8a5da52ed126447d359e70c05721a8aa', '2020-04-09 17:56:43'),
 (2, 34, 422, 'Ali', 'Veli', 'userbireysel', 'hesap@bireysel.com', '8a5da52ed126447d359e70c05721a8aa', '2020-03-10 10:29:49'),
 (3, 34, 454, 'Behzat', 'Çözer', 'behzatc', 'behz@c.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 10:31:16'),
 (4, 77, 928, 'Ercüment', 'Çizer', 'cizercument', 'ercu@ment.org', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 10:31:16'),
 (5, 61, 802, 'Hüsrev', 'İncir', 'husrevincir', 'husrev@incir.co', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 22:13:33'),
-(6, 81, 951, 'Selim', 'Derviş', 'derviselim', 'selim@dervis.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 22:13:33'),
-(7, 63, 835, 'Eşref', 'Başgan', 'basganesref', 'esref@basgan.com', 'aaa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 22:14:28'),
+(6, 81, 951, 'Selim', 'Derviş', 'derviselim', 'selim@dervis.net', '8a5da52ed126447d359e70c05721a8aa', '2020-03-10 22:13:33'),
+(7, 63, 835, 'Eşref', 'Başgan', 'basganesref', 'esref@basgan.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 22:14:28'),
 (35, 34, 442, 'Abdurrezzak', 'Kargı', 'arezzak', 'arezzak18@gmail.com', '11529902c1007059cf1009dcea903855', '2020-05-23 15:25:30');
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `degerlendirme`
+-- Table structure for table `degerlendirme`
 --
 
-DROP TABLE IF EXISTS `degerlendirme`;
 CREATE TABLE `degerlendirme` (
   `id` int(11) NOT NULL,
   `siparisKod` varchar(14) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL,
   `hiz` tinyint(2) UNSIGNED NOT NULL,
   `lezzet` tinyint(2) UNSIGNED NOT NULL,
-  `servis` tinyint(2) UNSIGNED NOT NULL,
   `yorum` varchar(120) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `degerlendirme`
+--
+
+INSERT INTO `degerlendirme` (`id`, `siparisKod`, `hiz`, `lezzet`, `yorum`) VALUES
+(20, '167689666566', 10, 10, 'kısa zamanda teslim edildi, harikaydı'),
+(21, '388300193736', 8, 10, 'çorba muhteşemdi'),
+(22, '209307457341', 2, 6, 'sipariş çok geç teslim edildi lezzeti ise eh işte');
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `envanter`
+-- Table structure for table `envanter`
 --
 
-DROP TABLE IF EXISTS `envanter`;
 CREATE TABLE `envanter` (
   `id` int(11) NOT NULL,
   `tabMenu_id` int(11) NOT NULL,
@@ -108,11 +195,11 @@ CREATE TABLE `envanter` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
--- Tablo döküm verisi `envanter`
+-- Dumping data for table `envanter`
 --
 
 INSERT INTO `envanter` (`id`, `tabMenu_id`, `ad`, `tanim`, `fiyat`, `alinabilirMi`) VALUES
-(1552, 1, 'Tosto Ayvalık Et Menü', ' Ayvalık Ekmeğine Et Döner Tost + Patates Kızartması + Kutu İçecek', 30, 0),
+(1552, 1, 'Tosto Ayvalık Et Menü', ' Ayvalık Ekmeğine Et Döner Tost + Patates Kızartması + Kutu İçecek', 30, 1),
 (1553, 1, 'Tosto Ayvalık Tavuk Menü', ' Ayvalık Ekmeğine Tavuk Döner Tost + Patates Kızartması + Kutu İçecek', 25, 1),
 (1554, 1, 'Büyük Burger Menü', ' Büyük Burger + Patates Kızartması + Kutu İçecek', 23, 1),
 (1555, 1, 'Doyuran Tavuk Menü', ' Pide Ekmek Arası Tavuk Döner + Patates Kızartması + Kutu İçecek\r', 19, 1),
@@ -248,7 +335,7 @@ INSERT INTO `envanter` (`id`, `tabMenu_id`, `ad`, `tanim`, `fiyat`, `alinabilirM
 (1688, 17, 'Portakal Suyu', ' (Bardak)', 9, 1),
 (1689, 17, 'Çikolatalı Atom Extra', ' (Bardak) Havuç, elma, portakal, muz, kivi, bal, çikolata\r', 12, 1),
 (1690, 17, 'Kokteyl Atom', ' (Bardak) Havuç, elma, portakal, muz, kivi, bal\r', 12.5, 0),
-(1728, 22, 'Çiğ Köfte Dürüm Menü', 'çok acı bu çiğköfte', 22, 1),
+(1728, 22, 'Çiğ Köfte Dürüm Menü', 'çok acı bu çiğköfte', 22, 0),
 (1729, 22, 'Çiğ Köfte Dürüm', ' 90 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi\r', 5.5, 1),
 (1730, 22, 'Mega Çiğ Köfte Dürüm', ' 125 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi\r', 8.5, 1),
 (1731, 22, 'Ultra Mega Çiğ Köfte Dürüm', ' 150 gr. çiğ köfte, isteğe göre domates, limon, maydanoz, roka, salatalık turşusu, süs biberi\r', 9, 1),
@@ -259,7 +346,7 @@ INSERT INTO `envanter` (`id`, `tabMenu_id`, `ad`, `tanim`, `fiyat`, `alinabilirM
 (1736, 22, 'Çiğ Köfte (1 kg.)', ' (5 Kişilik) Tam göbek marul, tam limon, 10 adet lavaş, nar ekşisi, acı sos, roka, maydanoz ile', 40, 0),
 (1737, 23, 'Amerikan Salatası (250 gr.)', NULL, 6, 1),
 (1738, 23, 'Rus Salatası (250 gr.)', NULL, 6, 1),
-(1739, 23, 'Acılı Ezme (250 gr.)', NULL, 6, 1),
+(1739, 23, 'Acılı Ezme (250 gr.)', 'null', 6, 0),
 (1740, 24, 'Fırın Sütlaç', NULL, 6, 1),
 (1741, 24, 'Karamelli Trileçe', NULL, 7, 1),
 (1742, 24, 'Kazandibi', NULL, 6, 1),
@@ -521,16 +608,14 @@ INSERT INTO `envanter` (`id`, `tabMenu_id`, `ad`, `tanim`, `fiyat`, `alinabilirM
 (1999, 68, 'Zerdeçallı Ayran', NULL, 3.5, 1),
 (2000, 68, 'Naneli Ayran', NULL, 3.5, 1),
 (2001, 69, 'Yeşil Detoks (40 cl.)', ' Ispanak, yeşil elma, salatalık, limon, kereviz sapı\r', 10, 1),
-(2002, 69, 'Gaji Detoks (40 cl.)', ' Portakal suyu, goji üzümü, muz\r', 12, 1),
-(2235, 144, 'hmmm çift kaşarlı', NULL, 15, 1);
+(2002, 69, 'Gaji Detoks (40 cl.)', ' Portakal suyu, goji üzümü, muz\r', 12, 1);
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `il`
+-- Table structure for table `il`
 --
 
-DROP TABLE IF EXISTS `il`;
 CREATE TABLE `il` (
   `id` tinyint(2) UNSIGNED NOT NULL,
   `il_adi` varchar(50) CHARACTER SET utf8 COLLATE utf8_turkish_ci DEFAULT NULL,
@@ -538,7 +623,7 @@ CREATE TABLE `il` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Tablo döküm verisi `il`
+-- Dumping data for table `il`
 --
 
 INSERT INTO `il` (`id`, `il_adi`, `slug`) VALUES
@@ -627,10 +712,9 @@ INSERT INTO `il` (`id`, `il_adi`, `slug`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `ilce`
+-- Table structure for table `ilce`
 --
 
-DROP TABLE IF EXISTS `ilce`;
 CREATE TABLE `ilce` (
   `id` smallint(5) UNSIGNED NOT NULL,
   `il_id` tinyint(2) UNSIGNED NOT NULL,
@@ -639,7 +723,7 @@ CREATE TABLE `ilce` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Tablo döküm verisi `ilce`
+-- Dumping data for table `ilce`
 --
 
 INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
@@ -1611,10 +1695,9 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `kurumsal`
+-- Table structure for table `kurumsal`
 --
 
-DROP TABLE IF EXISTS `kurumsal`;
 CREATE TABLE `kurumsal` (
   `id` int(11) UNSIGNED NOT NULL,
   `il_id` tinyint(2) UNSIGNED NOT NULL,
@@ -1631,12 +1714,12 @@ CREATE TABLE `kurumsal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
--- Tablo döküm verisi `kurumsal`
+-- Dumping data for table `kurumsal`
 --
 
 INSERT INTO `kurumsal` (`id`, `il_id`, `ilce_id`, `ad`, `kullaniciadi`, `email`, `sifre`, `ceptel`, `adres`, `minAlimTutar`, `acikMi`, `kayit_tarihi`) VALUES
-(1, 34, 422, 'Bambi cafe', 'cafebambi', 'bambi@cafebambi.com', '8a5da52ed126447d359e70c05721a8aa', '5413474141', 'Ayışığı Sk No:61', 15, 1, '2020-03-09 20:13:11'),
-(2, 34, 422, 'Balat Cafe Express', 'cafebalat', 'balat@balatcafe.co', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474147', 'Alipaşa Sk No:2', 25, 1, '2020-03-10 10:28:30'),
+(1, 34, 422, 'Bamb cafe', 'cafebamb', 'bamb@cafebamb.com', '8a5da52ed126447d359e70c05721a8aa', '5413474141', 'Ayışığı Sk No:61', 15, 1, '2020-03-09 20:13:11'),
+(2, 34, 422, 'Balat Cafe Express', 'cafebalat', 'balat@balatcafe.co', '8a5da52ed126447d359e70c05721a8aa', '5413474147', 'Alipaşa Sk No:2', 25, 1, '2020-03-10 10:28:30'),
 (3, 34, 442, 'Yeşilim Restaurant', 'restyes', 'yesilim@rest.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474148', 'Batı Mh. Maltepe Sk. No:34', 40, 1, '2020-03-10 10:28:30'),
 (4, 61, 802, 'Tadım Lokanta', 'tadimlok', 'tadim@tadimlokanta.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474144', 'İnönü Cd. No:61 ', 20, 1, '2020-03-10 22:18:41'),
 (5, 61, 802, 'İhlas Köfte', 'ihlaskofte', 'ihlas@kofte.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474146', 'Orta Mh. 61.Sk No:61', 44, 0, '2020-03-10 22:18:41'),
@@ -1644,15 +1727,14 @@ INSERT INTO `kurumsal` (`id`, `il_id`, `ilce_id`, `ad`, `kullaniciadi`, `email`,
 (7, 63, 835, 'Dikkat Launch', 'dikkatlaunch', 'dikkat@dikkat.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474145', 'Hamamçimeni İş Merkezi No:23', 38, 0, '2020-03-10 22:20:42'),
 (8, 81, 951, 'umutlu Tantuni', 'tantuniumutlu', 'umutlu@tantuni.com', 'aa1c8371ebd158fb3966a146e5f9ed45', NULL, 'orhangazi mah', 5, 0, '2020-03-11 19:50:25'),
 (9, 81, 951, 'Beçi Lokanta', 'becilokanta', 'hesap@kurumsal.com', '8a5da52ed126447d359e70c05721a8aa', '5413474142', 'Soğuk Sk No:202/A', 6, 1, '2020-03-11 19:50:25'),
-(53, 61, 802, 'Cafe de Albert', 'omurserdarr', 'omurserdarr@gmail.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '(541) 347 - 4150', '', 1, 1, '2020-05-22 23:36:17');
+(53, 61, 802, 'Cafe de Albert', 'omurserdarr', 'omurserdarr@gmail.com', '7c77470c8193d6b32a56c8bc5719aece', '(541) 347 - 4150', 'Akcami Karşısı No:121/A', 1, 1, '2020-05-22 23:36:17');
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `sepet`
+-- Table structure for table `sepet`
 --
 
-DROP TABLE IF EXISTS `sepet`;
 CREATE TABLE `sepet` (
   `id` int(11) NOT NULL,
   `bireysel_id` int(11) UNSIGNED NOT NULL,
@@ -1662,21 +1744,21 @@ CREATE TABLE `sepet` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
--- Tablo döküm verisi `sepet`
+-- Dumping data for table `sepet`
 --
 
 INSERT INTO `sepet` (`id`, `bireysel_id`, `kurumsal_id`, `envanter_id`, `adet`) VALUES
-(132, 1, 2, 1728, 2),
-(141, 2, 2, 1740, 1),
-(143, 2, 2, 1728, 1);
+(202, 2, 1, 1639, 1),
+(203, 2, 1, 1647, 1),
+(204, 2, 1, 1655, 1),
+(205, 2, 1, 1658, 1);
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `siparis`
+-- Table structure for table `siparis`
 --
 
-DROP TABLE IF EXISTS `siparis`;
 CREATE TABLE `siparis` (
   `siparisKod` varchar(14) CHARACTER SET utf8 COLLATE utf8_turkish_ci NOT NULL,
   `bireysel_id` int(11) UNSIGNED NOT NULL,
@@ -1687,20 +1769,33 @@ CREATE TABLE `siparis` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf16 COLLATE=utf16_turkish_ci;
 
 --
--- Tablo döküm verisi `siparis`
+-- Dumping data for table `siparis`
 --
 
 INSERT INTO `siparis` (`siparisKod`, `bireysel_id`, `kurumsal_id`, `durum_id`, `siparisTarih`, `toplamTutar`) VALUES
-('167689666566', 2, 2, 1, '2020-07-16 12:51:09', 28),
-('919228885607', 2, 1, 2, '2020-07-16 12:49:22', 33);
+('149390158871', 1, 2, 4, '2020-08-19 19:31:40', 26),
+('153287589730', 2, 1, 1, '2020-08-24 19:53:12', 62.5),
+('167689666566', 2, 2, 4, '2020-07-16 12:51:09', 28),
+('209307457341', 1, 1, 4, '2020-08-19 19:33:21', 22),
+('246830320760', 6, 9, 1, '2020-08-20 16:18:50', 38),
+('262831638692', 2, 1, 4, '2020-07-18 19:30:23', 36.5),
+('332623107400', 2, 2, 2, '2020-08-24 19:55:01', 59.5),
+('388300193736', 2, 1, 4, '2020-08-23 15:46:41', 98),
+('545634878626', 2, 1, 3, '2020-08-25 11:40:25', 75),
+('624910290213', 1, 1, 4, '2020-08-19 20:36:41', 62.1),
+('832562958516', 1, 1, 2, '2020-08-24 19:55:59', 47.5),
+('863941270336', 2, 2, 3, '2020-07-18 19:31:07', 33.5),
+('872171344877', 1, 2, 4, '2020-08-24 19:56:43', 26),
+('907680789186', 2, 2, 4, '2020-07-21 09:28:24', 30),
+('919228885607', 2, 1, 4, '2020-07-16 12:49:22', 33),
+('924997709809', 1, 1, 4, '2020-08-19 20:38:14', 100.1);
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `siparisDetay`
+-- Table structure for table `siparisDetay`
 --
 
-DROP TABLE IF EXISTS `siparisDetay`;
 CREATE TABLE `siparisDetay` (
   `siparisDetayId` int(11) NOT NULL,
   `siparisKod` varchar(14) COLLATE utf8_turkish_ci NOT NULL,
@@ -1710,7 +1805,7 @@ CREATE TABLE `siparisDetay` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci ROW_FORMAT=COMPACT;
 
 --
--- Tablo döküm verisi `siparisDetay`
+-- Dumping data for table `siparisDetay`
 --
 
 INSERT INTO `siparisDetay` (`siparisDetayId`, `siparisKod`, `envanter_id`, `adet`, `tutar`) VALUES
@@ -1718,22 +1813,57 @@ INSERT INTO `siparisDetay` (`siparisDetayId`, `siparisKod`, `envanter_id`, `adet
 (110, '919228885607', 1567, 1, 8),
 (111, '919228885607', 1611, 1, 14),
 (112, '167689666566', 1743, 1, 6),
-(113, '167689666566', 1728, 1, 22);
+(113, '167689666566', 1728, 1, 22),
+(114, '262831638692', 1652, 3, 28.5),
+(115, '262831638692', 1568, 1, 8),
+(116, '863941270336', 1729, 3, 16.5),
+(117, '863941270336', 1730, 2, 17),
+(118, '907680789186', 1738, 3, 18),
+(119, '907680789186', 1751, 4, 12),
+(122, '149390158871', 1742, 2, 12),
+(123, '149390158871', 1750, 2, 8),
+(124, '149390158871', 1740, 1, 6),
+(125, '209307457341', 1580, 1, 16),
+(126, '209307457341', 1660, 1, 6),
+(127, '624910290213', 1553, 2, 50),
+(128, '624910290213', 1579, 1, 12.1),
+(129, '924997709809', 1584, 2, 54),
+(130, '924997709809', 1585, 1, 15.1),
+(131, '924997709809', 1688, 2, 18),
+(132, '924997709809', 1682, 1, 13),
+(133, '246830320760', 1962, 1, 35),
+(134, '246830320760', 1991, 1, 3),
+(135, '388300193736', 1552, 3, 90),
+(136, '388300193736', 1567, 1, 8),
+(137, '153287589730', 1552, 1, 30),
+(138, '153287589730', 1561, 1, 17.5),
+(139, '153287589730', 1563, 1, 15),
+(140, '332623107400', 1730, 1, 8.5),
+(141, '332623107400', 1735, 1, 25),
+(142, '332623107400', 1744, 2, 10),
+(143, '332623107400', 1746, 4, 4),
+(144, '332623107400', 1751, 4, 12),
+(145, '832562958516', 1552, 1, 30),
+(146, '832562958516', 1561, 1, 17.5),
+(147, '872171344877', 1742, 2, 12),
+(148, '872171344877', 1741, 2, 14),
+(149, '545634878626', 1633, 2, 34),
+(150, '545634878626', 1627, 2, 30),
+(151, '545634878626', 1681, 1, 11);
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `siparisDurum`
+-- Table structure for table `siparisDurum`
 --
 
-DROP TABLE IF EXISTS `siparisDurum`;
 CREATE TABLE `siparisDurum` (
   `id` tinyint(1) UNSIGNED NOT NULL,
   `tanim` tinytext COLLATE utf8_turkish_ci NOT NULL DEFAULT 'Yeni Sipariş'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
--- Tablo döküm verisi `siparisDurum`
+-- Dumping data for table `siparisDurum`
 --
 
 INSERT INTO `siparisDurum` (`id`, `tanim`) VALUES
@@ -1745,10 +1875,9 @@ INSERT INTO `siparisDurum` (`id`, `tanim`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `tabMenu`
+-- Table structure for table `tabMenu`
 --
 
-DROP TABLE IF EXISTS `tabMenu`;
 CREATE TABLE `tabMenu` (
   `id` int(11) NOT NULL,
   `kurumsal_id` int(11) UNSIGNED NOT NULL,
@@ -1756,7 +1885,7 @@ CREATE TABLE `tabMenu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
--- Tablo döküm verisi `tabMenu`
+-- Dumping data for table `tabMenu`
 --
 
 INSERT INTO `tabMenu` (`id`, `kurumsal_id`, `ad`) VALUES
@@ -1823,16 +1952,14 @@ INSERT INTO `tabMenu` (`id`, `kurumsal_id`, `ad`) VALUES
 (67, 9, 'Salatalar'),
 (68, 9, 'İçecekler'),
 (69, 9, 'Detoks İçecekler (40 cl.)'),
-(117, 3, 'Abdurrezzak'),
-(144, 53, 'Poşetler'),
-(147, 9, 'Örnek');
+(117, 3, 'Abdurrezzak');
 
 --
--- Dökümü yapılmış tablolar için indeksler
+-- Indexes for dumped tables
 --
 
 --
--- Tablo için indeksler `bireysel`
+-- Indexes for table `bireysel`
 --
 ALTER TABLE `bireysel`
   ADD PRIMARY KEY (`id`),
@@ -1842,34 +1969,34 @@ ALTER TABLE `bireysel`
   ADD KEY `ilce_id` (`ilce_id`);
 
 --
--- Tablo için indeksler `degerlendirme`
+-- Indexes for table `degerlendirme`
 --
 ALTER TABLE `degerlendirme`
   ADD PRIMARY KEY (`id`),
   ADD KEY `siparisKod` (`siparisKod`);
 
 --
--- Tablo için indeksler `envanter`
+-- Indexes for table `envanter`
 --
 ALTER TABLE `envanter`
   ADD PRIMARY KEY (`id`),
   ADD KEY `tabMenu_id` (`tabMenu_id`);
 
 --
--- Tablo için indeksler `il`
+-- Indexes for table `il`
 --
 ALTER TABLE `il`
   ADD PRIMARY KEY (`id`);
 
 --
--- Tablo için indeksler `ilce`
+-- Indexes for table `ilce`
 --
 ALTER TABLE `ilce`
   ADD PRIMARY KEY (`id`),
   ADD KEY `il_id` (`il_id`);
 
 --
--- Tablo için indeksler `kurumsal`
+-- Indexes for table `kurumsal`
 --
 ALTER TABLE `kurumsal`
   ADD PRIMARY KEY (`id`),
@@ -1879,7 +2006,7 @@ ALTER TABLE `kurumsal`
   ADD KEY `ilce_id` (`ilce_id`);
 
 --
--- Tablo için indeksler `sepet`
+-- Indexes for table `sepet`
 --
 ALTER TABLE `sepet`
   ADD PRIMARY KEY (`id`),
@@ -1887,7 +2014,7 @@ ALTER TABLE `sepet`
   ADD KEY `bireysel_id` (`bireysel_id`);
 
 --
--- Tablo için indeksler `siparis`
+-- Indexes for table `siparis`
 --
 ALTER TABLE `siparis`
   ADD PRIMARY KEY (`siparisKod`),
@@ -1896,122 +2023,122 @@ ALTER TABLE `siparis`
   ADD KEY `durum_id` (`durum_id`);
 
 --
--- Tablo için indeksler `siparisDetay`
+-- Indexes for table `siparisDetay`
 --
 ALTER TABLE `siparisDetay`
   ADD PRIMARY KEY (`siparisDetayId`),
   ADD KEY `siparisKod` (`siparisKod`);
 
 --
--- Tablo için indeksler `siparisDurum`
+-- Indexes for table `siparisDurum`
 --
 ALTER TABLE `siparisDurum`
   ADD PRIMARY KEY (`id`);
 
 --
--- Tablo için indeksler `tabMenu`
+-- Indexes for table `tabMenu`
 --
 ALTER TABLE `tabMenu`
   ADD PRIMARY KEY (`id`),
   ADD KEY `kurumsal_id` (`kurumsal_id`);
 
 --
--- Dökümü yapılmış tablolar için AUTO_INCREMENT değeri
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- Tablo için AUTO_INCREMENT değeri `bireysel`
+-- AUTO_INCREMENT for table `bireysel`
 --
 ALTER TABLE `bireysel`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
--- Tablo için AUTO_INCREMENT değeri `degerlendirme`
+-- AUTO_INCREMENT for table `degerlendirme`
 --
 ALTER TABLE `degerlendirme`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
--- Tablo için AUTO_INCREMENT değeri `envanter`
+-- AUTO_INCREMENT for table `envanter`
 --
 ALTER TABLE `envanter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2243;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2244;
 
 --
--- Tablo için AUTO_INCREMENT değeri `kurumsal`
+-- AUTO_INCREMENT for table `kurumsal`
 --
 ALTER TABLE `kurumsal`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
--- Tablo için AUTO_INCREMENT değeri `sepet`
+-- AUTO_INCREMENT for table `sepet`
 --
 ALTER TABLE `sepet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
 
 --
--- Tablo için AUTO_INCREMENT değeri `siparisDetay`
+-- AUTO_INCREMENT for table `siparisDetay`
 --
 ALTER TABLE `siparisDetay`
-  MODIFY `siparisDetayId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
+  MODIFY `siparisDetayId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
 
 --
--- Tablo için AUTO_INCREMENT değeri `siparisDurum`
+-- AUTO_INCREMENT for table `siparisDurum`
 --
 ALTER TABLE `siparisDurum`
   MODIFY `id` tinyint(1) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- Tablo için AUTO_INCREMENT değeri `tabMenu`
+-- AUTO_INCREMENT for table `tabMenu`
 --
 ALTER TABLE `tabMenu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
 
 --
--- Dökümü yapılmış tablolar için kısıtlamalar
+-- Constraints for dumped tables
 --
 
 --
--- Tablo kısıtlamaları `bireysel`
+-- Constraints for table `bireysel`
 --
 ALTER TABLE `bireysel`
   ADD CONSTRAINT `bireysel_ibfk_1` FOREIGN KEY (`il_id`) REFERENCES `il` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `bireysel_ibfk_2` FOREIGN KEY (`ilce_id`) REFERENCES `ilce` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `degerlendirme`
+-- Constraints for table `degerlendirme`
 --
 ALTER TABLE `degerlendirme`
   ADD CONSTRAINT `degerlendirme_ibfk_1` FOREIGN KEY (`siparisKod`) REFERENCES `siparis` (`siparisKod`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `envanter`
+-- Constraints for table `envanter`
 --
 ALTER TABLE `envanter`
   ADD CONSTRAINT `envanter_ibfk_1` FOREIGN KEY (`tabMenu_id`) REFERENCES `tabMenu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `ilce`
+-- Constraints for table `ilce`
 --
 ALTER TABLE `ilce`
   ADD CONSTRAINT `ilce_ibfk_1` FOREIGN KEY (`il_id`) REFERENCES `il` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `kurumsal`
+-- Constraints for table `kurumsal`
 --
 ALTER TABLE `kurumsal`
   ADD CONSTRAINT `kurumsal_ibfk_1` FOREIGN KEY (`il_id`) REFERENCES `il` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `kurumsal_ibfk_2` FOREIGN KEY (`ilce_id`) REFERENCES `ilce` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `sepet`
+-- Constraints for table `sepet`
 --
 ALTER TABLE `sepet`
   ADD CONSTRAINT `sepet_ibfk_1` FOREIGN KEY (`envanter_id`) REFERENCES `envanter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `sepet_ibfk_2` FOREIGN KEY (`bireysel_id`) REFERENCES `bireysel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `siparis`
+-- Constraints for table `siparis`
 --
 ALTER TABLE `siparis`
   ADD CONSTRAINT `siparis_ibfk_1` FOREIGN KEY (`bireysel_id`) REFERENCES `bireysel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -2019,13 +2146,13 @@ ALTER TABLE `siparis`
   ADD CONSTRAINT `siparis_ibfk_3` FOREIGN KEY (`durum_id`) REFERENCES `siparisDurum` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `siparisDetay`
+-- Constraints for table `siparisDetay`
 --
 ALTER TABLE `siparisDetay`
   ADD CONSTRAINT `siparisDetay_ibfk_1` FOREIGN KEY (`siparisKod`) REFERENCES `siparis` (`siparisKod`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kısıtlamaları `tabMenu`
+-- Constraints for table `tabMenu`
 --
 ALTER TABLE `tabMenu`
   ADD CONSTRAINT `tabMenu_ibfk_1` FOREIGN KEY (`kurumsal_id`) REFERENCES `kurumsal` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;

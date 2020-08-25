@@ -32,6 +32,16 @@ kurumsal.id=siparis.kurumsal_id AND
 siparisDetay.envanter_id=envanter.id AND
 siparis.siparisKod='$sipKod'");
          if($sipVarMi->rowCount()>0){
+             
+             
+             $sipdurum=$db->query("SELECT siparis.durum_id,siparisDurum.tanim,bireysel.ad as bad,bireysel.id as bid,kurumsal.ad as kad,kurumsal.id as kid
+FROM siparis,siparisDurum,bireysel,kurumsal 
+WHERE siparisDurum.id=siparis.durum_id AND
+bireysel.id=siparis.bireysel_id AND
+kurumsal.id=siparis.kurumsal_id AND
+siparis.siparisKod='$sipKod'")->fetch(PDO::FETCH_ASSOC);
+             
+             
              $jsonArray["EnvnaterlerVeSiparisler"]=array();
              while($cek=$sipVarMi->fetch(PDO::FETCH_ASSOC)){
              $a=array("bireysel_ad"=>$cek["bad"],
@@ -42,6 +52,15 @@ siparis.siparisKod='$sipKod'");
              array_push($jsonArray["EnvnaterlerVeSiparisler"],$a);
              }
              $httpKOD = 200;
+             
+             //$ad=$sipVarMi->fetchAll();
+             
+             //$jsonArray["kurumsal_ad"]=$ad[0]["kad"];
+             //$jsonArray["envanter_ad"]=$cek["ead"];
+             
+             
+             
+             $jsonArray["durum"]=$sipdurum;
              $jsonArray["hata"] = false;
              $jsonArray["sayi"] = $sipVarMi->rowCount();
              }else {

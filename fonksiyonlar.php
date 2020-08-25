@@ -1,5 +1,38 @@
 <?php 
 
+//türkçe tarih
+function turkcetarih($datetime){
+    $z = date('j F Y l H:i', strtotime($datetime));
+    $gun_dizi = array(
+        'Monday'    => 'Pazartesi',
+        'Tuesday'   => 'Salı',
+        'Wednesday' => 'Çarşamba',
+        'Thursday'  => 'Perşembe',
+        'Friday'    => 'Cuma',
+        'Saturday'  => 'Cumartesi',
+        'Sunday'    => 'Pazar',
+        'January'   => 'Ocak',
+        'February'  => 'Şubat',
+        'March'     => 'Mart',
+        'April'     => 'Nisan',
+        'May'       => 'Mayıs',
+        'June'      => 'Haziran',
+        'July'      => 'Temmuz',
+        'August'    => 'Ağustos',
+        'September' => 'Eylül',
+        'October'   => 'Ekim',
+        'November'  => 'Kasım',
+        'December'  => 'Aralık',
+    );
+    foreach($gun_dizi as $en => $tr){
+        $z = str_replace($en, $tr, $z);
+    }
+    //if(strpos($z, 'Mayıs') !== false && strpos($format, 'F') === false) $z = str_replace('Mayıs', 'May', $z);
+    return $z;
+}
+//türkçe tarih son
+
+
 //session yoket ve aktif sayfayı yenile
 
 function sesDestYon(){
@@ -41,7 +74,7 @@ function mailGonder($gonderici,$gondericiUsername=null,$alici,$subject=null,$bod
     //$mail->CharSet  ="utf-8";
     
     $mail->Username = $gonderici; // Gönderici adresinizin sunucudaki kullanıcı adı (e-posta adresiniz)
-    $mail->Password = "*****"; // Mail adresimizin sifresi
+    $mail->Password = "Serdar*1461"; // Mail adresimizin sifresi
                 
                 //MAİL İCERİK
     $mail->Subject = $subject; // Email konu başlığı
@@ -142,6 +175,17 @@ header("Access-Control-Allow-Methods: GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 }
+
+// örneğin bireysel yoksa (diğer fonk farkı json return etmez, bool return eder)
+function spesifiksesvarmi($psesval,$pseskey){
+    //session_start();
+    if(isset($_SESSION[$psesval])&&$_SESSION["kullanici_tip"]==$pseskey)
+        return true;
+    else
+        return false;
+    //session_destroy();
+}
+//son spesifiksesvarmi
 
 
 function sesYoksaCik($param,$deger=null){
