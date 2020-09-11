@@ -38,8 +38,8 @@
 <script src="/assets/js/fontawesome.all.min.js" type="text/javascript"></script>
 <script src="/assets/js/jqueryconfirm.min.js"></script> <!-- confirm -->
 <script src="/assets/js/jsfonksiyonlar.js" type="text/javascript"></script> 
-<script src="/assets/js/qr1.js" type="text/javascript"></script>
-<script src="/assets/js/qr2.js" type="text/javascript"></script>
+<script src="/assets/js/qr1.js" type="text/javascript"></script> <!-- qr1-->
+<script src="/assets/js/qr2.js" type="text/javascript"></script> <!-- qr2 -->
    
     
   </head>
@@ -57,7 +57,7 @@
       
       
       <li class="nav-item">
-       <a class="nav-link" style="color:white" href="/kurumsallar">Kurumsallar</a> 
+       <a class="nav-link" style="color:white" href="/kurumsallar"><i class="fas fa-store-alt"></i> Kurumsallar</a> 
        <!--<a class="nav-link" style="color:white" href="/raporlar"><i class="fas fa-file"></i> Raporlar</a> -->
       </li>
       <!-- 
@@ -386,14 +386,14 @@ $('#ilceler').find('option').remove();
         
         //kullanımsartları click
         $("#btnsart").click(function(){
-        $.alert({
+        $.dialog({
         type:'blue',
         columnClass: 'col-md-6 col-md-offset-3',
         title: 'Kullanım Şartları ',
-        content: '<div>SİTE KULLANIM ŞARTLARI</div>'+
-	'<div>Lütfen sitemizi kullanmadan evvel bu ‘site kullanım şartları’nı'+ 'dikkatlice okuyunuz.&nbsp;</div>'+
-	'<div>Bu alışveriş sitesini kullanan ve alışveriş yapan müşterilerimiz'+ 'aşağıdaki şartları kabul etmiş varsayılmaktadır:</div>'+
-	'<div>Sitemizdeki web sayfaları ve ona bağlı tüm sayfalar (‘site’) ………'+ 'adresindeki ……………………………….firmasının (Firma) malıdır ve onun tarafından '+ 'işletilir. Sizler (‘Kullanıcı’) sitede sunulan tüm hizmetleri'+ 'kullanırken aşağıdaki şartlara tabi olduğunuzu, sitedeki hizmetten'+ 'yararlanmakla ve kullanmaya devam etmekle; Bağlı olduğunuz yasalara'+ 'göre sözleşme imzalama hakkına, yetkisine ve hukuki ehliyetine sahip ve'+ '18 yaşın üzerinde olduğunuzu, bu sözleşmeyi okuduğunuzu, anladığınızı ve sözleşmede yazan şartlarla bağlı olduğunuzu kabul etmiş sayılırsınız .&nbsp;</div><br>'
+        content: ''+
+	'<div>Lütfen sitemizi kullanmadan evvel bu ‘site kullanım şartları’nı '+ 'dikkatlice okuyunuz.&nbsp;</div>'+
+	'<div>Bu siteyi kullanan ve alışveriş yapan müşterilerimiz '+ 'aşağıdaki şartları kabul etmiş varsayılmaktadır:</div>'+
+	'<div>Sizler (‘Kullanıcı’) sitede sunulan tüm hizmetleri kullanırken aşağıdaki şartlara tabi olduğunuzu, sitedeki hizmetten yararlanmakla ve kullanmaya devam etmekle; Bağlı olduğunuz yasalara göre sözleşme imzalama hakkına, yetkisine ve hukuki ehliyetine sahip ve 18 yaşın üzerinde olduğunuzu, bu sözleşmeyi okuduğunuzu, anladığınızı ve sözleşmede yazan şartlarla bağlı olduğunuzu kabul etmiş sayılırsınız .&nbsp;</div><br>'
     });
         });
         //SON kullanımsart click
@@ -618,6 +618,7 @@ mesajKapat(diaKurKayitNo,2500);
             <center><div class="loader"></div></center>
             <br> <br> <br>
             <p>bireysel-> email:hesap@bireysel.com ; şifre:api</p>
+            <p>kurumsal-> email:bamb@cafebamb.com ; şifre:api</p>
             <p>kurumsal-> email:hesap@kurumsal.com ; şifre:api</p>
           </form>
           

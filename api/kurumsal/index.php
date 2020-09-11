@@ -1,6 +1,7 @@
 <?php
 include "../../db.php";
 include "../../fonksiyonlar.php";
+
 $jsonArray = array(); // son olarak json_encode işlemi yapılacak . 
 $jsonArray["hata"] = FALSE; // Başlangıçta hata yok olarak kabul edelim. 
  
@@ -51,16 +52,24 @@ else if($istekMOD=="PUT") {
              }else{
                  
                  
+                 if(!isset($gelenler->email)){
+                     $cek=$db->query("select email from kurumsal where id='$gelenler->id'")->fetchAll();
+                     $gelenler->email=$cek[0]["email"];
+                 }
+                 
                  //EĞER ŞİFRE GÜNCELLENECEK İSE
                  if(isset($gelenler->sifre)){
                      
-                    $sifre=generateRandomKey();
+                    if($gelenler->sifre=="sifirlama") 
+                        $sifre=generateRandomKey();
+                    else 
+                        $sifre=$gelenler->yenisifre;
                      
                     $db->beginTransaction();
                     
-                    $kurguncelle=$db->prepare("UPDATE kurumsal SET sifre=:psifre WHERE email=:pmail");
+                    $kurguncelle=$db->prepare("UPDATE kurumsal SET sifre=:psifre WHERE email=:pmail OR id=:pid");
                     $kurguncelle->execute(array("psifre"=>md5($sifre),
-                 "pmail" => $gelenler->email));
+                 "pmail" => $gelenler->email,"pid"=>$gelenler->id));
                  
                     if($kurguncelle) //SİFRE GUNCELLENDİ İSE 
                         $emailGonderilecekMi=true; //EMAİL GÖNDERİM İŞLEM YAKALAMA İÇİN

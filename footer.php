@@ -1,13 +1,9 @@
 </main>
 
 <footer class="text-muted">
-  <div class="container">
-    <p class="float-right">
-      <a class="top btn btn-outline-info btn-sm" href="javascript:void(0)"><i class="fa fa-arrow-circle-up" aria-hidden="true"></i> yukarı çık</a>
-    </p>
+      <a class="top btn btn-outline-info btn-sm mt-2 mb-2 float-right mr-3" href="javascript:void(0)"><i class="fa fa-arrow-circle-up" aria-hidden="true"></i> yukarı çık</a>
     
   <!--  <p> ömürcan serdar </p> -->
-  </div>
 </footer>
 
       <!-- YUKARI ÇIK BUTON -->

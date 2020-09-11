@@ -54,16 +54,24 @@ else if($istekMOD=="PUT") {
              $jsonArray["hataMesaj"] = "bireysel bulunamadı";
              }else{
                  
+                 if(!isset($gelenler->email)){
+                     $cek=$db->query("select email from bireysel where id='$gelenler->id'")->fetchAll();
+                     $gelenler->email=$cek[0]["email"];
+                 }
+                 
                  //EĞER ŞİFRE GÜNCELLENECEK İSE
                  if(isset($gelenler->sifre)){
                      
-                    $sifre=generateRandomKey();
-                     
+                    if($gelenler->sifre=="sifirlama") 
+                        $sifre=generateRandomKey();
+                    else 
+                        $sifre=$gelenler->yenisifre;
+                        
                     $db->beginTransaction();
                     
-                    $birguncelle=$db->prepare("UPDATE bireysel SET sifre=:psifre WHERE email=:pmail");
+                    $birguncelle=$db->prepare("UPDATE bireysel SET sifre=:psifre WHERE email=:pmail OR id=:pid");
                     $birguncelle->execute(array("psifre"=>md5($sifre),
-                 "pmail" => $gelenler->email));
+                 "pmail" => $gelenler->email,"pid"=>$gelenler->id));
                  
                     if($birguncelle) //SİFRE GUNCELLENDİ İSE 
                         $emailGonderilecekMi=true; //EMAİL GÖNDERİM İŞLEM YAKALAMA İÇİN

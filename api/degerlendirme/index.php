@@ -1,11 +1,11 @@
 <?php
 include "../../db.php";
 include "../../fonksiyonlar.php";
-$jsonArray = array(); // son olarak json_encode işlemi yapılacak . 
-$jsonArray["hata"] = FALSE; // Başlangıçta hata yok olarak kabul edelim. 
- 
-$httpKOD = 200; // HTTP Ok olarak durumu kabul edelim. 
+$jsonArray = array(); // son kısımda json_encode işlemi yapılacak
+$jsonArray["hata"] = FALSE; // Başlangıçta hata yok olarak kabul edilsin
+$httpKOD = 200; // HTTP OK
 $istekMOD = $_SERVER["REQUEST_METHOD"]; // istemciden gelen istek
+
 //print_r(json_decode(file_get_contents("php://input"), true));
 
 if($istekMOD=="POST") {
@@ -33,17 +33,18 @@ $degekle=$db->prepare("INSERT INTO degerlendirme set hiz=:phiz,lezzet=:plezzet,y
              $jsonArray["hata"] = TRUE;
              $jsonArray["mesaj"] = "eklenemedi";
 		 }
-    }//kullanici dbde varsa
+    }//değerlendirme varsa
     else{
              $httpKOD = 200;
              $jsonArray["hata"] = TRUE; // bir hata olduğu bildirilsin.
-             $jsonArray["mesaj"] = "kullanicizatenmevcut";
+             $jsonArray["mesaj"] = "daha önce değerlendirme yapılmış";
     }
     
 }
 
 //GÜNCELLEME İSTEĞİ
 else if($istekMOD=="PUT") {
+    sesYoksaCik("kullanici_tip","bireysel");
     
     $gelenler=json_decode(file_get_contents("php://input"));
         if($db->query("select * from degerlendirme where id='$gelenler->id'")->rowCount()==0){
@@ -67,27 +68,22 @@ else if($istekMOD=="PUT") {
                      $jsonArray["mesaj"] = "güncellenmedi";
                  }
         }
-
-    
 }
-
 //SON GÜNCELLEME İSTEĞİ
+
 
 
 //SİLME İSTEĞİ
 else if($istekMOD=="DELETE") {
-       
        sesYoksaCik("kullanici_tip","bireysel");
-       // parse_str(file_get_contents("php://input"),$veriler);
-       // $bid=$veriler["id"];
-       
+
     if(isset($_GET["id"])){
         $id=strip_tags($_GET["id"]);
         $degVarMi = $db->query("select * from degerlendirme where id=$id");
         if($degVarMi->rowCount()==1){
             $degsil = $db->query("delete from degerlendirme where id=$id");
             if($degsil->rowCount()==1){
-                $httpKOD = 200;
+                $httpKOD = 202;
                 $jsonArray["mesaj"] = "silindi";
             }else{
                 $httpKOD = 200;
@@ -96,7 +92,7 @@ else if($istekMOD=="DELETE") {
             }
         }
         else{
-            $httpKOD = 200; 
+            $httpKOD = 204; 
             $jsonArray["hata"] = TRUE;
             $jsonArray["mesaj"] = "kayıt bulunamadı";
         }
@@ -114,13 +110,12 @@ else if($istekMOD=="DELETE") {
 
 //BİLGİ ÇEKME İSTEĞİ
 else if($istekMOD=="GET"){
-  
 
   if((isset($_GET["id"])&&!isset($_GET["sipariskod"])) or (!isset($_GET["id"]) && isset($_GET["sipariskod"]))){
       
       //yalnızca sipkod oldugunda sorguda id= degeri aramaya çalısıyor fakat bulamıyor, bu durumdan dolayı id='""' ile işlem yaptım
       
-      $deg=$db->query("select * from degerlendirme where id='".$_GET["id"]."' or siparisKod='".$_GET["sipariskod"]."' ")->fetch(PDO::FETCH_ASSOC);
+      $deg=$db->query("select * from degerlendirme where id='".strip_tags($_GET["id"])."' or siparisKod='".strip_tags($_GET["sipariskod"])."' ")->fetch(PDO::FETCH_ASSOC);
       if(empty($deg)){
         $httpKOD = 200;
         $jsonArray["hata"] = TRUE;
@@ -136,12 +131,12 @@ else if($istekMOD=="GET"){
       
   }
   elseif(isset($_GET["id"])and isset($_GET["sipariskod"])){
-    $httpKOD = 200;
+    $httpKOD = 400;
     $jsonArray["hata"] = TRUE; 
     $jsonArray["mesaj"] = "id veya siparis kod değerlerinden yalnızca bir tanesini gönder";
   }
   else{
-        $httpKOD = 200;
+        $httpKOD = 400;
         $jsonArray["hata"] = TRUE;
         $jsonArray["mesaj"] = "değerlendirme id ya da siparis kod yok";
   }

@@ -1,5 +1,13 @@
 <?php 
 
+//bootstrap renklerinden rastgele 1ini return eder
+function bsRenkYaziUret(){
+     $renkDizi=array("primary","success","secondary","warning","info");
+     return $renkDizi[array_rand($renkDizi,1)];
+ }
+//son bs renk
+
+
 //türkçe tarih
 function turkcetarih($datetime){
     $z = date('j F Y l H:i', strtotime($datetime));
@@ -117,47 +125,25 @@ function mailGonder($gonderici,$gondericiUsername=null,$alici,$subject=null,$bod
 // https://tools.ietf.org/html/rfc7231
 function HttpStatus($kod) {
  $status = array(
-        100 => 'Continue',         
-        101 => 'Switching Protocols',  
-        200 => 'OK',               
-        201 => 'Created',  
-        202 => 'Accepted',         
-        203 => 'Non-Authoritative Information',  
-        204 => 'No Content',       
-        205 => 'Reset Content',  
-        206 => 'Partial Content',  
-        300 => 'Multiple Choices',  
-        301 => 'Moved Permanently',
-        302 => 'Found',  
-        303 => 'See Other',        
-        304 => 'Not Modified',  
-        305 => 'Use Proxy',        
-        306 => '(Unused)',  
-        307 => 'Temporary Redirect', 
-        400 => 'Bad Request',  
-        401 => 'Unauthorized',       
-        402 => 'Payment Required',  
-        403 => 'Forbidden',          
-        404 => 'Not Found',  
-        405 => 'Method Not Allowed', 
-        406 => 'Not Acceptable',  
-        407 => 'Proxy Authentication Required', 
-        408 => 'Request Timeout',  
-        409 => 'Conflict',           
-        410 => 'Gone',  
-        411 => 'Length Required',    
-        412 => 'Precondition Failed',  
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Long',  
-        415 => 'Unsupported Media Type',  
-        416 => 'Requested Range Not Satisfiable',  
-        417 => 'Expectation Failed',
-        500 => 'Internal Server Error',  
-        501 => 'Not Implemented',    
-        502 => 'Bad Gateway',  
-        503 => 'Service Unavailable',
-        504 => 'Gateway Timeout',  
-        505 => 'HTTP Version Not Supported');
+        100 => 'Continue',101 => 'Switching Protocols',
+        200 => 'OK', 201 => 'Created',  
+        202 => 'Accepted',203 => 'Non-Authoritative Information',  
+        204 => 'No Content', 205 => 'Reset Content', 206 => 'Partial Content',  
+        300 => 'Multiple Choices', 301 => 'Moved Permanently',
+        302 => 'Found',  303 => 'See Other', 304 => 'Not Modified',  
+        305 => 'Use Proxy', 306 => '(Unused)', 307 => 'Temporary Redirect', 
+        400 => 'Bad Request', 401 => 'Unauthorized', 
+        402 => 'Payment Required', 403 => 'Forbidden',          
+        404 => 'Not Found', 405 => 'Method Not Allowed', 
+        406 => 'Not Acceptable', 407 => 'Proxy Authentication Required', 
+        408 => 'Request Timeout', 409 => 'Conflict',           
+        410 => 'Gone', 411 => 'Length Required',    
+        412 => 'Precondition Failed', 413 => 'Request Entity Too Large',
+        414 => 'Request-URI Too Long',  415 => 'Unsupported Media Type',  
+        416 => 'Requested Range Not Satisfiable', 417 => 'Expectation Failed',
+        500 => 'Internal Server Error', 501 => 'Not Implemented',    
+        502 => 'Bad Gateway', 503 => 'Service Unavailable',
+        504 => 'Gateway Timeout', 505 => 'HTTP Version Not Supported');
         
     return $status[$kod] ? $status[$kod] : $status[500];
 }
@@ -190,7 +176,7 @@ function spesifiksesvarmi($psesval,$pseskey){
 
 function sesYoksaCik($param,$deger=null){
     session_start();
-    if(!isset($_SESSION[$param])||$_SESSION[$param]!=$deger||empty($_SESSION[$param])){
+    if(!isset($_SESSION[$param])||$_SESSION[$param]!=$deger){
         $jsonArray=array();
         $httpKOD = 403; //forbidden
         SetHeader($httpKOD);

@@ -1,9 +1,35 @@
-.modal {
-  overflow-y:auto;
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #333333; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #EDEDED; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #FF0000; 
+}
+
+/* scrol menu dropdown */
+.scrollable-menu {
+    height: auto;
+    max-height: 300px;
+    overflow-x: hidden;
 }
 
 
 
+.modal {
+  overflow-y:auto;
+}
 
 .bd-placeholder-img {
         font-size: 1.125rem;

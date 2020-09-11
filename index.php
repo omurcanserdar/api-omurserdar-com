@@ -1,6 +1,6 @@
 <?php
  $title="Anasayfa | API";
- $desc="anasayfa api";
+ $desc="yiyecek/içecek siparişi verebilmek ya da satışa sunabilmek için geliştirilmiş API projesine ait anasayfa ";
  include "header.php";?>
 <head>
 
@@ -83,7 +83,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                 <h4 class="modal-title siparisDetayModTit">Bilgiler</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <!-- <button type="button" class="close" data-dismiss="modal">&times;</button>-->
+                <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i> Kapat</button>
                     </div>
                     <!-- <small class="text-info ml-2 "> *** sipariş sonrasında tutar kısmı ile
                          ürünlerin toplam tutarlarının eşit olmaması ürünün daha 
@@ -171,21 +172,22 @@
                              <div class="modal-content">
                               <div class="modal-header">
                                 <h4 class="modal-title kurumsalModTit">Bilgiler</h4>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i> Kapat</button>
+                                <!--<button type="button" class="close" data-dismiss="modal">&times;</button>-->
                               </div>
                               <div class="modal-body envanterVeTab">
                          
                               </div>
-                              <div class="modal-footer">
+                              <!--<div class="modal-footer">
                                <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
-                              </div>
+                              </div>-->
                              </div>
                             </div>
                            </div>
     <!--SON KURUMSAL BİLGİ Modal -->
      
 <div class="tab-content" id="pills-tabContent">
-  <div class="tab-pane fade show active" id="pills-cevrem" role="tabpanel" aria-labelledby="pills-cevrem-tab">
+  <div class="tab-pane show active" id="pills-cevrem" role="tabpanel" aria-labelledby="pills-cevrem-tab">
       <div class="btcevrem"></div>
     <div class="container">
     <p class="lead" id="cevrebilgi"></p>
@@ -256,7 +258,7 @@ $('.nav-pills a[href="#pills-cevrem"]').on('click',function(){
                     var mindurum='<span class="badge badge-pill badge-info">'+kurbilgi.minAlimTutar+' ₺</span>';
                     //son açık ya da kapalı bilgisi ve min alım tutar yazsın
                     
-                eklencek+='<div class="card border-'+renk+' mb-2 mr-2" style="max-width: 25rem;">'+
+                eklencek+='<div class="card border-'+renk+' mb-2 mr-2" style="max-width: 18rem;">'+
                 '<div class="card-header"><span class="badge badge-pill badge-primary">'+kurbilgi.kullaniciadi+"</span> "+acikdurum+" "+mindurum+'</div><div class="card-body">'+
                 '<button acikmi='+kurbilgi.acikMi+' type="button" data-id="'+kurbilgi.id+'" class="btnkurAd btn btn-outline-'+renk+" btn-block "+butdurum+'" durum='+butdurum+'>'+kurbilgi.ad+'</button></div>'+
                 '<div class="card-footer text-muted"><p class="card-text"><i class="fas fa-map-pin"></i> '+kurbilgi.adres+'<hr/>'+
@@ -641,8 +643,9 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
   
                     <!-- TAB BİR SİPARİŞLERİM -->
   <div class="bid" data-id="<?=$_SESSION["kullanici_id"]?>"></div>
-  <div class="tab-pane fade" id="pills-siparislerim" role="tabpanel" aria-labelledby="pills-siparislerim-tab">
+  <div class="tab-pane" id="pills-siparislerim" role="tabpanel" aria-labelledby="pills-siparislerim-tab">
       
+      <div class="btbirsip"></div>
       <div class="sipcard"></div>
       
   </div>
@@ -659,6 +662,8 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
            $('.nav-pills a[href="#pills-siparislerim"]').click(function(){
             var birid=$(".bid").data("id");
             
+            spinekle(".btbirsip");
+            
             $.ajax({
      method: 'GET',
      url : "https://www.api.omurserdar.com/api/siparislerim",
@@ -666,11 +671,14 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
      dataType: "json",
      contentType: "application/json",
      success: function(dataSip){
+         
+         spinkaldir(".btbirsip");
+         
          if(dataSip.sayi==0){
              $(".sipcard").html("<h2 class='text-info'> Sipariş Yok </h2>");
          }
          if(dataSip.hata==false && dataSip.sayi>0){  
-     var veri='<table class="table table-striped"><thead class="thead-dark"><tr><th scope="col"><i class="fas fa-key"></i> Sipariş Kod</th><th scope="col"><i class="fas fa-store-alt"></i> Kurumsal Üye </th><th scope="col"><i class="fas fa-dolly"></i> Sipariş Durumu</th><th scope="col"><i class="fas fa-calendar-alt"></i> Sipariş Tarihi</th><th scope="col"><i class="fas fa-lira-sign"></i> Toplam Tutar</th></tr></thead><tbody><tr>';
+     var veri='<div class="table-responsive"><table class="table table-striped"><thead class="thead-dark"><tr><th scope="col"><i class="fas fa-key"></i> Sipariş Kod</th><th scope="col"><i class="fas fa-store-alt"></i> Kurumsal Üye </th><th scope="col"><i class="fas fa-dolly"></i> Sipariş Durumu</th><th scope="col"><i class="fas fa-calendar-alt"></i> Sipariş Tarihi</th><th scope="col"><i class="fas fa-lira-sign"></i> Toplam Tutar</th></tr></thead><tbody><tr>';
       var metin="";
   
      for (i in dataSip.siparislerKume) { // class="atablosipKod
@@ -715,7 +723,7 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
           metin+='<td class="sipTarih'+dataSip.siparislerKume[i].siparisKod+'" data-id="'+dataSip.siparislerKume[i].sipTarih+'">'+tr_tarih(dataSip.siparislerKume[i].sipTarih)+'</td>'; 
           metin+='<td class="sipTutar'+dataSip.siparislerKume[i].siparisKod+'" data-id="'+dataSip.siparislerKume[i].toplamTutar+'">'+dataSip.siparislerKume[i].toplamTutar+'  &#8378</td></tr>';
         }
-    metin+='</tbody></table>';
+    metin+='</tbody></table></div>';
     
     $(".sipcard").html(veri+metin);
     
@@ -734,30 +742,30 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
             var hizyildiz="";
             for(j=0;j<datasipdeger.degerlendirme.hiz;j++)
                     hizyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
-			for(k=0; k<(10-datasipdeger.degerlendirme.hiz); k++)
+			for(k=0; k<(5-datasipdeger.degerlendirme.hiz); k++)
 					hizyildiz+='<span><i class="far fa-star"></i></span>';
 					
 			var lezzetyildiz="";
             for(j=0;j<datasipdeger.degerlendirme.lezzet;j++)
                     lezzetyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
-			for(k=0; k<(10-datasipdeger.degerlendirme.lezzet); k++)
+			for(k=0; k<(5-datasipdeger.degerlendirme.lezzet); k++)
 					lezzetyildiz+='<span><i class="far fa-star"></i></span>';		
-					
-  
-        var dikurdeggor=$.dialog({
+        var dibirdeggor=$.dialog({
             type:'purple',
             title: '<b class="text-info">Değerlendirme Bilgileri</b>',
-            content: 'HIZ: '+hizyildiz+' <br> LEZZET: '+lezzetyildiz+' <br> YORUM: '+datasipdeger.degerlendirme.yorum
+            content: 'HIZ: '+hizyildiz+' <br> LEZZET: '+lezzetyildiz+' <br> YORUM: '+datasipdeger.degerlendirme.yorum,
+            onOpenBefore: function () {
+                          dibirdeggor.showLoading();
+                    },
+            onContentReady: function () {
+                          dibirdeggor.hideLoading();
+                    }
          });
          
-         mesajKapat(dikurdeggor,"7000");
+         mesajKapat(dibirdeggor,"7000");
    
              }
              });
-    
-         
-         
-                
                 
     });
     //son ddowndeggor
@@ -765,7 +773,6 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
     //ddowndegduz
     $(".ddowndegduz").on("click",function(){
            var sipkop=$(this).attr("id"); 
-           //var degyorum=$(".yorum").html();
             
            //bilgileri al
            $.ajax({
@@ -775,27 +782,20 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
             contentType: "application/json",
             success: function(data){
                 var bilgi=data.degerlendirme;
-                //var hizyildiz="";
-                /*
-                for(j=0;j<bilgi.hiz;j++)
-                    hizyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
-				for(k=0; k<(10-bilgi.hiz); k++)
-					hizyildiz+='<span><i class="far fa-star"></i></span>';
-                */
                 //confirm  
-                    $.confirm({
+                var confSipDegGunc=$.confirm({
                 type:'purple',
                 title: '<b class="text-info"> Sipariş Değerlendirme Düzenleme</b>',
                 content: '' +
                 '<form action="" class="formName">' +
                 '<div class="form-group">' +
                 '<label>Hız: </label>' +
-                '<input type="number" step="any" min="1" max="10" value="'+bilgi.hiz+'" class="form-control hizduz" required />' +
+                '<input type="number" step="any" min="1" max="5" value="'+bilgi.hiz+'" class="form-control hizduz" required />' +
                 '</div>'+
                 
                 '<div class="form-group">' +
                 '<label>Lezzet </label>' +
-                '<input type="number" step="any" min="1" max="10" value="'+bilgi.lezzet+'" class="form-control lezzetduz" required />' +
+                '<input type="number" step="any" min="1" max="5" value="'+bilgi.lezzet+'" class="form-control lezzetduz" required />' +
                 '</div>'+
                 
                 '<div class="form-group">' +
@@ -803,6 +803,13 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                 '<textarea class="form-control" id="duzenleyorum">'+bilgi.yorum+'</textarea>' +
                  '</div>' +
                 '</form>',
+                onOpenBefore: function () {
+                          confSipDegGunc.showLoading();
+                    },
+                onContentReady: function () {
+                          confSipDegGunc.hideLoading();
+                    },
+                
                 buttons: {
                     formSubmit: {
                         text: 'Gönder',
@@ -811,16 +818,16 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                              
                               var phiz=$(".hizduz").val();
                              
-                            if(!phiz || phiz<1 || phiz>10){
-                                var diDegHiz=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
+                            if(!phiz || phiz<1 || phiz>5){
+                                var diDegHiz=$.dialog('<b class="text-danger">1 ile 5 arası değer girişi yapın </b>');
                                 mesajKapat(diDegHiz);
                                 return false;
                             }
                              
                             var plezzet=$(".lezzetduz").val();
                              
-                            if(!plezzet || plezzet<1 || plezzet>10){
-                                var diDegLezzet=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
+                            if(!plezzet || plezzet<1 || plezzet>5){
+                                var diDegLezzet=$.dialog('<b class="text-danger">1 ile 5 arası değer girişi yapın </b>');
                                 mesajKapat(diDegLezzet);
                                 return false;
                             } 
@@ -834,51 +841,41 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                             } 
                              
                              //burada put işlemi olacak
-                             
                              var dobje={"id":bilgi.id,"hiz":phiz,"lezzet":plezzet,"yorum":pyorum};
                             dobje=JSON.stringify(dobje);
                             //alert(dobje);
                                  $.ajax({
                                 method: 'PUT',
                                 url : "https://www.api.omurserdar.com/api/degerlendirme/",
-                                //dataType: "json",
-                                //contentType: "application/json"
                                 data : dobje,
                                 success: function(apidegduzenle){
                                     if(apidegduzenle.mesaj=="güncellendi"){
-                                var didegGuncellendi=$.dialog({
+                                    var didegGuncellendi=$.dialog({
                                     type:'green',
                                     title: '<b class="text-success">Güncellendi</b>',
                                     content: 'Değerlendirme Güncellendi',
                                     onClose: function () {
-                                        
-                                        window.location.replace("https://api.omurserdar.com");
+                                        //güncelledikten sonra tab click tetiklen
+                                        $('.nav-pills a[href="#pills-siparislerim"]').trigger("click");
                                                  }
                                             });
-                                    
-                                                mesajKapat(didegGuncellendi);
-                            //$('.nav-pills a[href="#pills-kurbilgilerim"]').trigger('click'); 
-                                }
-                                
-                                }
-                                });
+                                    mesajKapat(didegGuncellendi);
+                                    }
+                                }//success
+                                }); //ajax
                              //put işlemi son
                              
-                    } //dialog action
+                        } //dialog action
                     },
                 cancel: {
                          text:'İptal et'
                     },
              
-            }
-            }); //confirm
-                
-                
-            }
-           });
+                }
+              }); //confirm
+            }// get success
+           });// get ajax
            //bilgileri al son
-           
-           
         });
     //son ddowndegduz
     
@@ -906,121 +903,116 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                                         type:'dark',    
                                         title: '<b class="text-info"          >Silindi</b>',
                                         content:  "<b class='text-info'> Değerlendirme silinmiştir </b>",
-                                        
+        
                                         onClose: function () {
-                                        
-                                        window.location.replace("https://api.omurserdar.com");
+                                       //sildikten sonra tab click tetiklen
+                                        $('.nav-pills a[href="#pills-siparislerim"]').trigger("click");
                                                  }
                                             });
                                                 mesajKapat(diaDegSil);
                                             }
                                         
-                                    }//delete success
-                                 });
-                                 
-                        }
+                                    } //delete success
+                                 }); //ajax
+                        } //action
                     },
                     cancel: {
                          text:'İptal et'
                     }
                 }
             });
-         
      });
     //son ddowndegsil
+    
     
     //btndegerlendir click
     $(".btndegerlendir").on("click",function(){
         
-        var sipkod=$(this).attr("sipkod");
-        //confirm deg
-                    $.confirm({
-                type:'purple',
-                title: '<b class="text-info"> Sipariş Değerlendirme</b>',
-                content: '' +
-                '<form action="" class="formName">' +
-                '<div class="form-group">' +
-                '<label>Hız: </label>' +
-                '<input type="number" step="any" min="1" max="10" value="1" class="form-control inphiz" required />' +
-                '</div>'+
+    var sipkod=$(this).attr("sipkod"); //sipariş kodunu al
+    //confirm deg (modal)
+    $.confirm({
+        type:'purple',
+        title: '<b class="text-info"> Sipariş Değerlendirme</b>',
+        content: '' +
+        '<form action="" class="formName">' +
+        '<div class="form-group">' +
+        '<label>Hız: </label>' +
+        '<input type="number" step="any" min="1" max="5" value="1" class="form-control inphiz" required />' +
+        '</div>'+
                 
-                '<div class="form-group">' +
-                '<label>Lezzet: </label>' +
-                '<input type="number" step="any" min="1" max="10" value="1" class="form-control inplezzet" required />' +
-                '</div>'+
+        '<div class="form-group">' +
+        '<label>Lezzet: </label>' +
+        '<input type="number" step="any" min="1" max="5" value="1" class="form-control inplezzet" required />' +
+        '</div>'+
                 
-                '<div class="form-group">' +
-                '<label>Yorum: </label>' +
-                '<textarea class="form-control" id="tareyorum" placeholder="Yorumunuzu yazın"></textarea>' +
-                 '</div>' +
-                '</form>',
-                buttons: {
-                    formSubmit: {
-                        text: 'Gönder',
-                        btnClass: 'btn-blue',
-                        action: function(){
+        '<div class="form-group">' +
+        '<label>Yorum: </label>' +
+        '<textarea class="form-control" id="tareyorum" placeholder="Yorumunuzu yazın"></textarea>' +
+        '</div>' +
+        '</form>',
+        buttons: {
+            formSubmit: {
+                text: 'Gönder',
+                btnClass: 'btn-blue',
+                action: function(){ //gönder butonuna basıldığında
                              
-                            var phiz=$(".inphiz").val();
+                    var phiz=$(".inphiz").val(); //hiz input değeri
                              
-                            if(!phiz || phiz<1 || phiz>10){
-                                var diDegHiz=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
-                                mesajKapat(diDegHiz);
-                                return false;
-                            }
+                    if(!phiz || phiz<1 || phiz>5){ 
+                        var diDegHiz=$.dialog('<b class="text-danger">1 ile 5 arası değer girişi yapın </b>');
+                        mesajKapat(diDegHiz); //bildirimi kapat
+                        return false;
+                    }
                              
-                            var plezzet=$(".inplezzet").val();
+                    var plezzet=$(".inplezzet").val();
                              
-                            if(!plezzet || plezzet<1 || plezzet>10){
-                                var diDegLezzet=$.dialog('<b class="text-danger">1 ile 10 arası değer girişi yapın </b>');
-                                mesajKapat(diDegLezzet);
-                                return false;
-                            } 
+                    if(!plezzet || plezzet<1 || plezzet>5){
+                        var diDegLezzet=$.dialog('<b class="text-danger">1 ile 5 arası değer girişi yapın </b>');
+                        mesajKapat(diDegLezzet);
+                        return false;
+                    } 
                              
-                            var pyorum=$.trim($("#tareyorum").val());
+                    var pyorum=$.trim($("#tareyorum").val());
                             
-                            if(!pyorum){
-                                var diDegYorum=$.dialog('<b class="text-danger"> Yorum alanı boş bırakılamaz</b>');
-                                mesajKapat(diDegYorum);
-                                return false;
-                            } 
+                    if(!pyorum){
+                        var diDegYorum=$.dialog('<b class="text-danger"> Yorum alanı boş bırakılamaz</b>');
+                        mesajKapat(diDegYorum);
+                        return false;
+                    } 
                             
-                             //burada post işlemi olacak
-                             
-                             
-                             
-                              $.ajax({
+                    //burada post işlemi gerçekleşecek
+                    $.ajax({
                          method: 'POST',
                          url : "https://www.api.omurserdar.com/api/degerlendirme/index.php",
                          //data : {secim:dsecim,id:pEnvId,fiyat:pEnvFiyat},
                          data : {sipariskod:sipkod,hiz:phiz,lezzet:plezzet,yorum:pyorum},
                          success: function(datadegekle){
                              if(datadegekle.mesaj=="eklendi"){  
-                                            var diaDegEklendi=$.dialog({
+                                var diaDegEklendi=$.dialog({
                                 //autoClose: 'cancelAction|8000',
-                                type:'green',
-                                title: '<b class="text-success"> <i class="fas fa-check-circle"></i> Harika </b>',
-                                content: 'Değerlendirme Eklendi',
-                                onClose: function () {
+                                    type:'green',
+                                    title: '<b class="text-success"> <i class="fas fa-check-circle"></i> Harika </b>',
+                                    content: 'Değerlendirme Eklendi',
+                                    onClose: function () {
                                         //eklendikten sonra tab click tetiklen
-                                        //$('.nav-tabs a[href="#pills-siparislerim"]').trigger("click");
+                                        $('.nav-pills a[href="#pills-siparislerim"]').trigger("click");
                                         
-                                        window.location.replace("https://api.omurserdar.com");
+                                        //window.location.replace("https://api.omurserdar.com");
                                                  }
                                             });
-                                                mesajKapat(diaDegEklendi);
-                                            }
-                            else{
-                        $.dialog({
-                        title: '<b class="text-danger"><i class="fas fa-times"></i> HATA </b>',
-                        content: 'Değerlendirilme Eklenemedi :( ! '+datadegekle.mesaj
+                                mesajKapat(diaDegEklendi);
+                            }
+                            else{ //mesaj eklendi değilse
+                                $.dialog({
+                                    title: '<b class="text-danger"><i class="fas fa-times"></i> HATA </b>',
+                                    content: 'Değerlendirilme Eklenemedi :( ! '+datadegekle.mesaj
                                           });
                                         }
-                                 }
-                                 });
-                             
+                                 } //success
+                                 }); //ajax
                              //post işlemi son
                              
-                    } //dialog action
+                     } //dialog action
                     },
                 cancel: {
                          text:'İptal et'
@@ -1029,7 +1021,7 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
             }
             }); 
         
-        //son confrim deg
+        //son confirm deg
     });
     //btndegerlendir click son
     
@@ -1091,7 +1083,7 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
   <!-- SON SİPARİSLERİM JS -->
   
   
-  <div class="tab-pane fade" id="pills-bilgilerim" role="tabpanel" aria-labelledby="pills-bilgilerim-tab">
+  <div class="tab-pane" id="pills-bilgilerim" role="tabpanel" aria-labelledby="pills-bilgilerim-tab">
        <div class="bid" data-id="<?=$_SESSION["kullanici_id"]?>"></div>
       <center>
           <div class="card border-primary mb-3">
@@ -1101,6 +1093,9 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                 <p class="card-text bcka"></p> <!-- userName -->
                 <p class="card-text bcilveilce"></p> <!-- il ilce-->
                 <p class="card-text bckt"></p> <!-- kayit tarih -->
+                
+                <button id="<?=$_SESSION["kullanici_id"]?>" type="button" data-id="bireysel" class="btn btn-outline-primary btnsifguncelle"><i class="fas fa-edit"></i> Şifre Güncelle</button>
+                
               </div>
          </div>
       </center>
@@ -1128,7 +1123,6 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
  
   </script>
 <!-- SON BİR BİLGİLERİM JS -->
-  
 </div>
               
               </div>
@@ -1162,6 +1156,8 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                 <p class="card-text kcmin" data-id=""></p> <!-- min-->
                 <p class="card-text kcacik" data-id=""></p> <!-- acikMi-->
                 <p class="card-text kckt"></p> <!-- kayit tarih -->
+                
+                <button id="<?=$_SESSION["kullanici_id"]?>" type="button" data-id="kurumsal" class="btn btn-outline-primary btnsifguncelle mt-1 ml-1"><i class='fas fa-key'></i> Şifre Güncelle</button>
                 
               </div>
               <div class="card-footer kcislem"></div>
@@ -1212,7 +1208,7 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                  $(".kcacik").attr("data-id",acikMiDurum);
                  
                 $(".kckt").html("<h2> Kayıt Tarihi: <span class='badge badge-primary'>"+tr_tarih(dkb.kayit_tarihi)+"</span></h2>");
-                $(".kcislem").html("<button type='button' class='btn btn-outline-primary mt-1 btnkurduzenle'><i class='fas fa-edit'></i> DÜZENLE</button>");
+                $(".kcislem").html("<button type='button' class='btn btn-outline-primary mt-1 btnkurduzenle'><i class='fas fa-edit'></i> Bilgileri Düzenle</button>");
                 
                 $('.btnkurduzenle').on('click', function(){ 
                 //alert("AÇIK MI: "+acikMiDurum+" Min tutar: "+minTutar);
@@ -1670,7 +1666,7 @@ $('.nav-tabs a[href="#nav-sil"]').on("click",function(){
                         if(item.alim==1)
                             alinabilirsayi++
                      });
-                    var btngrup='<div class="col-md-12 mt-2 mb-2"><span class="lead"> TOPLAM <b class="badge badge-info">'+alinabilirsayi+'</b> adet envanter alınabilir durumda. Seçili eleman sayısı: <b id="bsecelsay" class="badge badge-primary">0</b> <button type="button" style="cursor:no-drop;" class="btncealinamazyap btn btn-outline-danger ml-2" disabled><i class="fas fa-lock"></i> Seçilileri ALINAMAZ Yap</button></span></div>';
+                    var btngrup='<div class="col-md-12 mt-2 mb-2"><span class="lead"> TOPLAM <b class="badge badge-info">'+alinabilirsayi+'</b> adet envanter alınabilir durumda. Seçili eleman sayısı: <b id="bsecelsay" class="badge badge-primary">0</b> <button type="button" style="cursor:no-drop;" class="btncealinamazyap btn btn-outline-danger ml-2" disabled><i class="fas fa-lock-open"></i> -> <i class="fas fa-lock"></i> Seçilileri ALINAMAZ Yap</button></span></div>';
                 //$(".coklusil").append(btngrup);
                 var cevap="";
             $.each(dataKur.kurumsalEnv,function(i,item){
@@ -1856,7 +1852,7 @@ $('.nav-tabs a[href="#nav-sil"]').on("click",function(){
                             alinamazsayi++
             });
                      
-            var btngrup='<div class="col-md-12 mt-2 mb-2"><span class="lead"> TOPLAM <b class="badge badge-info">'+alinamazsayi+'</b> adet envanter alınamaz durumda. Seçili eleman sayısı: <b id="bsecalimyokvarsay" class="badge badge-primary">0</b> <button type="button" style="cursor:no-drop;" class="btncealinabiliryap btn btn-outline-danger ml-2" disabled><i class="fas fa-lock-open"></i> Seçilileri ALINABİLİR Yap</button></span></div>';
+            var btngrup='<div class="col-md-12 mt-2 mb-2"><span class="lead"> TOPLAM <b class="badge badge-info">'+alinamazsayi+'</b> adet envanter alınamaz durumda. Seçili eleman sayısı: <b id="bsecalimyokvarsay" class="badge badge-primary">0</b> <button type="button" style="cursor:no-drop;" class="btncealinabiliryap btn btn-outline-danger ml-2" disabled><i class="fas fa-lock"></i> -> <i class="fas fa-lock-open"></i> Seçilileri ALINABİLİR Yap</button></span></div>';
                 //$(".coklusil").append(btngrup);
             var cevap="";
             $.each(dataKur.kurumsalEnv,function(i,item){
@@ -2763,7 +2759,7 @@ $(document).ready(function(){
              $(".sipkurDiv").html("<h2 class='text-info'> Sipariş Yok </h2>");
          }
          if(dataSipKur.hata==false && dataSipKur.sayi>0){  
-     var veri='<table class="table table-striped"><thead class="thead-dark"><tr><th scope="col"><i class="fas fa-key"></i> Sipariş Kodu</th><th scope="col"><i class="fas fa-user"></i> Sipariş Sahibi</th><th scope="col"><i class="fas fa-dolly"></i> Sipariş Durumu</th><th scope="col"><i class="fas fa-calendar-alt"></i> Sipariş Tarihi </th><th scope="col"> <i class="fas fa-lira-sign"></i> Toplam Tutar</th><th scope="col"><i class="fas fa-cogs"></i> İşlem</th> </tr></thead><tbody><tr>';
+     var veri='<div class="table-responsive"><table class="table table-striped"><thead class="thead-dark"><tr><th scope="col"><i class="fas fa-key"></i> Sipariş Kodu</th><th scope="col"><i class="fas fa-user"></i> Sipariş Sahibi</th><th scope="col"><i class="fas fa-dolly"></i> Sipariş Durumu</th><th scope="col"><i class="fas fa-calendar-alt"></i> Sipariş Tarihi </th><th scope="col"> <i class="fas fa-lira-sign"></i> Toplam Tutar</th><th scope="col"><i class="fas fa-cogs"></i> İşlem</th> </tr></thead><tbody><tr>';
       var metin="";
       
     for (i in dataSipKur.siparislerKume) {
@@ -2811,7 +2807,7 @@ $(document).ready(function(){
            
           
         }
-    metin+='</tbody></table>';
+    metin+='</tbody></table></div>';
     $(".sipkurDiv").html(veri+metin);
     
     
@@ -2829,20 +2825,27 @@ $(document).ready(function(){
             var hizyildiz="";
             for(j=0;j<datasipdeger.degerlendirme.hiz;j++)
                     hizyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
-			for(k=0; k<(10-datasipdeger.degerlendirme.hiz); k++)
+			for(k=0; k<(5-datasipdeger.degerlendirme.hiz); k++)
 					hizyildiz+='<span><i class="far fa-star"></i></span>';
 					
 			var lezzetyildiz="";
             for(j=0;j<datasipdeger.degerlendirme.lezzet;j++)
                     lezzetyildiz+='<span><i class="fas fa-star" style="color:#FFA500"></i></span>';
-			for(k=0; k<(10-datasipdeger.degerlendirme.lezzet); k++)
+			for(k=0; k<(5-datasipdeger.degerlendirme.lezzet); k++)
 					lezzetyildiz+='<span><i class="far fa-star"></i></span>';		
 					
   
         var dikurdeggor=$.dialog({
             type:'purple',
             title: '<b class="text-info">Değerlendirme Bilgileri</b>',
-            content: 'HIZ: '+hizyildiz+' <br> LEZZET: '+lezzetyildiz+' <br> YORUM: '+datasipdeger.degerlendirme.yorum
+            content: 'HIZ: '+hizyildiz+' <br> LEZZET: '+lezzetyildiz+' <br> YORUM: '+datasipdeger.degerlendirme.yorum,
+            onOpenBefore: function () {
+                          dikurdeggor.showLoading();
+                    },
+                onContentReady: function () {
+                          dikurdeggor.hideLoading();
+                    },
+            
          });
          
          mesajKapat(dikurdeggor,"7000");
@@ -3024,8 +3027,108 @@ $(document).ready(function(){
 
         <?
       }
+
+ ?>
+ 
+  <!-- ŞİFRE GÜNCELLEME JS -->
+   
+   <script>
+    
+    $(".btnsifguncelle").on("click",function(){
+          $.confirm({
+    title: '<b class="text-info">Şifre Güncelleme!</b>',
+    content: '' +
+    '<form action="" class="formName">' +
+    '<div class="form-group">' +
+    '<label>Yeni Şifre</label>' +
+    '<input type="password" placeholder="Yeni Şifreniz" class="name form-control" id="inputyenisifre" required />' +
+    '</div>' +
+    '<div class="form-group">' +
+    '<label>Yeni Şifre (Tekrar)</label>' +
+    '<input type="password" placeholder="Yeni Şifrenizi tekrar girin" class="name form-control" id="inputyenisifretekrar" required />' +
+    '</div>' +
+    '</form>',
+    buttons: {
+        formSubmit: {
+            text: 'Gönder',
+            btnClass: 'btn-blue',
+            action: function () {
+                var sif = $.trim(this.$content.find('#inputyenisifre').val());
+                if(!sif){
+                    var diSifBos=$.dialog('<b class="text-danger">şifre alanı boş geçilemez</b>');
+                    mesajKapat(diSifBos);
+                    return false;
+                }
+                
+                var siftek = $.trim(this.$content.find('#inputyenisifretekrar').val());
+                if(!siftek){
+                    var diSifTekBos=$.dialog('<b class="text-danger">şifre(tekrar) alanı boş geçilemez</b>');
+                    mesajKapat(diSifTekBos);
+                    return false;
+                }
+                
+                if(sif!=siftek){
+                    var diSifEslesmiyor=$.dialog('<b class="text-danger">şifreler eşleşmiyor</b>');
+                    mesajKapat(diSifEslesmiyor);
+                    return false;
+                }
+                
+                //ŞİFRE GÜNCELLEME PUT İŞLEMİ 
+                 //var did=$(this).attr("data-id");    
+                 var id=$(".btnsifguncelle").attr("id");   
+                 var uyelik=$(".btnsifguncelle").attr("data-id");
+                 var dobje={"id":id,"sifre":"guncelle","yenisifre":sif};
+                 dobje=JSON.stringify(dobje);
+                    $.ajax({
+                    method: 'PUT',
+                    url : "https://www.api.omurserdar.com/api/"+uyelik+"/",
+                    data: dobje,
+                    success: function(apisifreguncelle){
+                        if(apisifreguncelle.mesaj=="güncellendi"){
+                            var diaSifregonderildiMail=$.dialog({
+                             closeIcon:false,
+                             type:'info',    
+                             title:'<b class="text-info">Mail Gönderildi</b>',
+                             content:"<p class='lead font-weight-bolder'> Yeni Şifreniz Email adresinize gönderilmiştir </p>",
+                                 
+                            onClose: function(){
+                                window.location.href = "https://www.api.omurserdar.com/cikis";
+                                },
+                                            
+                            });
+                            mesajKapat(diaSifregonderildiMail,3000);
+                        }
+                      }//GÜNCELLE SUCCESS
+                    });
+                
+                //SON ŞİFRE GÜNCELLEME PUT İŞLEMİ
+            }//action
+        },
+        cancel:{
+            text:'İptal et',
+        },
+    },
+    onContentReady: function () {
+        // bind to events
+        var jc = this;
+        this.$content.find('form').on('submit', function (e) {
+            // if the user submits the form by pressing enter in the field.
+            e.preventDefault();
+            jc.$$formSubmit.trigger('click'); // reference the button and click it
+        });
+    }
+});
+    });
+    
+</script>
+    
+    <!-- SON ŞİFRE GÜNCELLEME JS -->
+    
+ <?  
      
  } //isset sessi kultip son
+ 
+ 
  
  //giris YAPMAMIŞ icin event
  else { ?>
@@ -3086,7 +3189,7 @@ $(document).ready(function(){
         }
         ?>
      </h2>
-        <p class="lead p-5">İstek sonucunda JSON veri döndürülür, dönen cevap işlenir. Örnek olarak <b><a href="https://api.omurserdar.com/api/kurumsal?id=1" target="_blank">https://api.omurserdar.com/api/kurumsal?id=1</a></b> adresindeki "1" id değerine sahip satır bilgileri JSON olarak döndürülüp işlendikten sonra bilgi gösterimi yapılmıştır. </p>
+        <p class="lead p-5">İstek sonucunda JSON veri döndürülür, dönen cevap işlenir. Örnek olarak <a href="https://api.omurserdar.com/api/kurumsal?id=1" target="_blank">/api/kurumsal?id=1</a> adresindeki "1" id değerine sahip satır bilgileri JSON olarak döndürülüp işlendikten sonra bilgi gösterimi yapılmıştır. </p>
       </div>
       <div class="col-md-5 order-md-1">
         <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" src="/assets/images/2.gif" />
@@ -3096,33 +3199,145 @@ $(document).ready(function(){
     <hr class="featurette-divider">
 
     <div class="row featurette">
-      <div class="col-md-7">
+      <div class="col-md-4">
           
-           <?php 
-           $url = "https://api.omurserdar.com/api/envanter?id=1554";
-           $json = file_get_contents($url);
-           $jsonverilerim = json_decode($json, true);   
-           $envKume=$jsonverilerim["envanterBilgi"];
-          ?>
+        <div class="card">
+            <img class="card-img-top" src="/assets/images/istanbul.jpg" alt="İstanbul" width="100" height="250">
+            <h5 class="card-title text-center mt-1 mb-1">İstanbul</h5>
+            <a href="/kurumsallar?il=34" class="btn btn-outline-primary btn-block mt-1">kurumsal üyeleri incele <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+      </div>
+      
+      <div class="col-md-4">
           
-        <h2 class="featurette-heading text-primary"><b><?=$envKume["ad"]?></b>
-        <?if($envKume["alinabilirMi"]==0){
-            echo '<span class="badge badge-danger"><i class="fas fa-lock"></i> KAPALI - Sipariş Verilemez</span>';
-        }
-        else{
-            echo '<span class="badge badge-success"><i class="fas fa-lock-open"></i> AÇIK - Sipariş Verilebilir</span>';
-        }
-        ?>
-        </h2>
-        <p class="lead p-5"><?=$envKume["tanim"]?> ( <b class="text-info"><?=$envKume["fiyat"]?> &#8378;</b> )</p>
+        <div class="card">
+            <img class="card-img-top" src="/assets/images/trabzon.jpg" alt="Trabzon" width="100" height="250">
+            <h5 class="card-title text-center mt-1 mb-1">Trabzon</h5>
+            <a href="/kurumsallar?il=61" class="btn btn-outline-primary btn-block mt-1">kurumsal üyeleri incele <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
       </div>
-      <div class="col-md-5 order-md-1">
-        <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" 
-        src="/assets/images/3.webp" />
+      
+      <div class="col-md-4">
+          
+        <div class="card">
+            <img class="card-img-top" src="/assets/images/duzce.jpg" alt="Düzce" width="100" height="250">
+            <h5 class="card-title text-center mt-1 mb-1">Düzce</h5>
+            <a href="/kurumsallar?il=81" class="btn btn-outline-primary btn-block mt-1">kurumsal üyeleri incele <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
       </div>
+
     </div>
     
-
+    <hr/>
+    
+    <div class="row">
+        
+          <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-users fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_topbirsay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> bireysel kullanıcı</p>
+              </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-store-alt fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_topkursay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> kurumsal kullanıcı</p>
+              </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-dolly fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_topsipsay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> sipariş</p>
+              </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-star fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_topdegsay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> değerlendirme</p>
+              </div>
+            </div>
+        </div>
+        
+        </div>
+        
+        <div class="row mt-1">
+            
+            <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-clipboard-list fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_topmenusay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> menü</p>
+              </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-utensils fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_topenvantersay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> envanter </p>
+              </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-lira-sign fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_toptutarsay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> tutarında satış</p>
+              </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card border-primary" style="width: 18rem;">
+              <div class="card-body">
+                <h1 class="card-title text-info"><i class="fas fa-shopping-basket fa-2x"></i></h1>
+                <p class="lead">toplam <b><?
+                $sor=$db->query("select fn_topsepsay()")->fetchAll();
+                echo $sor[0][0];
+                ?> </b> envanter sepette</p>
+              </div>
+            </div>
+        </div>
+        
+        
+            
+        </div>
+        
+    </div>
+    
 
 </div>
      

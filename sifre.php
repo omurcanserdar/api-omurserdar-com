@@ -188,7 +188,7 @@
                         btnClass: 'btn-danger',
                         action: function () {
                             
-                            var dobje={"email":dad,"sifre":"ok"};
+                            var dobje={"email":dad,"sifre":"sifirlama"};
                             dobje=JSON.stringify(dobje);
                             
                             
@@ -260,4 +260,9 @@
      
  </script>
  
- <?php include "footer.php" ?>
+ <?php
+ if(isset($_SESSION["kullanici_tip"])&&$_SESSION["kullanici_tip"]=="bireysel"){
+	    include "sepetmodaljs.php";
+	}
+	
+ include "footer.php" ?>
