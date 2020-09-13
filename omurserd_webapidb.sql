@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 25, 2020 at 04:10 PM
+-- Generation Time: Sep 13, 2020 at 06:10 PM
 -- Server version: 10.3.23-MariaDB
 -- PHP Version: 7.3.6
 
@@ -122,6 +122,71 @@ IF kurumsalid IS NOT NULL
     END IF;
 END$$
 
+--
+-- Functions
+--
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_topbirsay` () RETURNS INT(11) BEGIN 
+
+DECLARE sayi INT;
+SET sayi=(SELECT COUNT(id) as topsayi FROM bireysel);
+RETURN sayi;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_topdegsay` () RETURNS INT(11) BEGIN 
+
+DECLARE sayi INT;
+SET sayi=(SELECT COUNT(id) as topsay FROM degerlendirme);
+RETURN sayi;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_topenvantersay` () RETURNS INT(11) BEGIN 
+
+DECLARE sayi INT;
+SET sayi=(SELECT COUNT(id) as topsay FROM envanter);
+RETURN sayi;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_topkursay` () RETURNS INT(11) BEGIN 
+
+DECLARE sayi INT;
+SET sayi=(SELECT COUNT(id) as topkursay FROM kurumsal);
+RETURN sayi;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_topmenusay` () RETURNS INT(11) BEGIN 
+
+DECLARE sayi INT;
+SET sayi=(SELECT COUNT(id) as topsay FROM tabMenu);
+RETURN sayi;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_topsepsay` () RETURNS INT(11) BEGIN
+DECLARE sayi INT;
+SET sayi=(SELECT COUNT(DISTINCT(envanter_id)) as topsay FROM sepet);
+RETURN sayi;
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_topsipsay` () RETURNS INT(11) BEGIN 
+
+DECLARE sayi INT;
+SET sayi=(SELECT COUNT(siparisKod) as topsay FROM siparis);
+RETURN sayi;
+
+END$$
+
+CREATE DEFINER=`omurserd`@`localhost` FUNCTION `fn_toptutarsay` () RETURNS FLOAT BEGIN 
+
+DECLARE sayi FLOAT;
+SET sayi=(SELECT ROUND(SUM(toplamTutar),2) as topsay FROM siparis);
+RETURN sayi;
+
+END$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -153,7 +218,7 @@ INSERT INTO `bireysel` (`id`, `il_id`, `ilce_id`, `ad`, `soyad`, `kullaniciadi`,
 (4, 77, 928, 'Ercüment', 'Çizer', 'cizercument', 'ercu@ment.org', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 10:31:16'),
 (5, 61, 802, 'Hüsrev', 'İncir', 'husrevincir', 'husrev@incir.co', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 22:13:33'),
 (6, 81, 951, 'Selim', 'Derviş', 'derviselim', 'selim@dervis.net', '8a5da52ed126447d359e70c05721a8aa', '2020-03-10 22:13:33'),
-(7, 63, 835, 'Eşref', 'Başgan', 'basganesref', 'esref@basgan.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '2020-03-10 22:14:28'),
+(7, 63, 835, 'Eşref', 'Başgan', 'basganesref', 'esref@basgan.com', '8a5da52ed126447d359e70c05721a8aa', '2020-03-10 22:14:28'),
 (35, 34, 442, 'Abdurrezzak', 'Kargı', 'arezzak', 'arezzak18@gmail.com', '11529902c1007059cf1009dcea903855', '2020-05-23 15:25:30');
 
 -- --------------------------------------------------------
@@ -175,9 +240,15 @@ CREATE TABLE `degerlendirme` (
 --
 
 INSERT INTO `degerlendirme` (`id`, `siparisKod`, `hiz`, `lezzet`, `yorum`) VALUES
-(20, '167689666566', 10, 10, 'kısa zamanda teslim edildi, harikaydı'),
-(21, '388300193736', 8, 10, 'çorba muhteşemdi'),
-(22, '209307457341', 2, 6, 'sipariş çok geç teslim edildi lezzeti ise eh işte');
+(20, '167689666566', 5, 5, 'kısa zamanda teslim edildi, harikaydı'),
+(22, '209307457341', 1, 3, 'sipariş çok geç teslim edildi lezzeti ise eh işte'),
+(24, '149390158871', 5, 5, 'kısa zamanda geldi, lezzeti muhteşemdi'),
+(25, '872171344877', 4, 4, 'Trileçeyi ilk defa denedim, yani güzeldi lezzeti'),
+(26, '919228885607', 4, 4, 'İlk siparişim oldu, tost haricinde hepsi gayet lezzetliydi'),
+(36, '924997709809', 5, 5, 'Harikaa'),
+(37, '624910290213', 3, 5, 'sipariş daha erken teslim edilebilirdi'),
+(38, '388300193736', 2, 1, 'nerden söyledim, nerden söyledim'),
+(39, '907680789186', 2, 3, '35 dakikada geldi, çok kötüydü');
 
 -- --------------------------------------------------------
 
@@ -742,7 +813,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (13, 1, 'Saimbeyli', 'saimbeyli'),
 (14, 1, 'Tufanbeyli', 'tufanbeyli'),
 (15, 1, 'Yumurtalık', 'yumurtalik'),
-(16, 2, 'merkez', 'adiyaman'),
+(16, 2, 'Merkez', 'adiyaman'),
 (17, 2, 'Besni', 'besni'),
 (18, 2, 'Çelikhan', 'celikhan'),
 (19, 2, 'Gerger', 'gerger'),
@@ -751,7 +822,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (22, 2, 'Samsat', 'samsat'),
 (23, 2, 'Sincik', 'sincik'),
 (24, 2, 'Tut', 'tut'),
-(25, 3, 'merkez', 'afyonkarahisar'),
+(25, 3, 'Merkez', 'afyonkarahisar'),
 (26, 3, 'Başmakçı', 'basmakci'),
 (27, 3, 'Bayat', 'bayat'),
 (28, 3, 'Bolvadin', 'bolvadin'),
@@ -769,7 +840,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (40, 3, 'Sincanlı(Sinanpaşa)', 'sincanlisinanpasa'),
 (41, 3, 'Sultandağı', 'sultandagi'),
 (42, 3, 'Şuhut', 'suhut'),
-(43, 4, 'merkez', 'agri'),
+(43, 4, 'Merkez', 'agri'),
 (44, 4, 'Diyadin', 'diyadin'),
 (45, 4, 'Doğubeyazıt', 'dogubeyazit'),
 (46, 4, 'Eleşkirt', 'eleskirt'),
@@ -777,7 +848,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (48, 4, 'Patnos', 'patnos'),
 (49, 4, 'Taşlıçay', 'taslicay'),
 (50, 4, 'Tutak', 'tutak'),
-(51, 5, 'merkez', 'amasya'),
+(51, 5, 'Merkez', 'amasya'),
 (52, 5, 'Göynücek', 'goynucek'),
 (53, 5, 'Gümüşhacıköy', 'gumushacikoy'),
 (54, 5, 'Hamamözü', 'hamamozu'),
@@ -828,7 +899,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (99, 7, 'Kumluca', 'kumluca'),
 (100, 7, 'Manavgat', 'manavgat'),
 (101, 7, 'Serik', 'serik'),
-(102, 8, 'merkez', 'artvin'),
+(102, 8, 'Merkez', 'artvin'),
 (103, 8, 'Ardanuç', 'ardanuc'),
 (104, 8, 'Arhavi', 'arhavi'),
 (105, 8, 'Borçka', 'borcka'),
@@ -836,7 +907,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (107, 8, 'Murgul(Göktaş)', 'murgulgoktas'),
 (108, 8, 'Şavşat', 'savsat'),
 (109, 8, 'Yusufeli', 'yusufeli'),
-(110, 9, 'merkez', 'aydin'),
+(110, 9, 'Merkez', 'aydin'),
 (111, 9, 'Bozdoğan', 'bozdogan'),
 (112, 9, 'Buharkent(Çubukdağı)', 'buharkentcubukdagi'),
 (113, 9, 'Çine', 'cine'),
@@ -853,7 +924,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (124, 9, 'Sultanhisar', 'sultanhisar'),
 (125, 9, 'Didim', 'didimyenihisar'),
 (126, 9, 'Yenipazar', 'yenipazar'),
-(127, 10, 'merkez', 'balikesir'),
+(127, 10, 'Merkez', 'balikesir'),
 (128, 10, 'Ayvalık', 'ayvalik'),
 (129, 10, 'Balya', 'balya'),
 (130, 10, 'Bandırma', 'bandirma'),
@@ -872,7 +943,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (143, 10, 'Savaştepe', 'savastepe'),
 (144, 10, 'Sındırgı', 'sindirgi'),
 (145, 10, 'Susurluk', 'susurluk'),
-(146, 11, 'merkez', 'bilecik'),
+(146, 11, 'Merkez', 'bilecik'),
 (147, 11, 'Bozüyük', 'bozuyuk'),
 (148, 11, 'Gölpazarı', 'golpazari'),
 (149, 11, 'İnhisar', 'inhisar'),
@@ -880,7 +951,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (151, 11, 'Pazaryeri', 'pazaryeri'),
 (152, 11, 'Söğüt', 'sogut'),
 (153, 11, 'Yenipazar', 'yenipazar'),
-(154, 12, 'merkez', 'bingol'),
+(154, 12, 'Merkez', 'bingol'),
 (155, 12, 'Adaklı', 'adakli'),
 (156, 12, 'Genç', 'genc'),
 (157, 12, 'Karlıova', 'karliova'),
@@ -888,14 +959,14 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (159, 12, 'Solhan', 'solhan'),
 (160, 12, 'Yayladere', 'yayladere'),
 (161, 12, 'Yedisu', 'yedisu'),
-(162, 13, 'merkez', 'bitlis'),
+(162, 13, 'Merkez', 'bitlis'),
 (163, 13, 'Adilcevaz', 'adilcevaz'),
 (164, 13, 'Ahlat', 'ahlat'),
 (165, 13, 'Güroymak', 'guroymak'),
 (166, 13, 'Hizan', 'hizan'),
 (167, 13, 'Mutki', 'mutki'),
 (168, 13, 'Tatvan', 'tatvan'),
-(169, 14, 'merkez', 'bolu'),
+(169, 14, 'Merkez', 'bolu'),
 (170, 14, 'Dörtdivan', 'dortdivan'),
 (171, 14, 'Gerede', 'gerede'),
 (172, 14, 'Göynük', 'goynuk'),
@@ -904,7 +975,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (175, 14, 'Mudurnu', 'mudurnu'),
 (176, 14, 'Seben', 'seben'),
 (177, 14, 'Yeniçağa', 'yenicaga'),
-(178, 15, 'merkez', 'burdur'),
+(178, 15, 'Merkez', 'burdur'),
 (179, 15, 'Ağlasun', 'aglasun'),
 (180, 15, 'Altınyayla(Dirmil)', 'altinyayladirmil'),
 (181, 15, 'Bucak', 'bucak'),
@@ -932,7 +1003,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (203, 16, 'Orhaneli', 'orhaneli'),
 (204, 16, 'Orhangazi', 'orhangazi'),
 (205, 16, 'Yenişehir', 'yenisehir'),
-(206, 17, 'merkez', 'canakkale'),
+(206, 17, 'Merkez', 'canakkale'),
 (207, 17, 'Ayvacık-Assos', 'ayvacik-assos'),
 (208, 17, 'Bayramiç', 'bayramic'),
 (209, 17, 'Biga', 'biga'),
@@ -944,7 +1015,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (215, 17, 'Gökçeada(İmroz)', 'gokceadaimroz'),
 (216, 17, 'Lapseki', 'lapseki'),
 (217, 17, 'Yenice', 'yenice'),
-(218, 18, 'merkez', 'cankiri'),
+(218, 18, 'Merkez', 'cankiri'),
 (219, 18, 'Atkaracalar', 'atkaracalar'),
 (220, 18, 'Bayramören', 'bayramoren'),
 (221, 18, 'Çerkeş', 'cerkes'),
@@ -956,7 +1027,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (227, 18, 'Orta', 'orta'),
 (228, 18, 'Şabanözü', 'sabanozu'),
 (229, 18, 'Yapraklı', 'yaprakli'),
-(230, 19, 'merkez', 'corum'),
+(230, 19, 'Merkez', 'corum'),
 (231, 19, 'Alaca', 'alaca'),
 (232, 19, 'Bayat', 'bayat'),
 (233, 19, 'Boğazkale', 'bogazkale'),
@@ -970,7 +1041,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (241, 19, 'Osmancık', 'osmancik'),
 (242, 19, 'Sungurlu', 'sungurlu'),
 (243, 19, 'Uğurludağ', 'ugurludag'),
-(244, 20, 'merkez', 'denizli'),
+(244, 20, 'Merkez', 'denizli'),
 (245, 20, 'Acıpayam', 'acipayam'),
 (246, 20, 'Akköy', 'akkoy'),
 (247, 20, 'Babadağ', 'babadag'),
@@ -1006,7 +1077,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (277, 21, 'Kulp', 'kulp'),
 (278, 21, 'Lice', 'lice'),
 (279, 21, 'Silvan', 'silvan'),
-(280, 22, 'merkez', 'edirne'),
+(280, 22, 'Merkez', 'edirne'),
 (281, 22, 'Enez', 'enez'),
 (282, 22, 'Havsa', 'havsa'),
 (283, 22, 'İpsala', 'ipsala'),
@@ -1015,7 +1086,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (286, 22, 'Meriç', 'meric'),
 (287, 22, 'Süleoğlu(Süloğlu)', 'suleoglusuloglu'),
 (288, 22, 'Uzunköprü', 'uzunkopru'),
-(289, 23, 'merkez', 'elazig'),
+(289, 23, 'Merkez', 'elazig'),
 (290, 23, 'Ağın', 'agin'),
 (291, 23, 'Alacakaya', 'alacakaya'),
 (292, 23, 'Arıcak', 'aricak'),
@@ -1026,7 +1097,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (297, 23, 'Maden', 'maden'),
 (298, 23, 'Palu', 'palu'),
 (299, 23, 'Sivrice', 'sivrice'),
-(300, 24, 'merkez', 'erzincan'),
+(300, 24, 'Merkez', 'erzincan'),
 (301, 24, 'Çayırlı', 'cayirli'),
 (302, 24, 'İliç(Ilıç)', 'ilicilic'),
 (303, 24, 'Kemah', 'kemah'),
@@ -1078,7 +1149,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (349, 27, 'Nizip', 'nizip'),
 (350, 27, 'Nurdağı', 'nurdagi'),
 (351, 27, 'Yavuzeli', 'yavuzeli'),
-(352, 28, 'merkez', 'giresun'),
+(352, 28, 'Merkez', 'giresun'),
 (353, 28, 'Alucra', 'alucra'),
 (354, 28, 'Bulancak', 'bulancak'),
 (355, 28, 'Çamoluk', 'camoluk'),
@@ -1094,13 +1165,13 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (365, 28, 'Şebinkarahisar', 'sebinkarahisar'),
 (366, 28, 'Tirebolu', 'tirebolu'),
 (367, 28, 'Yağlıdere', 'yaglidere'),
-(368, 29, 'merkez', 'gumushane'),
+(368, 29, 'Merkez', 'gumushane'),
 (369, 29, 'Kelkit', 'kelkit'),
 (370, 29, 'Köse', 'kose'),
 (371, 29, 'Kürtün', 'kurtun'),
 (372, 29, 'Şiran', 'siran'),
 (373, 29, 'Torul', 'torul'),
-(374, 30, 'merkez', 'hakkari'),
+(374, 30, 'Merkez', 'hakkari'),
 (375, 30, 'Çukurca', 'cukurca'),
 (376, 30, 'Şemdinli', 'semdinli'),
 (377, 30, 'Yüksekova', 'yuksekova'),
@@ -1116,7 +1187,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (387, 31, 'Reyhanlı', 'reyhanli'),
 (388, 31, 'Samandağ', 'samandag'),
 (389, 31, 'Yayladağı', 'yayladagi'),
-(390, 32, 'merkez', 'isparta'),
+(390, 32, 'Merkez', 'isparta'),
 (391, 32, 'Aksu', 'aksu'),
 (392, 32, 'Atabey', 'atabey'),
 (393, 32, 'Eğridir(Eğirdir)', 'egridiregirdir'),
@@ -1211,7 +1282,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (482, 35, 'Kiraz', 'kiraz'),
 (483, 35, 'Ödemiş', 'odemis'),
 (484, 35, 'Tire', 'tire'),
-(485, 36, 'merkez', 'kars'),
+(485, 36, 'Merkez', 'kars'),
 (486, 36, 'Akyaka', 'akyaka'),
 (487, 36, 'Arpaçay', 'arpacay'),
 (488, 36, 'Digor', 'digor'),
@@ -1219,7 +1290,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (490, 36, 'Sarıkamış', 'sarikamis'),
 (491, 36, 'Selim', 'selim'),
 (492, 36, 'Susuz', 'susuz'),
-(493, 37, 'merkez', 'kastamonu'),
+(493, 37, 'Merkez', 'kastamonu'),
 (494, 37, 'Abana', 'abana'),
 (495, 37, 'Ağlı', 'agli'),
 (496, 37, 'Araç', 'arac'),
@@ -1255,7 +1326,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (526, 38, 'Tomarza', 'tomarza'),
 (527, 38, 'Yahyalı', 'yahyali'),
 (528, 38, 'Yeşilhisar', 'yesilhisar'),
-(529, 39, 'merkez', 'kirklareli'),
+(529, 39, 'Merkez', 'kirklareli'),
 (530, 39, 'Babaeski', 'babaeski'),
 (531, 39, 'Demirköy', 'demirkoy'),
 (532, 39, 'Kofçaz', 'kofcaz'),
@@ -1263,7 +1334,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (534, 39, 'Pehlivanköy', 'pehlivankoy'),
 (535, 39, 'Pınarhisar', 'pinarhisar'),
 (536, 39, 'Vize', 'vize'),
-(537, 40, 'merkez', 'kirsehir'),
+(537, 40, 'Merkez', 'kirsehir'),
 (538, 40, 'Akçakent', 'akcakent'),
 (539, 40, 'Akpınar', 'akpinar'),
 (540, 40, 'Boztepe', 'boztepe'),
@@ -1313,7 +1384,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (584, 42, 'Tuzlukçu', 'tuzlukcu'),
 (585, 42, 'Yalıhüyük', 'yalihuyuk'),
 (586, 42, 'Yunak', 'yunak'),
-(587, 43, 'merkez', 'kutahya'),
+(587, 43, 'Merkez', 'kutahya'),
 (588, 43, 'Altıntaş', 'altintas'),
 (589, 43, 'Aslanapa', 'aslanapa'),
 (590, 43, 'Çavdarhisar', 'cavdarhisar'),
@@ -1327,7 +1398,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (598, 43, 'Şaphane', 'saphane'),
 (599, 43, 'Tavşanlı', 'tavsanli'),
 (600, 43, 'Tunçbilek', 'tuncbilek'),
-(601, 44, 'merkez', 'malatya'),
+(601, 44, 'Merkez', 'malatya'),
 (602, 44, 'Akçadağ', 'akcadag'),
 (603, 44, 'Arapkir', 'arapkir'),
 (604, 44, 'Arguvan', 'arguvan'),
@@ -1341,7 +1412,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (612, 44, 'Pötürge', 'poturge'),
 (613, 44, 'Yazıhan', 'yazihan'),
 (614, 44, 'Yeşilyurt', 'yesilyurt'),
-(615, 45, 'merkez', 'manisa'),
+(615, 45, 'Merkez', 'manisa'),
 (616, 45, 'Ahmetli', 'ahmetli'),
 (617, 45, 'Akhisar', 'akhisar'),
 (618, 45, 'Alaşehir', 'alasehir'),
@@ -1357,7 +1428,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (628, 45, 'Selendi', 'selendi'),
 (629, 45, 'Soma', 'soma'),
 (630, 45, 'Turgutlu', 'turgutlu'),
-(631, 46, 'merkez', 'kahramanmaras'),
+(631, 46, 'Merkez', 'kahramanmaras'),
 (632, 46, 'Afşin', 'afsin'),
 (633, 46, 'Andırın', 'andirin'),
 (634, 46, 'Çağlayancerit', 'caglayancerit'),
@@ -1367,7 +1438,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (638, 46, 'Nurhak', 'nurhak'),
 (639, 46, 'Pazarcık', 'pazarcik'),
 (640, 46, 'Türkoğlu', 'turkoglu'),
-(641, 47, 'merkez', 'mardin'),
+(641, 47, 'Merkez', 'mardin'),
 (642, 47, 'Dargeçit', 'dargecit'),
 (643, 47, 'Derik', 'derik'),
 (644, 47, 'Kızıltepe', 'kiziltepe'),
@@ -1377,7 +1448,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (648, 47, 'Ömerli', 'omerli'),
 (649, 47, 'Savur', 'savur'),
 (650, 47, 'Yeşilli', 'yesilli'),
-(651, 48, 'merkez', 'mugla'),
+(651, 48, 'Merkez', 'mugla'),
 (652, 48, 'Bodrum', 'bodrum'),
 (653, 48, 'Dalaman', 'dalaman'),
 (654, 48, 'Datça', 'datca'),
@@ -1389,13 +1460,13 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (660, 48, 'Ortaca', 'ortaca'),
 (661, 48, 'Ula', 'ula'),
 (662, 48, 'Yatağan', 'yatagan'),
-(663, 49, 'merkez', 'mus'),
+(663, 49, 'Merkez', 'mus'),
 (664, 49, 'Bulanık', 'bulanik'),
 (665, 49, 'Hasköy', 'haskoy'),
 (666, 49, 'Korkut', 'korkut'),
 (667, 49, 'Malazgirt', 'malazgirt'),
 (668, 49, 'Varto', 'varto'),
-(669, 50, 'merkez', 'nevsehir'),
+(669, 50, 'Merkez', 'nevsehir'),
 (670, 50, 'Acıgöl', 'acigol'),
 (671, 50, 'Avanos', 'avanos'),
 (672, 50, 'Derinkuyu', 'derinkuyu'),
@@ -1403,13 +1474,13 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (674, 50, 'Hacıbektaş', 'hacibektas'),
 (675, 50, 'Kozaklı', 'kozakli'),
 (676, 50, 'Göreme', 'goreme'),
-(677, 51, 'merkez', 'nigde'),
+(677, 51, 'Merkez', 'nigde'),
 (678, 51, 'Altunhisar', 'altunhisar'),
 (679, 51, 'Bor', 'bor'),
 (680, 51, 'Çamardı', 'camardi'),
 (681, 51, 'Çiftlik(Özyurt)', 'ciftlikozyurt'),
 (682, 51, 'Ulukışla', 'ulukisla'),
-(683, 52, 'merkez', 'ordu'),
+(683, 52, 'Merkez', 'ordu'),
 (684, 52, 'Akkuş', 'akkus'),
 (685, 52, 'Aybastı', 'aybasti'),
 (686, 52, 'Çamaş', 'camas'),
@@ -1428,7 +1499,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (699, 52, 'Perşembe', 'persembe'),
 (700, 52, 'Ulubey', 'ulubey'),
 (701, 52, 'Ünye', 'unye'),
-(702, 53, 'merkez', 'rize'),
+(702, 53, 'Merkez', 'rize'),
 (703, 53, 'Ardeşen', 'ardesen'),
 (704, 53, 'Çamlıhemşin', 'camlihemsin'),
 (705, 53, 'Çayeli', 'cayeli'),
@@ -1473,14 +1544,14 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (744, 55, 'Terme', 'terme'),
 (745, 55, 'Vezirköprü', 'vezirkopru'),
 (746, 55, 'Yakakent', 'yakakent'),
-(747, 56, 'merkez', 'siirt'),
+(747, 56, 'Merkez', 'siirt'),
 (748, 56, 'Baykan', 'baykan'),
 (749, 56, 'Eruh', 'eruh'),
 (750, 56, 'Kurtalan', 'kurtalan'),
 (751, 56, 'Pervari', 'pervari'),
 (752, 56, 'Aydınlar', 'aydinlar'),
 (753, 56, 'Şirvan', 'sirvan'),
-(754, 57, 'merkez', 'sinop'),
+(754, 57, 'Merkez', 'sinop'),
 (755, 57, 'Ayancık', 'ayancik'),
 (756, 57, 'Boyabat', 'boyabat'),
 (757, 57, 'Dikmen', 'dikmen'),
@@ -1489,7 +1560,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (760, 57, 'Gerze', 'gerze'),
 (761, 57, 'Saraydüzü', 'sarayduzu'),
 (762, 57, 'Türkeli', 'turkeli'),
-(763, 58, 'merkez', 'sivas'),
+(763, 58, 'Merkez', 'sivas'),
 (764, 58, 'Akıncılar', 'akincilar'),
 (765, 58, 'Altınyayla', 'altinyayla'),
 (766, 58, 'Divriği', 'divrigi'),
@@ -1506,7 +1577,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (777, 58, 'Ulaş', 'ulas'),
 (778, 58, 'Yıldızeli', 'yildizeli'),
 (779, 58, 'Zara', 'zara'),
-(780, 59, 'merkez', 'tekirdag'),
+(780, 59, 'Merkez', 'tekirdag'),
 (781, 59, 'Çerkezköy', 'cerkezkoy'),
 (782, 59, 'Çorlu', 'corlu'),
 (783, 59, 'Hayrabolu', 'hayrabolu'),
@@ -1515,7 +1586,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (786, 59, 'Muratlı', 'muratli'),
 (787, 59, 'Saray', 'saray'),
 (788, 59, 'Şarköy', 'sarkoy'),
-(789, 60, 'merkez', 'tokat'),
+(789, 60, 'Merkez', 'tokat'),
 (790, 60, 'Almus', 'almus'),
 (791, 60, 'Artova', 'artova'),
 (792, 60, 'Başçiftlik', 'basciftlik'),
@@ -1527,7 +1598,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (798, 60, 'Turhal', 'turhal'),
 (799, 60, 'Yeşilyurt', 'yesilyurt'),
 (800, 60, 'Zile', 'zile'),
-(801, 61, 'merkez', 'trabzon'),
+(801, 61, 'Merkez', 'trabzon'),
 (802, 61, 'Akçaabat', 'akcaabat'),
 (803, 61, 'Araklı', 'arakli'),
 (804, 61, 'Arsin', 'arsin'),
@@ -1545,7 +1616,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (816, 61, 'Tonya', 'tonya'),
 (817, 61, 'Vakfıkebir', 'vakfikebir'),
 (818, 61, 'Yomra', 'yomra'),
-(819, 62, 'merkez', 'tunceli'),
+(819, 62, 'Merkez', 'tunceli'),
 (820, 62, 'Çemişgezek', 'cemisgezek'),
 (821, 62, 'Hozat', 'hozat'),
 (822, 62, 'Mazgirt', 'mazgirt'),
@@ -1553,7 +1624,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (824, 62, 'Ovacık', 'ovacik'),
 (825, 62, 'Pertek', 'pertek'),
 (826, 62, 'Pülümür', 'pulumur'),
-(827, 63, 'merkez', 'sanliurfa'),
+(827, 63, 'Merkez', 'sanliurfa'),
 (828, 63, 'Akçakale', 'akcakale'),
 (829, 63, 'Birecik', 'birecik'),
 (830, 63, 'Bozova', 'bozova'),
@@ -1564,13 +1635,13 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (835, 63, 'Siverek', 'siverek'),
 (836, 63, 'Suruç', 'suruc'),
 (837, 63, 'Viranşehir', 'viransehir'),
-(838, 64, 'merkez', 'usak'),
+(838, 64, 'Merkez', 'usak'),
 (839, 64, 'Banaz', 'banaz'),
 (840, 64, 'Eşme', 'esme'),
 (841, 64, 'Karahallı', 'karahalli'),
 (842, 64, 'Sivaslı', 'sivasli'),
 (843, 64, 'Ulubey', 'ulubey'),
-(844, 65, 'merkez', 'van'),
+(844, 65, 'Merkez', 'van'),
 (845, 65, 'Bahçesaray', 'bahcesaray'),
 (846, 65, 'Başkale', 'baskale'),
 (847, 65, 'Çaldıran', 'caldiran'),
@@ -1582,7 +1653,7 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (853, 65, 'Muradiye', 'muradiye'),
 (854, 65, 'Özalp', 'ozalp'),
 (855, 65, 'Saray', 'saray'),
-(856, 66, 'merkez', 'yozgat'),
+(856, 66, 'Merkez', 'yozgat'),
 (857, 66, 'Akdağmadeni', 'akdagmadeni'),
 (858, 66, 'Aydıncık', 'aydincik'),
 (859, 66, 'Boğazlıyan', 'bogazliyan'),
@@ -1596,29 +1667,29 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (867, 66, 'Şefaatli', 'sefaatli'),
 (868, 66, 'Yenifakılı', 'yenifakili'),
 (869, 66, 'Yerköy', 'yerkoy'),
-(870, 67, 'merkez', 'zonguldak'),
+(870, 67, 'Merkez', 'zonguldak'),
 (871, 67, 'Alaplı', 'alapli'),
 (872, 67, 'Çaycuma', 'caycuma'),
 (873, 67, 'Devrek', 'devrek'),
 (874, 67, 'Karadenizereğli', 'karadenizeregli'),
 (875, 67, 'Gökçebey', 'gokcebey'),
-(876, 68, 'merkez', 'aksaray'),
+(876, 68, 'Merkez', 'aksaray'),
 (877, 68, 'Ağaçören', 'agacoren'),
 (878, 68, 'Eskil', 'eskil'),
 (879, 68, 'Gülağaç(Ağaçlı)', 'gulagacagacli'),
 (880, 68, 'Güzelyurt', 'guzelyurt'),
 (881, 68, 'Ortaköy', 'ortakoy'),
 (882, 68, 'Sarıyahşi', 'sariyahsi'),
-(883, 69, 'merkez', 'bayburt'),
+(883, 69, 'Merkez', 'bayburt'),
 (884, 69, 'Aydıntepe', 'aydintepe'),
 (885, 69, 'Demirözü', 'demirozu'),
-(886, 70, 'merkez', 'karaman'),
+(886, 70, 'Merkez', 'karaman'),
 (887, 70, 'Ayrancı', 'ayranci'),
 (888, 70, 'Başyayla', 'basyayla'),
 (889, 70, 'Ermenek', 'ermenek'),
 (890, 70, 'Kazımkarabekir', 'kazimkarabekir'),
 (891, 70, 'Sarıveliler', 'sariveliler'),
-(892, 71, 'merkez', 'kirikkale'),
+(892, 71, 'Merkez', 'kirikkale'),
 (893, 71, 'Bahşili', 'bahsili'),
 (894, 71, 'Balışeyh', 'baliseyh'),
 (895, 71, 'Çelebi', 'celebi'),
@@ -1627,57 +1698,57 @@ INSERT INTO `ilce` (`id`, `il_id`, `ilce_adi`, `slug`) VALUES
 (898, 71, 'Keskin', 'keskin'),
 (899, 71, 'Sulakyurt', 'sulakyurt'),
 (900, 71, 'Yahşihan', 'yahsihan'),
-(901, 72, 'merkez', 'batman'),
+(901, 72, 'Merkez', 'batman'),
 (902, 72, 'Beşiri', 'besiri'),
 (903, 72, 'Gercüş', 'gercus'),
 (904, 72, 'Hasankeyf', 'hasankeyf'),
 (905, 72, 'Kozluk', 'kozluk'),
 (906, 72, 'Sason', 'sason'),
-(907, 73, 'merkez', 'sirnak'),
+(907, 73, 'Merkez', 'sirnak'),
 (908, 73, 'Beytüşşebap', 'beytussebap'),
 (909, 73, 'Cizre', 'cizre'),
 (910, 73, 'Güçlükonak', 'guclukonak'),
 (911, 73, 'İdil', 'idil'),
 (912, 73, 'Silopi', 'silopi'),
 (913, 73, 'Uludere', 'uludere'),
-(914, 74, 'merkez', 'bartin'),
+(914, 74, 'Merkez', 'bartin'),
 (915, 74, 'Amasra', 'amasra'),
 (916, 74, 'Kurucaşile', 'kurucasile'),
 (917, 74, 'Ulus', 'ulus'),
-(918, 75, 'merkez', 'ardahan'),
+(918, 75, 'Merkez', 'ardahan'),
 (919, 75, 'Çıldır', 'cildir'),
 (920, 75, 'Damal', 'damal'),
 (921, 75, 'Göle', 'gole'),
 (922, 75, 'Hanak', 'hanak'),
 (923, 75, 'Posof', 'posof'),
-(924, 76, 'merkez', 'igdir'),
+(924, 76, 'Merkez', 'igdir'),
 (925, 76, 'Aralık', 'aralik'),
 (926, 76, 'Karakoyunlu', 'karakoyunlu'),
 (927, 76, 'Tuzluca', 'tuzluca'),
-(928, 77, 'merkez', 'yalova'),
+(928, 77, 'Merkez', 'yalova'),
 (929, 77, 'Altınova', 'altinova'),
 (930, 77, 'Armutlu', 'armutlu'),
 (931, 77, 'Çiftlikköy', 'ciftlikkoy'),
 (932, 77, 'Çınarcık', 'cinarcik'),
 (933, 77, 'Termal', 'termal'),
-(934, 78, 'merkez', 'karabuk'),
+(934, 78, 'Merkez', 'karabuk'),
 (935, 78, 'Eflani', 'eflani'),
 (936, 78, 'Eskipazar', 'eskipazar'),
 (937, 78, 'Ovacık', 'ovacik'),
 (938, 78, 'Safranbolu', 'safranbolu'),
 (939, 78, 'Yenice', 'yenice'),
-(940, 79, 'merkez', 'kilis'),
+(940, 79, 'Merkez', 'kilis'),
 (941, 79, 'Elbeyli', 'elbeyli'),
 (942, 79, 'Musabeyli', 'musabeyli'),
 (943, 79, 'Polateli', 'polateli'),
-(944, 80, 'merkez', 'osmaniye'),
+(944, 80, 'Merkez', 'osmaniye'),
 (945, 80, 'Bahçe', 'bahce'),
 (946, 80, 'Düziçi', 'duzici'),
 (947, 80, 'Hasanbeyli', 'hasanbeyli'),
 (948, 80, 'Kadirli', 'kadirli'),
 (949, 80, 'Sumbas', 'sumbas'),
 (950, 80, 'Toprakkale', 'toprakkale'),
-(951, 81, 'merkez', 'duzce'),
+(951, 81, 'Merkez', 'duzce'),
 (952, 81, 'Akçakoca', 'akcakoca'),
 (953, 81, 'Cumayeri', 'cumayeri'),
 (954, 81, 'Çilimli', 'cilimli'),
@@ -1718,16 +1789,16 @@ CREATE TABLE `kurumsal` (
 --
 
 INSERT INTO `kurumsal` (`id`, `il_id`, `ilce_id`, `ad`, `kullaniciadi`, `email`, `sifre`, `ceptel`, `adres`, `minAlimTutar`, `acikMi`, `kayit_tarihi`) VALUES
-(1, 34, 422, 'Bamb cafe', 'cafebamb', 'bamb@cafebamb.com', '8a5da52ed126447d359e70c05721a8aa', '5413474141', 'Ayışığı Sk No:61', 15, 1, '2020-03-09 20:13:11'),
-(2, 34, 422, 'Balat Cafe Express', 'cafebalat', 'balat@balatcafe.co', '8a5da52ed126447d359e70c05721a8aa', '5413474147', 'Alipaşa Sk No:2', 25, 1, '2020-03-10 10:28:30'),
-(3, 34, 442, 'Yeşilim Restaurant', 'restyes', 'yesilim@rest.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474148', 'Batı Mh. Maltepe Sk. No:34', 40, 1, '2020-03-10 10:28:30'),
-(4, 61, 802, 'Tadım Lokanta', 'tadimlok', 'tadim@tadimlokanta.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474144', 'İnönü Cd. No:61 ', 20, 1, '2020-03-10 22:18:41'),
-(5, 61, 802, 'İhlas Köfte', 'ihlaskofte', 'ihlas@kofte.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474146', 'Orta Mh. 61.Sk No:61', 44, 0, '2020-03-10 22:18:41'),
+(1, 34, 422, 'Bamb cafe', 'cafebamb', 'bamb@cafebamb.com', '8a5da52ed126447d359e70c05721a8aa', '5413474141', 'Ayvansaray, Paşa Hamamı Cd. No:70', 15, 1, '2020-03-09 20:13:11'),
+(2, 34, 422, 'Balat Cafe Express ', 'cafebalat', 'balat@cafebalat.com', '8a5da52ed126447d359e70c05721a8aa', '5413474147', 'Balat, Yıldırım Cd. No:66', 25, 1, '2020-03-10 10:28:30'),
+(3, 34, 442, 'Karam Restaurant', 'karamrest', 'iletisim@karamrest.xyz', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474148', 'Batı Mh. Maltepe Sk. No:34', 40, 1, '2020-03-10 10:28:30'),
+(4, 61, 802, 'Sebat Lokanta', 'sebatlokanta', 'sebat@lokantasebat.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474144', 'İnönü Cad. Pulathane İş Merkezi', 20, 1, '2020-03-10 22:18:41'),
+(5, 61, 802, 'Nefs Köfte', 'nefskofte', 'nefs@nefskofte.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474146', 'Dürbinar, Milli Egemenlik Cd, No:9', 44, 0, '2020-03-10 22:18:41'),
 (6, 63, 835, 'Siverek Cafe', 'cafesiverek', 'cafesiv@siverek.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474143', 'Mumışığı Sk No:1', 27, 0, '2020-03-10 22:20:42'),
-(7, 63, 835, 'Dikkat Launch', 'dikkatlaunch', 'dikkat@dikkat.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474145', 'Hamamçimeni İş Merkezi No:23', 38, 0, '2020-03-10 22:20:42'),
-(8, 81, 951, 'umutlu Tantuni', 'tantuniumutlu', 'umutlu@tantuni.com', 'aa1c8371ebd158fb3966a146e5f9ed45', NULL, 'orhangazi mah', 5, 0, '2020-03-11 19:50:25'),
-(9, 81, 951, 'Beçi Lokanta', 'becilokanta', 'hesap@kurumsal.com', '8a5da52ed126447d359e70c05721a8aa', '5413474142', 'Soğuk Sk No:202/A', 6, 1, '2020-03-11 19:50:25'),
-(53, 61, 802, 'Cafe de Albert', 'omurserdarr', 'omurserdarr@gmail.com', '7c77470c8193d6b32a56c8bc5719aece', '(541) 347 - 4150', 'Akcami Karşısı No:121/A', 1, 1, '2020-05-22 23:36:17');
+(7, 63, 835, 'Dikk Launch', 'dikklaunch', 'mesaj@dikk.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474145', 'Hamamçimeni İş Merkezi No:22', 38, 0, '2020-03-10 22:20:42'),
+(8, 81, 951, 'Mut Tantuni', 'tantunimut', 'mut@tantuni.com', 'aa1c8371ebd158fb3966a146e5f9ed45', NULL, 'Şerefiye Mh İstanbul Cd. No:46', 5, 0, '2020-03-11 19:50:25'),
+(9, 81, 951, 'Beçi Lokanta', 'becilokanta', 'hesap@kurumsal.com', '8a5da52ed126447d359e70c05721a8aa', '5413474142', 'Orhangazi Mh. Necmi Hoşver Cad. No:22', 6, 1, '2020-03-11 19:50:25'),
+(53, 61, 802, 'Cafe de Albert', 'omurserdarr', 'iletisim@cafedealb.net', '4a8a08f09d37b73795649038408b5f33', '(541) 347 - 4150', 'Orta Mh. Yaylı Sk.', 1, 1, '2020-05-22 23:36:17');
 
 -- --------------------------------------------------------
 
@@ -1748,10 +1819,8 @@ CREATE TABLE `sepet` (
 --
 
 INSERT INTO `sepet` (`id`, `bireysel_id`, `kurumsal_id`, `envanter_id`, `adet`) VALUES
-(202, 2, 1, 1639, 1),
-(203, 2, 1, 1647, 1),
-(204, 2, 1, 1655, 1),
-(205, 2, 1, 1658, 1);
+(202, 2, 1, 1639, 2),
+(203, 2, 1, 1647, 1);
 
 -- --------------------------------------------------------
 
@@ -1780,10 +1849,11 @@ INSERT INTO `siparis` (`siparisKod`, `bireysel_id`, `kurumsal_id`, `durum_id`, `
 ('246830320760', 6, 9, 1, '2020-08-20 16:18:50', 38),
 ('262831638692', 2, 1, 4, '2020-07-18 19:30:23', 36.5),
 ('332623107400', 2, 2, 2, '2020-08-24 19:55:01', 59.5),
+('341415632765', 1, 1, 2, '2020-09-07 12:40:16', 35.5),
 ('388300193736', 2, 1, 4, '2020-08-23 15:46:41', 98),
 ('545634878626', 2, 1, 3, '2020-08-25 11:40:25', 75),
 ('624910290213', 1, 1, 4, '2020-08-19 20:36:41', 62.1),
-('832562958516', 1, 1, 2, '2020-08-24 19:55:59', 47.5),
+('832562958516', 1, 1, 3, '2020-08-24 19:55:59', 47.5),
 ('863941270336', 2, 2, 3, '2020-07-18 19:31:07', 33.5),
 ('872171344877', 1, 2, 4, '2020-08-24 19:56:43', 26),
 ('907680789186', 2, 2, 4, '2020-07-21 09:28:24', 30),
@@ -1849,7 +1919,9 @@ INSERT INTO `siparisDetay` (`siparisDetayId`, `siparisKod`, `envanter_id`, `adet
 (148, '872171344877', 1741, 2, 14),
 (149, '545634878626', 1633, 2, 34),
 (150, '545634878626', 1627, 2, 30),
-(151, '545634878626', 1681, 1, 11);
+(151, '545634878626', 1681, 1, 11),
+(154, '341415632765', 1561, 1, 17.5),
+(155, '341415632765', 1688, 2, 18);
 
 -- --------------------------------------------------------
 
@@ -2056,7 +2128,7 @@ ALTER TABLE `bireysel`
 -- AUTO_INCREMENT for table `degerlendirme`
 --
 ALTER TABLE `degerlendirme`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `envanter`
@@ -2074,13 +2146,13 @@ ALTER TABLE `kurumsal`
 -- AUTO_INCREMENT for table `sepet`
 --
 ALTER TABLE `sepet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
 
 --
 -- AUTO_INCREMENT for table `siparisDetay`
 --
 ALTER TABLE `siparisDetay`
-  MODIFY `siparisDetayId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `siparisDetayId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
 
 --
 -- AUTO_INCREMENT for table `siparisDurum`
