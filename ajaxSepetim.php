@@ -42,7 +42,7 @@ if($btn=="btnsepetEkle"){
            //kullanıcının sepetindeki kurumsallar bir diziye eklendi
            
            //aynı envid sepet sorgu 
-           $envsayisor=$db->prepare("select count(id) as envsayi from sepet where bireysel_id=:pbid and envanter_id=:penvid");
+           $envsayisor=$db->prepare("select count(id) as envsayi,adet from sepet where bireysel_id=:pbid and envanter_id=:penvid");
            $envsayisor->execute(array("pbid"=>$birid,"penvid"=>$id));
            $envsayicek=$envsayisor->fetch(PDO::FETCH_ASSOC);
            $envsayi=$envsayicek["envsayi"];
@@ -50,6 +50,12 @@ if($btn=="btnsepetEkle"){
            
            //aynı envid sepette varsa arttir
 	        if($envsayi>0){
+	            
+	            if($envsayicek["adet"]==5){
+	                echo "limit";
+	                exit;
+	            }
+	            
                     $sepetadetguncelle=$db->prepare("update sepet set adet=adet+1 where bireysel_id=:pbir and envanter_id=:penv");
                     $sepetadetguncelle->execute(array('pbir'=>$birid,'penv'=>$id));
                     //$_SESSION["sepet"][$sayac]["fiyat"]=$birimFiyat*$_SESSION["sepet"][$sayac]["adet"];

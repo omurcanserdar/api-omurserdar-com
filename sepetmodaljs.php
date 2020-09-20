@@ -194,6 +194,24 @@
                             $('.btnSepetim').trigger("click");
                                            
                             }
+                            else if(eklendiMi=="limit"){
+                                
+                            $("#sepetModal").unbind("shown.bs.modal");
+                            $("#sepetModal").modal("hide");
+                                
+                                var dilim=$.dialog({
+                                type:'purple',         
+                                title: ' <b class="text-warning"> Bilgilendirme <b> ',
+                                content: 'Limit değerine ulaşıldığından işlem gerçekleştirilemedi !',
+                                onClose: function () {
+                                    $('.btnSepetim').trigger("click");
+                                }
+                                });
+                                mesajKapat(dilim);  
+                                
+                                
+                                
+                            }
                                         
                             else{
                                 /*

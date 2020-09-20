@@ -355,6 +355,14 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                                                  });
                                             mesajKapat(diVardi);
                                         }
+                                        else if(eklendiMi=="limit"){
+                                           var diLimit=$.dialog({
+                                    type:'purple',
+                                title: '<b class="text-info"> <i class="fas fa-info"></i> Bilgilendirme <b>',
+                                content: 'Limit değerine ulaşıldığından işlem gerçekleştirilemedi !'
+                                                 });
+                                            mesajKapat(diLimit);
+                                        }
                                         else if(eklendiMi=="farkli"){
                                            var diFark=$.dialog({
                                     type:'orange',
