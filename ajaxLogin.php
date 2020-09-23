@@ -1,5 +1,6 @@
 <?php
 include "db.php";
+include "fonksiyonlar.php";
 $btn=strip_tags($_POST['secim']);
 if($btn=="btngirisyap"){
     try{
@@ -22,8 +23,38 @@ if($btn=="btngirisyap"){
             $_SESSION['kullanici_mail']=$kullanici_mail;
             $kullanicicek=$kullanicisor->fetch(PDO::FETCH_ASSOC);
             $_SESSION['kullanici_id']=$kullanicicek["id"];
+            $_SESSION['kullanici_token']=$kullanicicek["oturumToken"];
             //$_SESSION["sepet"]=array();
-	    //header("Location:/");
+	        //header("Location:/");
+	        
+	        
+	        
+	           $oTok=$kullanicicek["oturumToken"];
+    	       $cevrimDurum=1;
+    	       $ip=getIP();
+	         //burada eğer oturum tablosunda yoksa ekleme yapılacak
+	         $oturumkayitVarMi=$db->prepare("SELECT oturumToken FROM oturum where oturumToken=?");
+             $oturumkayitVarMi->execute(array($_SESSION['kullanici_token']));
+             if($oturumkayitVarMi->rowCount()==0){
+                //oturum ekleme
+    	        //oturum vtye ekle
+    	        $oturumEkle=$db->prepare("INSERT INTO oturum (oturumToken,cevrimiciMi,sonGirisIP) VALUES (?,?,?)");
+                $oturumEkle->execute([$oTok, $cevrimDurum, $ip]);
+    	        //son oturum vtye ekle
+    	        //son oturum ekleme
+             }
+             elseif($oturumkayitVarMi->rowCount()==1){
+                $oturumGuncelle=$db->prepare("UPDATE oturum SET cevrimiciMi=?,sonGirisIP=?,sonGirisTarih=? WHERE oturumToken=?");
+                $oturumGuncelle->execute([$cevrimDurum,$ip,date("Y-m-d H:i:s"),$oTok]);
+             }
+	        
+	       
+	        
+	        
+	        
+	        //eğer oturum tablosunda kayıt varsa bilgiler güncellenecek
+	        //
+	        
 		exit;
 	} 
 	else{

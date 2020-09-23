@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 13, 2020 at 06:10 PM
--- Server version: 10.3.23-MariaDB
+-- Generation Time: Sep 23, 2020 at 01:46 PM
+-- Server version: 10.3.24-MariaDB
 -- PHP Version: 7.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -1773,6 +1773,7 @@ CREATE TABLE `kurumsal` (
   `id` int(11) UNSIGNED NOT NULL,
   `il_id` tinyint(2) UNSIGNED NOT NULL,
   `ilce_id` smallint(5) UNSIGNED NOT NULL,
+  `oturumToken` varchar(32) COLLATE utf8_turkish_ci DEFAULT NULL,
   `ad` varchar(120) COLLATE utf8_turkish_ci NOT NULL,
   `kullaniciadi` varchar(40) COLLATE utf8_turkish_ci NOT NULL,
   `email` varchar(254) COLLATE utf8_turkish_ci NOT NULL,
@@ -1788,17 +1789,39 @@ CREATE TABLE `kurumsal` (
 -- Dumping data for table `kurumsal`
 --
 
-INSERT INTO `kurumsal` (`id`, `il_id`, `ilce_id`, `ad`, `kullaniciadi`, `email`, `sifre`, `ceptel`, `adres`, `minAlimTutar`, `acikMi`, `kayit_tarihi`) VALUES
-(1, 34, 422, 'Bamb cafe', 'cafebamb', 'bamb@cafebamb.com', '8a5da52ed126447d359e70c05721a8aa', '5413474141', 'Ayvansaray, Paşa Hamamı Cd. No:70', 15, 1, '2020-03-09 20:13:11'),
-(2, 34, 422, 'Balat Cafe Express ', 'cafebalat', 'balat@cafebalat.com', '8a5da52ed126447d359e70c05721a8aa', '5413474147', 'Balat, Yıldırım Cd. No:66', 25, 1, '2020-03-10 10:28:30'),
-(3, 34, 442, 'Karam Restaurant', 'karamrest', 'iletisim@karamrest.xyz', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474148', 'Batı Mh. Maltepe Sk. No:34', 40, 1, '2020-03-10 10:28:30'),
-(4, 61, 802, 'Sebat Lokanta', 'sebatlokanta', 'sebat@lokantasebat.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474144', 'İnönü Cad. Pulathane İş Merkezi', 20, 1, '2020-03-10 22:18:41'),
-(5, 61, 802, 'Nefs Köfte', 'nefskofte', 'nefs@nefskofte.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474146', 'Dürbinar, Milli Egemenlik Cd, No:9', 44, 0, '2020-03-10 22:18:41'),
-(6, 63, 835, 'Siverek Cafe', 'cafesiverek', 'cafesiv@siverek.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474143', 'Mumışığı Sk No:1', 27, 0, '2020-03-10 22:20:42'),
-(7, 63, 835, 'Dikk Launch', 'dikklaunch', 'mesaj@dikk.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474145', 'Hamamçimeni İş Merkezi No:22', 38, 0, '2020-03-10 22:20:42'),
-(8, 81, 951, 'Mut Tantuni', 'tantunimut', 'mut@tantuni.com', 'aa1c8371ebd158fb3966a146e5f9ed45', NULL, 'Şerefiye Mh İstanbul Cd. No:46', 5, 0, '2020-03-11 19:50:25'),
-(9, 81, 951, 'Beçi Lokanta', 'becilokanta', 'hesap@kurumsal.com', '8a5da52ed126447d359e70c05721a8aa', '5413474142', 'Orhangazi Mh. Necmi Hoşver Cad. No:22', 6, 1, '2020-03-11 19:50:25'),
-(53, 61, 802, 'Cafe de Albert', 'omurserdarr', 'iletisim@cafedealb.net', '4a8a08f09d37b73795649038408b5f33', '(541) 347 - 4150', 'Orta Mh. Yaylı Sk.', 1, 1, '2020-05-22 23:36:17');
+INSERT INTO `kurumsal` (`id`, `il_id`, `ilce_id`, `oturumToken`, `ad`, `kullaniciadi`, `email`, `sifre`, `ceptel`, `adres`, `minAlimTutar`, `acikMi`, `kayit_tarihi`) VALUES
+(1, 34, 422, '6a9zk2vkdhyd2tpeyczj3te4ujfkw1n8', 'Bamb cafe', 'cafebamb', 'bamb@cafebamb.com', '8a5da52ed126447d359e70c05721a8aa', '5413474141', 'Ayvansaray, Paşa Hamamı Cd. No:70', 15, 1, '2020-03-09 20:13:11'),
+(2, 34, 422, 'mjapad44klsh0zr0zvkzq1cxutshe0mt', 'Balat Cafe Express ', 'cafebalat', 'balat@cafebalat.com', '8a5da52ed126447d359e70c05721a8aa', '5413474147', 'Balat, Yıldırım Cd. No:66', 25, 1, '2020-03-10 10:28:30'),
+(3, 34, 442, 'o1zq6xx0wqvocyvv16yt8awpx7mplst3', 'Karam Restaurant', 'karamrest', 'iletisim@karamrest.xyz', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474148', 'Batı Mh. Maltepe Sk. No:34', 40, 1, '2020-03-10 10:28:30'),
+(4, 61, 802, 'ypiibhbg50yjg2nez8eyf3mqynkw2t3g', 'Sebat Lokanta', 'sebatlokanta', 'sebat@lokantasebat.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474144', 'İnönü Cad. Pulathane İş Merkezi', 20, 1, '2020-03-10 22:18:41'),
+(5, 61, 802, 'kndtoiyxsb0q8l8zc0ozrdhf8jmgjcrp', 'Nefs Köfte', 'nefskofte', 'nefs@nefskofte.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474146', 'Dürbinar, Milli Egemenlik Cd, No:9', 44, 0, '2020-03-10 22:18:41'),
+(6, 63, 835, '96uzk0jlfjj8p48ub4v0d5xfoyoga01f', 'Siverek Cafe', 'cafesiverek', 'cafesiv@siverek.com', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474143', 'Mumışığı Sk No:1', 27, 0, '2020-03-10 22:20:42'),
+(7, 63, 835, 'p6bquokfxn57cky4ov24mn5f7vq2u70w', 'Dikk Launch', 'dikklaunch', 'mesaj@dikk.net', 'aa1c8371ebd158fb3966a146e5f9ed45', '5413474145', 'Hamamçimeni İş Merkezi No:22', 38, 0, '2020-03-10 22:20:42'),
+(8, 81, 951, '5km3dqoi7k258m4a411t2csz9ooexj4y', 'Mut Tantuni', 'tantunimut', 'mut@tantuni.com', 'aa1c8371ebd158fb3966a146e5f9ed45', NULL, 'Şerefiye Mh İstanbul Cd. No:46', 5, 0, '2020-03-11 19:50:25'),
+(9, 81, 951, 'fbo5w2yaysrdawaldc36lml54oq9oj2a', 'Beçi Lokanta', 'becilokanta', 'hesap@kurumsal.com', '8a5da52ed126447d359e70c05721a8aa', '5413474142', 'Orhangazi Mh. Necmi Hoşver Cad. No:22', 6, 1, '2020-03-11 19:50:25'),
+(53, 61, 802, 'gpbwwl77wsfws73472mz38efcxmf1d2y', 'Cafe de Albert', 'omurserdarr', 'iletisim@cafedealb.net', '4a8a08f09d37b73795649038408b5f33', '(541) 347 - 4150', 'Orta Mh. Yaylı Sk.', 1, 1, '2020-05-22 23:36:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oturum`
+--
+
+CREATE TABLE `oturum` (
+  `oturumToken` varchar(32) COLLATE utf8_turkish_ci NOT NULL,
+  `cevrimiciMi` tinyint(1) NOT NULL,
+  `sonGirisTarih` datetime NOT NULL DEFAULT current_timestamp(),
+  `sonGirisIP` varchar(39) COLLATE utf8_turkish_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
+
+--
+-- Dumping data for table `oturum`
+--
+
+INSERT INTO `oturum` (`oturumToken`, `cevrimiciMi`, `sonGirisTarih`, `sonGirisIP`) VALUES
+('6a9zk2vkdhyd2tpeyczj3te4ujfkw1n8', 0, '2020-09-23 13:40:19', '159.146.41.161'),
+('fbo5w2yaysrdawaldc36lml54oq9oj2a', 0, '2020-09-23 13:09:38', '159.146.41.161'),
+('mjapad44klsh0zr0zvkzq1cxutshe0mt', 0, '2020-09-23 12:57:35', '159.146.41.161');
 
 -- --------------------------------------------------------
 
@@ -1819,8 +1842,9 @@ CREATE TABLE `sepet` (
 --
 
 INSERT INTO `sepet` (`id`, `bireysel_id`, `kurumsal_id`, `envanter_id`, `adet`) VALUES
-(202, 2, 1, 1639, 2),
-(203, 2, 1, 1647, 1);
+(203, 2, 1, 1647, 5),
+(213, 2, 1, 1552, 5),
+(214, 2, 1, 1561, 5);
 
 -- --------------------------------------------------------
 
@@ -2074,8 +2098,15 @@ ALTER TABLE `kurumsal`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
   ADD UNIQUE KEY `kullaniciadi` (`kullaniciadi`),
+  ADD UNIQUE KEY `oturumToken` (`oturumToken`),
   ADD KEY `il_id` (`il_id`),
   ADD KEY `ilce_id` (`ilce_id`);
+
+--
+-- Indexes for table `oturum`
+--
+ALTER TABLE `oturum`
+  ADD PRIMARY KEY (`oturumToken`);
 
 --
 -- Indexes for table `sepet`
@@ -2134,7 +2165,7 @@ ALTER TABLE `degerlendirme`
 -- AUTO_INCREMENT for table `envanter`
 --
 ALTER TABLE `envanter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2244;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2245;
 
 --
 -- AUTO_INCREMENT for table `kurumsal`
@@ -2146,7 +2177,7 @@ ALTER TABLE `kurumsal`
 -- AUTO_INCREMENT for table `sepet`
 --
 ALTER TABLE `sepet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=215;
 
 --
 -- AUTO_INCREMENT for table `siparisDetay`
@@ -2201,6 +2232,12 @@ ALTER TABLE `ilce`
 ALTER TABLE `kurumsal`
   ADD CONSTRAINT `kurumsal_ibfk_1` FOREIGN KEY (`il_id`) REFERENCES `il` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `kurumsal_ibfk_2` FOREIGN KEY (`ilce_id`) REFERENCES `ilce` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `oturum`
+--
+ALTER TABLE `oturum`
+  ADD CONSTRAINT `oturum_ibfk_1` FOREIGN KEY (`oturumToken`) REFERENCES `kurumsal` (`oturumToken`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `sepet`

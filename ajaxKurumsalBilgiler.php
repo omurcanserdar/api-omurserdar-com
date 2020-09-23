@@ -34,14 +34,13 @@ if(!empty($kumekurbilgi)){
     } ?>
         <? if($kurbilgi_ket["alim"]==1){
             $response.="<span class='badge badge-pill badge-success'><i class='fas fa-toggle-on'></i> Sipariş Verilebilir </span>";
-            $response.='<br/><button type="button" id="'.$kurbilgi_ket["envanterid"].'" style="font-size:18px" class="btnsepetEkle btn btn-outline-primary btn-outline btn-sm mt-2"><i class="fas fa-cart-plus"></i> EKLE </button>';
-            
+            $response.='<br/><a href="javascript:void(0);" id="'.$kurbilgi_ket["envanterid"].'" style="font-size:18px" class="btnsepetEkle mt-4 float-left" title="sepete ekle"><i class="fas fa-cart-plus fa-2x"></i> </a>';
         }
         else{
             $response.="<span class='badge badge-pill badge-danger'><i class='fas fa-toggle-off'></i> Sipariş Verilemez  </span>";
         }
-       $response.=" </div>
-</div>";
+       $response.='<a href="javascript:void(0);" style="font-size:18px;color:red" class="btnFavEkle mt-4 float-right" title="favorilere ekle"><i class="far fa-heart fa-2x"></i> </a></div>
+</div>';
  }
 }
         $response.="  </div>

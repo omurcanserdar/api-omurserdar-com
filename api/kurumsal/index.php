@@ -188,6 +188,7 @@ else if($istekMOD=="GET"){
              ORDER BY tabMenu.id");
             $tabAdveSayi->execute(array($kid));
             
+            //değerlendirme
     $yildiz=$db->query("SELECT degerlendirme.* FROM degerlendirme,siparis where degerlendirme.siparisKod=siparis.siparisKod and siparis.kurumsal_id='$kid'");
     
     if($yildiz->rowCount()>0){
@@ -197,6 +198,13 @@ else if($istekMOD=="GET"){
         $jsonArray["degerlendirme"]["sayi"]=$yildiz->rowCount();
         $jsonArray["degerlendirme"]["bilgiler"]=$yildiz->fetchAll(PDO::FETCH_ASSOC);
     }
+    //son değerlendirme
+    
+    //oturum
+    $oturumBilgiler=$db->prepare("SELECT oturum.* from oturum,kurumsal where oturum.oturumToken=kurumsal.oturumToken and kurumsal.id=?");
+    $oturumBilgiler->execute(array($kid));
+    $jsonArray["oturum"]=$oturumBilgiler->fetch(PDO::FETCH_ASSOC);
+    //son oturum
          
   
  $jsonArray["kurumsalTumTab"]=array();

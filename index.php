@@ -1,7 +1,8 @@
 <?php
  $title="Anasayfa | API";
  $desc="yiyecek/içecek siparişi verebilmek ya da satışa sunabilmek için geliştirilmiş API projesine ait anasayfa ";
- include "header.php";?>
+ include "header.php";
+ ?>
 <head>
 
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.all.js"> </script> sweetalert için js -->
@@ -232,6 +233,7 @@ $('.nav-pills a[href="#pills-cevrem"]').on('click',function(){
             var eklencek='';
                 $.each(cevil.ilegorebilgiler, function (i, item) {
                     //console.log(item);
+                    
                     var kurbilgi=item.kurumsalbilgileri;
                     var renk=random_item(renkler);
                     var butdurum="";
@@ -257,6 +259,21 @@ $('.nav-pills a[href="#pills-cevrem"]').on('click',function(){
                     
                     var mindurum='<span class="badge badge-pill badge-info">'+kurbilgi.minAlimTutar+' ₺</span>';
                     //son açık ya da kapalı bilgisi ve min alım tutar yazsın
+                    
+                    //oturum
+                    if(item.oturum){
+                        //eklencek+=""
+                        if(item.oturum.cevrimiciMi=="1")
+                            eklencek+='<span class="badge badge-pill badge-success"><i class="fas fa-user-check fa-2x"></i> Çevrimiçi</span>';
+                        else
+                            eklencek+='<span class="badge badge-pill badge-danger"><i class="fas fa-user-times fa-2x"></i> Çevrimdışı</span>';
+                        
+                    }
+                    //oturum bilgisi mevcut değilse
+                    else{
+                        eklencek+='<span class="badge badge-pill badge-warning"><i class="fas fa-question"></i></span>';
+                    }
+                    //son oturum
                     
                 eklencek+='<div class="card border-'+renk+' mb-2 mr-2" style="max-width: 18rem;">'+
                 '<div class="card-header"><span class="badge badge-pill badge-primary">'+kurbilgi.kullaniciadi+"</span> "+acikdurum+" "+mindurum+'</div><div class="card-body">'+
@@ -326,6 +343,7 @@ $( ".btnkurAd" ).on("mouseout",(function(){ $( this ).css( "font-size", "14px" )
 $(".btnsepetEkle").on("mouseover",(function(){ $( this ).css( "font-size", "22px" ); }));
 $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px" ); }));
 
+
                               //sepete Ekleme   
                                 $('.btnsepetEkle').on("click",function(){
                                         var pEnvId = $(this).attr('id');
@@ -382,6 +400,9 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                                         });
                               // SON sepete Ekleme 
                               
+                              //FAVORİ
+                                
+                              //SON FAVORİ
                               
                             },
                              complete:function(data){
@@ -2043,6 +2064,12 @@ $('.nav-tabs a[href="#nav-sil"]').on("click",function(){
                     for (i in dataTabKurEnv.kurumsalEnv){
             metin+='<div id="cardenv'+dataTabKurEnv.kurumsalEnv[i].envanterid+'" class="card border-'+random_item(renkler)+' mb-2 ml-2 col-md-4" style="max-width: 20rem;"><div class="card-body">';
             metin+='<h2 class="card-title text-'+random_item(renkler)+'"><span id="keid'+dataTabKurEnv.kurumsalEnv[i].envanterid+'" class="font-weight-bold">'+dataTabKurEnv.kurumsalEnv[i].ad+'<span></h2>';
+            
+            
+            
+             metin+='<div class="btn-group mt-1 ml-1"><button type="button" class="btn btn-outline-danger btn-sm dropdown-toggle float-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i> İşlemler</button><div class="dropdown-menu"><a href="javascript:void(0);" id="'+dataTabKurEnv.kurumsalEnv[i].ad+'" data-id="'+dataTabKurEnv.kurumsalEnv[i].envanterid+'" class="btnenvduzenle btnedid'+dataTabKurEnv.kurumsalEnv[i].envanterid+' dropdown-item"><i class="fas fa-edit"></i> Düzenle</a><a href="javascript:void(0);" id="'+dataTabKurEnv.kurumsalEnv[i].ad+'" data-id="'+dataTabKurEnv.kurumsalEnv[i].envanterid+'" class="btnenvsil btnesid'+dataTabKurEnv.kurumsalEnv[i].envanterid+' dropdown-item"><i class="fas fa-trash-alt"></i> Sil</a></div></div>';
+             
+
             if(dataTabKurEnv.kurumsalEnv[i].tanim!=" ")
                  metin+='<hr/><h4 id="envtanim'+dataTabKurEnv.kurumsalEnv[i].envanterid+'">Tanım: <span class="text-info">'+dataTabKurEnv.kurumsalEnv[i].tanim+'</span></h4>';
             else
@@ -2057,9 +2084,13 @@ $('.nav-tabs a[href="#nav-sil"]').on("click",function(){
             else
              metin+='<h3><span class="badge badge-success envalim'+dataTabKurEnv.kurumsalEnv[i].envanterid+'" data-id="1"><i class="fas fa-lock-open"></i> AÇIK - Sipariş Verilebilir</span></h3>';
             
+            /*
             metin+='<button type="button" id="'+dataTabKurEnv.kurumsalEnv[i].ad+'" data-id="'+dataTabKurEnv.kurumsalEnv[i].envanterid+'" class="btnenvduzenle btnedid'+dataTabKurEnv.kurumsalEnv[i].envanterid+' btn btn-outline-primary pr-2 mr-2"><i class="fas fa-edit"></i> Düzenle</button>';
             
             metin+='<button type="button" id="'+dataTabKurEnv.kurumsalEnv[i].ad+'" data-id="'+dataTabKurEnv.kurumsalEnv[i].envanterid+'" class="btnenvsil btnesid'+dataTabKurEnv.kurumsalEnv[i].envanterid+' btn btn-outline-danger pr-2 mr-2"><i class="fas fa-trash-alt"></i> Sil</button> </div></div>';
+            */
+            metin+="</div></div>";
+            
                             }//for
                             $(".sipenvDiv").html(metin+"</div>");
 

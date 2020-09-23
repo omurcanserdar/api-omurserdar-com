@@ -57,10 +57,13 @@
       
       
       <li class="nav-item">
-       <a class="nav-link" style="color:white" href="/kurumsallar"><i class="fas fa-store-alt"></i> Kurumsallar</a> 
-       <!--<a class="nav-link" style="color:white" href="/raporlar"><i class="fas fa-file"></i> Raporlar</a> -->
+       <a class="nav-link" style="color:white" href="/kurumsallar"><i class="fas fa-store-alt"></i> Kurumsallar</a>
+       </li>
+       <li class="nav-item">
+       <a class="nav-link" style="color:white" href="/raporlar"><i class="fas fa-file"></i> Raporlar</a>
       </li>
-      <!-- 
+       
+       <!--
       <li class="nav-item">
           <a class="nav-link" style="color:white" target="_blank" href="https://github.com/omurserdarr"><i class="fab fa-github"></i> omurserdarr</a>
       </li>  
