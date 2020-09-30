@@ -207,6 +207,26 @@ and bireysel.id='$bid' or email='$bemail'")->fetch(PDO::FETCH_ASSOC);
              $jsonArray["bireyselbilgileri"] = $birbilgiler;
              unset($jsonArray["bireyselbilgileri"]["sifre"]);
             // $jsonArray["sepet"]=null;
+             
+             //favori
+             //daha önce envantere bireysel favori yapmış mı
+                $sorgu=$db->prepare("SELECT COUNT(bireysel_id) as varmi FROM favori where bireysel_id=?");
+                $sorgu->execute(array($bid));
+                $cek=$sorgu->fetch(PDO::FETCH_ASSOC);
+                if($cek["varmi"]>0){
+                     $favsor=$db->prepare("SELECT favori.*,envanter.ad as envad,kurumsal.ad as kad,tabMenu.ad as tad
+                     FROM bireysel,favori,envanter,tabMenu,kurumsal
+                     WHERE bireysel.id=favori.bireysel_id 
+                     AND tabMenu.id=envanter.tabMenu_id
+                     AND kurumsal.id=tabMenu.kurumsal_id
+                     AND envanter.id=favori.envanter_id
+                     AND bireysel_id=? ORDER BY favori.eklenmeTarih DESC");
+                     $favsor->execute([$bid]);
+                     $jsonArray["favoriler"]=$favsor->fetchAll(PDO::FETCH_ASSOC);
+                }
+             //son favori
+             
+             
              $httpKOD = 200;
              }else {
                  $httpKOD = 200;

@@ -6,7 +6,8 @@ RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
 
 #cikis
 RewriteRule ^kurumsal/([a-zA-Z-0-9-]+)$ kurumsaldetay.php?username=$1
-#RewriteRule ^degerlendir/([0-9]+)$ siparisdegerlendir.php?sipkod=$1
+RewriteRule ^api/favori/([0-9]+)$ api/favori/index.php?id=$1 
+#RewriteRule ^api/favori/([^.?]+)$ api/favori/index.php?id=$1 [QSA,NC,L]
 RewriteRule ^kurumsallar$ kurumsallar.php [NC] 
 RewriteRule ^sifreislem$ sifre.php [NC]
 RewriteRule ^cikis$ cikis.php [NC] 

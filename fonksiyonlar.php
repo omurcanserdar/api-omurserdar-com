@@ -197,11 +197,11 @@ function sesYoksaCik($param,$deger=null){
     session_start();
     if(!isset($_SESSION[$param])||$_SESSION[$param]!=$deger){
         $jsonArray=array();
-        $httpKOD = 403; //forbidden
+        $httpKOD = 401; //unauthorized
         SetHeader($httpKOD);
         $jsonArray[$httpKOD] = HttpStatus($httpKOD);
         $jsonArray["hata"]=true;
-        $jsonArray["mesaj"]="oturumhata";
+        $jsonArray["mesaj"]="yetkiyok";
         echo json_encode($jsonArray);
         exit;
     }

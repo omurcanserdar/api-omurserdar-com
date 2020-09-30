@@ -25,6 +25,9 @@
   <li class="nav-item">
     <a class="nav-link" id="pills-siparislerim-tab" data-toggle="pill" href="#pills-siparislerim" role="tab" aria-controls="pills-siparislerim" aria-selected="false"><i class="fas fa-history"></i> Siparişlerim</a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" id="pills-favorilerim-tab" data-toggle="pill" href="#pills-favorilerim" role="tab" aria-controls="pills-favorilerim" aria-selected="false"><i class="fas fa-heart"></i> Favorilerim</a>
+  </li>
    <li class="nav-item">
     <a class="nav-link" id="pills-bilgilerim-tab" data-toggle="pill" href="#pills-bilgilerim" role="tab" aria-controls="pills-bilgilerim" aria-selected="false"><i class="fas fa-user"></i> Bilgilerim</a>
   </li>
@@ -399,11 +402,7 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
                                  });
                                         });
                               // SON sepete Ekleme 
-                              
-                              //FAVORİ
-                                
-                              //SON FAVORİ
-                              
+   
                             },
                              complete:function(data){
                                $(".loader").hide();
@@ -416,6 +415,136 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
         }); //ajax
     }); //click 
       
+          </script>
+          
+          <script>
+              
+              //FAVORİ EKLEME btnFavEkle(ajaxKurumsal sayfadan)
+     $(document).on('click', ".btnFavEkle", function() {
+      var nesne=$(this);
+      var envid=nesne.attr("id");
+      var userid=$("#userid").attr("data-id");
+      var diaFavEkleBekle=$.dialog({
+                    content:'İşlem Gerçekleştiriliyor...',
+                    lazyOpen: true
+      });
+      //fav ajax post
+        $.ajax({
+            method: 'POST',
+            url : "https://www.api.omurserdar.com/api/favori/index.php",
+            data : {envid:envid,birid:userid},
+            beforeSend:function(){
+                diaFavEkleBekle.open();
+            },
+            success: function(data){
+                diaFavEkleBekle.close();
+                
+                //data=JSON.parse(data);
+                if(data.mesaj=="eklendi"){  
+                    var diFavEkle=$.dialog({
+                        type:'green',
+                        title: '<b class="text-success"> H A R İ K A <b>',
+                        content: '<b class="text-dark"> Favorilere eklendi </b>',
+                    });
+                    mesajKapat(diFavEkle);
+                    //$('.nav-pills a[href="#pills-siparislerim"]').trigger('click');
+                    //ekleme sonrası butondaki değişiklikler
+                    nesne.children().removeClass();
+                    nesne.children().addClass("fas fa-heart fa-2x");
+                    //nesne.removeClass("btnFavEkle");
+                    //nesne.addClass("btnFavCikar");
+                    nesne.attr("class","btnFavCikar mt-4 float-right");
+                    nesne.attr("title","favorilerimden çıkar");
+                    //son ekleme sonrası butondaki değişiklikler
+                }
+                else if(data.mesaj=="mevcut"){
+                    var diFavVar=$.dialog({
+                        type:'purple',         
+                        title: ' <b class="text-warning"> N O T <b> ',
+                        content: 'Zaten Favorilenmiş !',
+                        });
+                    mesajKapat(diFavVar,3000);            
+                }
+                else{
+                    $.dialog({
+                        type:'red',
+                        title: ' <b class="text-danger text-center"> H A T A <b> ',
+                        content: 'İşlem Gerçekleştirilemedi :( !',
+                            });
+                    }
+            }
+        });
+      //son fav ajax post
+      //SON FAVORİ EKLEME
+    
+    
+    
+    //FAVORİ ÇIKAR
+    });
+    
+    $(document).on('click', ".btnFavCikar", function() {
+        var nesne=$(this);
+        var favenvid=nesne.attr("id");
+        
+        //ajax öncesi bekleme sırasında mesaj gösterimi icin
+        //lazyOpen ile ekrana basılma işlemi iptal edilir
+        var diaFavSilBekle=$.dialog({
+            content:'İşlem Gerçekleştiriliyor...',
+            lazyOpen: true
+        });
+        //
+        
+        $.ajax({
+            method: 'DELETE',
+            url : "https://www.api.omurserdar.com/api/favori/"+favenvid,
+             beforeSend: function() {
+                //istek öncesi yükleme mesajı göstermek için 
+                diaFavSilBekle.open();
+                  
+            },
+            success: function(apifavsil){
+                
+                //istek sonucunda yükleme mesajı kapatmak için
+                diaFavSilBekle.close();
+                
+                if(apifavsil.mesaj=="silindi"){
+                                        
+                    nesne.children().removeClass();
+                    nesne.children().addClass("far fa-heart fa-2x");
+                    //nesne.removeClass("btnFavEkle");
+                    //nesne.addClass("btnFavCikar");
+                    nesne.attr("class","btnFavEkle mt-4 float-right");
+                    nesne.attr("title","favorilerime ekle");                    
+                                        
+                    var diaFavSil=$.dialog({
+                        type:'dark',
+                        title: '<b class="text-danger">Silindi</b>',
+                        content:  "<b class='text-dark'> Favorilerden kaldırıldı </b>"
+        /*
+                        onOpenBefore: function () {
+                            diaFavSil.showLoading();
+                        },
+                        onContentReady: function () {
+                            diaFavSil.hideLoading();
+                        }
+        
+                        onClose: function () {
+                                       //sildikten sonra tab click tetiklen
+                        $('.nav-pills a[href="#pills-siparislerim"]').trigger("click");
+                                    }
+        */
+                            });
+                                mesajKapat(diaFavSil);
+                            }
+                                        
+            } //delete success
+        }); //ajax
+
+         
+     });
+    
+    //SON FAVORİ ÇIKAR
+              
           </script>
          
                 
@@ -1111,6 +1240,45 @@ $(".btnsepetEkle" ).on("mouseout",(function(){ $( this ).css( "font-size", "18px
   </script>
   <!-- SON SİPARİSLERİM JS -->
   
+  <!-- HTML FAVS -->
+  <div class="tab-pane" id="pills-favorilerim" role="tabpanel" aria-labelledby="pills-favorilerim-tab">
+    <div class="btbirfav"></div>
+    <div class="birfavscontent"></div>  
+     
+  </div>
+  <!-- SON HTML FAVS -->
+  
+  <!-- BİR FAVORİLERİM JS -->
+  <script>
+  
+        $('.nav-pills a[href="#pills-favorilerim"]').on('click', function(){
+             spinekle(".btbirfav");
+             
+             var birid=$(".bid").data("id");
+               $.ajax({
+            method: 'GET',
+            url : "https://www.api.omurserdar.com/api/bireysel/index.php",
+            data : {id:birid},
+            contentType: "application/json",
+            success: function(dataBirBilgiFavs){
+               spinkaldir(".btbirfav");
+               
+               if(dataBirBilgiFavs.favoriler){
+                var conteklencek='';
+                $.each(dataBirBilgiFavs.favoriler,function(i,item){
+                    conteklencek+=item.envad+"<br>";
+                });
+                   
+                $(".birfavscontent").html(conteklencek);
+               }else{
+                   $(".birfavscontent").html("<div class='alert alert-info'>Daha önce herhangi bir envanter favorilere eklenmemiş</div>");
+               }
+            }
+            });
+           });
+      
+  </script>
+  <!-- SON BİR FAVORİLERİM JS -->
   
   <div class="tab-pane" id="pills-bilgilerim" role="tabpanel" aria-labelledby="pills-bilgilerim-tab">
        <div class="bid" data-id="<?=$_SESSION["kullanici_id"]?>"></div>

@@ -1,4 +1,5 @@
 <?php
+session_start(); //favorilerim icin eklendi
 include "db.php";
 if(isset($_POST["id"]))
     $id=strip_tags($_POST["id"]); //id güvenlik kontrolü
@@ -9,6 +10,25 @@ $jsonverilerim = json_decode($json, true);
 $kumekurbilgi=$jsonverilerim["kurumsalbilgileri"];
 $kumekurbilgikurtab=$jsonverilerim["kurumsalTab"];
 $kumekurbilgi_kurenvtab=$jsonverilerim["kurumsalEnv"];
+
+//favori icin
+$sesid=$_SESSION["kullanici_id"];
+$urlfav = "https://api.omurserdar.com/api/bireysel?id=$sesid";
+$jsonfav = file_get_contents($urlfav);
+$jsonverilerimfav = json_decode($jsonfav, true);
+$favoriler=$jsonverilerimfav["favoriler"];
+
+if(count($favoriler)>0){
+    $favsEnvDizi=array();
+    foreach($favoriler as $favs){
+        array_push($favsEnvDizi,$favs["envanter_id"]);
+    }
+}
+//son favori icin
+
+
+
+
 if(!empty($kumekurbilgi)){
     $response='<div class="row text-center">';
     $sayac=1;
@@ -39,8 +59,26 @@ if(!empty($kumekurbilgi)){
         else{
             $response.="<span class='badge badge-pill badge-danger'><i class='fas fa-toggle-off'></i> Sipariş Verilemez  </span>";
         }
-       $response.='<a href="javascript:void(0);" style="font-size:18px;color:red" class="btnFavEkle mt-4 float-right" title="favorilere ekle"><i class="far fa-heart fa-2x"></i> </a></div>
-</div>';
+        
+        //favs
+        /*
+            for($i=0;$i<count($favsEnvDizi);$i++){
+                if($kurbilgi_ket["envanterid"]==$favsEnvDizi[$i]){
+                    $response.='<a href="javascript:void(0);" id="'.$kurbilgi_ket["envanterid"].'" style="font-size:18px;color:red" class="btnFavCikar mt-4 float-right" title="favorilerimden çıkar"><i class="fas fa-heart fa-2x"></i></a>';
+                }
+            }*/
+            
+            if(in_array($kurbilgi_ket["envanterid"],$favsEnvDizi)){
+                  $response.='<a href="javascript:void(0);" id="'.$kurbilgi_ket["envanterid"].'" style="font-size:18px;color:red" class="btnFavCikar mt-4 float-right" title="favorilerimden çıkar"><i class="fas fa-heart fa-2x"></i></a>';
+            }
+            else{
+                $response.='<a href="javascript:void(0);" id="'.$kurbilgi_ket["envanterid"].'" style="font-size:18px;color:red" class="btnFavEkle mt-4 float-right" title="favorilerime ekle"><i class="far fa-heart fa-2x"></i></a>';
+            }
+                
+            
+        //son favs
+        $response.="</div></div>";
+       
  }
 }
         $response.="  </div>

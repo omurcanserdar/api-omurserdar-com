@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 23, 2020 at 01:46 PM
+-- Generation Time: Sep 30, 2020 at 09:38 AM
 -- Server version: 10.3.24-MariaDB
 -- PHP Version: 7.3.6
 
@@ -680,6 +680,44 @@ INSERT INTO `envanter` (`id`, `tabMenu_id`, `ad`, `tanim`, `fiyat`, `alinabilirM
 (2000, 68, 'Naneli Ayran', NULL, 3.5, 1),
 (2001, 69, 'Yeşil Detoks (40 cl.)', ' Ispanak, yeşil elma, salatalık, limon, kereviz sapı\r', 10, 1),
 (2002, 69, 'Gaji Detoks (40 cl.)', ' Portakal suyu, goji üzümü, muz\r', 12, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `favori`
+--
+
+CREATE TABLE `favori` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `bireysel_id` int(11) UNSIGNED NOT NULL,
+  `envanter_id` int(11) NOT NULL,
+  `eklenmeTarih` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
+
+--
+-- Dumping data for table `favori`
+--
+
+INSERT INTO `favori` (`id`, `bireysel_id`, `envanter_id`, `eklenmeTarih`) VALUES
+(16, 2, 1564, '2020-09-25 01:47:35'),
+(17, 2, 1581, '2020-09-25 01:48:17'),
+(18, 2, 1583, '2020-09-25 01:48:21'),
+(19, 2, 1641, '2020-09-25 01:49:09'),
+(20, 2, 1642, '2020-09-25 01:49:18'),
+(22, 2, 1566, '2020-09-25 01:53:11'),
+(24, 2, 1582, '2020-09-25 01:56:38'),
+(28, 2, 1565, '2020-09-25 02:02:33'),
+(37, 2, 1643, '2020-09-25 08:52:31'),
+(79, 2, 1731, '2020-09-25 11:57:12'),
+(83, 2, 1732, '2020-09-25 11:58:06'),
+(93, 2, 1729, '2020-09-25 12:00:43'),
+(94, 2, 1737, '2020-09-25 12:00:51'),
+(96, 1, 1728, '2020-09-25 12:32:21'),
+(97, 1, 1729, '2020-09-25 12:32:24'),
+(98, 1, 1567, '2020-09-25 12:32:35'),
+(108, 2, 1740, '2020-09-28 13:39:27'),
+(109, 2, 1741, '2020-09-28 13:39:38'),
+(110, 2, 1742, '2020-09-28 13:39:41');
 
 -- --------------------------------------------------------
 
@@ -1819,7 +1857,7 @@ CREATE TABLE `oturum` (
 --
 
 INSERT INTO `oturum` (`oturumToken`, `cevrimiciMi`, `sonGirisTarih`, `sonGirisIP`) VALUES
-('6a9zk2vkdhyd2tpeyczj3te4ujfkw1n8', 0, '2020-09-23 13:40:19', '159.146.41.161'),
+('6a9zk2vkdhyd2tpeyczj3te4ujfkw1n8', 0, '2020-09-23 15:44:32', '159.146.41.161'),
 ('fbo5w2yaysrdawaldc36lml54oq9oj2a', 0, '2020-09-23 13:09:38', '159.146.41.161'),
 ('mjapad44klsh0zr0zvkzq1cxutshe0mt', 0, '2020-09-23 12:57:35', '159.146.41.161');
 
@@ -1842,9 +1880,7 @@ CREATE TABLE `sepet` (
 --
 
 INSERT INTO `sepet` (`id`, `bireysel_id`, `kurumsal_id`, `envanter_id`, `adet`) VALUES
-(203, 2, 1, 1647, 5),
-(213, 2, 1, 1552, 5),
-(214, 2, 1, 1561, 5);
+(213, 2, 1, 1552, 3);
 
 -- --------------------------------------------------------
 
@@ -2079,6 +2115,14 @@ ALTER TABLE `envanter`
   ADD KEY `tabMenu_id` (`tabMenu_id`);
 
 --
+-- Indexes for table `favori`
+--
+ALTER TABLE `favori`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `bireysel_id` (`bireysel_id`),
+  ADD KEY `envanter_id` (`envanter_id`);
+
+--
 -- Indexes for table `il`
 --
 ALTER TABLE `il`
@@ -2168,6 +2212,12 @@ ALTER TABLE `envanter`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2245;
 
 --
+-- AUTO_INCREMENT for table `favori`
+--
+ALTER TABLE `favori`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+
+--
 -- AUTO_INCREMENT for table `kurumsal`
 --
 ALTER TABLE `kurumsal`
@@ -2177,7 +2227,7 @@ ALTER TABLE `kurumsal`
 -- AUTO_INCREMENT for table `sepet`
 --
 ALTER TABLE `sepet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=215;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
 
 --
 -- AUTO_INCREMENT for table `siparisDetay`
@@ -2219,6 +2269,13 @@ ALTER TABLE `degerlendirme`
 --
 ALTER TABLE `envanter`
   ADD CONSTRAINT `envanter_ibfk_1` FOREIGN KEY (`tabMenu_id`) REFERENCES `tabMenu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `favori`
+--
+ALTER TABLE `favori`
+  ADD CONSTRAINT `favori_ibfk_2` FOREIGN KEY (`envanter_id`) REFERENCES `envanter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `favori_ibfk_3` FOREIGN KEY (`bireysel_id`) REFERENCES `bireysel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `ilce`
